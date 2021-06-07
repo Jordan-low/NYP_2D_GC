@@ -73,13 +73,15 @@ public:
 
 	bool CheckQuantity(string itemName);
 
-	void ReduceQuantity(string itemName);
+	void ReduceQuantity(string itemName, int quantity);
 
 	int ConvertItemNameToBlockNumber(string itemName);
 
 	void ResetPosition();
 
 	void UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string itemName);		// Update Placing/Harvesting Blocks using mouse position
+
+	void UpdateSeeds(double dt);
 
 	glm::vec2 playerOffset;
 

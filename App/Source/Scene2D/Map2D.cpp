@@ -424,19 +424,22 @@ bool CMap2D::SaveMap(string filename, const unsigned int uiCurLevel)
 }
 
 /**
- @brief create a new default map
+ @brief generate a new random map
  @param filename A string variable containing the name of the world
  */
 bool CMap2D::GenerateNewMap(string worldName)
 {
 	LoadNewMap("Maps/" + worldName + ".csv");
-	LoadPresetMap();
+	GenerateRandomMap();
 	SaveMap("Maps/" + worldName + ".csv");
-	//cout << "TOTAL MAPS: " << totalWorlds << endl;
 	return true;
 }
 
-bool CMap2D::LoadNewMap(string filename, const unsigned int uiLevel)
+/**
+ @brief Load a new default map
+ @param filename A string variable containing the name of the world
+ */
+bool CMap2D::LoadNewMap(string filename)
 {
 	doc = rapidcsv::Document(FileSystem::getPath("Maps/DEFAULT.csv").c_str());
 
@@ -464,7 +467,10 @@ bool CMap2D::LoadNewMap(string filename, const unsigned int uiLevel)
 	return true;
 }
 
-bool CMap2D::LoadPresetMap()
+/**
+@brief Generate a fully loaded random map
+*/
+bool CMap2D::GenerateRandomMap()
 {
 	int current = 20;
 	for (int i = 3; i < 100; i++)
@@ -491,109 +497,6 @@ bool CMap2D::LoadPresetMap()
 			}
 		}
 	}
-
-	return true;
-}
-
-bool CMap2D::SpawnRandomBlock(string filename)
-{
-	unsigned int randomX = rand() % 20 + 1;
-	unsigned int randomY = rand() % 20 + 1;
-
-	arrMapInfo[uiCurLevel][randomX][randomY].value = 1;
-
-	doc.SetCell(randomX, randomY, arrMapInfo[uiCurLevel][randomX][randomY].value);
-
-	// Save the rapidcsv::Document to a file
-	doc.Save(FileSystem::getPath(filename).c_str());
-
-	return true;
-}
-
-bool CMap2D::SpawnBlock(string filename, int x, int y, int block)
-{
-	arrMapInfo[uiCurLevel][x][y].value = block;
-
-	doc.SetCell(x, y, arrMapInfo[uiCurLevel][x][y].value);
-
-	// Save the rapidcsv::Document to a file
-	doc.Save(FileSystem::getPath(filename).c_str());
-
-	return true;
-}
-
-bool CMap2D::SpawnBlockByMousePosition(string filename, double x, double y, int block)
-{
-	double mouseToScreenPosX = x / 1280 * 32;
-	double mouseToScreenPosY = y / 720 * 24;
-
-	if (mouseToScreenPosX < 0)
-	{
-		mouseToScreenPosX = 0;
-	}
-	if (mouseToScreenPosX > 32)
-	{
-		mouseToScreenPosX = 32;
-	}
-	if (mouseToScreenPosY < 0)
-	{
-		mouseToScreenPosY = 0;
-	}
-	if (mouseToScreenPosY > 24)
-	{
-		mouseToScreenPosY = 24;
-	}
-
-	arrMapInfo[uiCurLevel][(int)mouseToScreenPosY][(int)mouseToScreenPosX].value = block;
-
-	doc.SetCell((int)mouseToScreenPosY, (int)mouseToScreenPosX, arrMapInfo[uiCurLevel][(int)mouseToScreenPosY][(int)mouseToScreenPosX].value);
-
-	// Save the rapidcsv::Document to a file
-	doc.Save(FileSystem::getPath(filename).c_str());
-
-	return true;
-}
-
-bool CMap2D::DeSpawnBlock(string filename, int x, int y, int block)
-{
-	arrMapInfo[uiCurLevel][y][x].value = block;
-
-	doc.SetCell(y, x, arrMapInfo[uiCurLevel][y][x].value);
-
-	// Save the rapidcsv::Document to a file
-	doc.Save(FileSystem::getPath(filename).c_str());
-
-	return true;
-}
-
-bool CMap2D::DeSpawnBlockByMousePosition(string filename, double x, double y)
-{
-	double mouseToScreenPosX = x / 1280 * 32;
-	double mouseToScreenPosY = y / 720 * 24;
-
-	if (mouseToScreenPosX < 0)
-	{
-		mouseToScreenPosX = 0;
-	}
-	if (mouseToScreenPosX > 32)
-	{
-		mouseToScreenPosX = 32;
-	}
-	if (mouseToScreenPosY < 0)
-	{
-		mouseToScreenPosY = 0;
-	}
-	if (mouseToScreenPosY > 24)
-	{
-		mouseToScreenPosY = 24;
-	}
-
-	arrMapInfo[uiCurLevel][(int)mouseToScreenPosY][(int)mouseToScreenPosX].value = 0;
-
-	doc.SetCell((int)mouseToScreenPosY, (int)mouseToScreenPosX, arrMapInfo[uiCurLevel][(int)mouseToScreenPosY][(int)mouseToScreenPosX].value);
-
-	// Save the rapidcsv::Document to a file
-	doc.Save(FileSystem::getPath(filename).c_str());
 
 	return true;
 }
@@ -700,33 +603,49 @@ void CMap2D::RenderTile(const unsigned int uiRow, const unsigned int uiCol)
 	}
 }
 
+/**
+ @brief Return world name vector list
+ */
 vector<string> CMap2D::GetWorldNameList()
 {
 	return worldNameList;
 }
 
+/**
+ @brief Get total worlds generated
+ */
 int CMap2D::GetTotalWorldsGenerated()
 {
 	return totalWorlds;
 }
 
+/**
+ @brief Set total worlds generated
+ */
 void CMap2D::SetTotalWorldsGenerated(int num)
 {
 	totalWorlds = num;
 }
 
-void CMap2D::UpdateSeed(string name, double dt, int blockIndex, int resultBlockIndex, float timer)
+/**
+ @brief Update individual seed timer
+ @param name (Optional) A string for item name, for reference only.
+ @param dt Delta time
+ @param blockNumber The seed's block number to be updated
+ @param timer A float value for how long it takes for the seed to grow
+ */
+void CMap2D::UpdateSeed(string itemName, double dt, int blockNumber, float timer)
 {
 	for (unsigned int uiRow = 0; uiRow < cSettings->NUM_TILES_YAXIS; uiRow++)
 	{
 		for (unsigned int uiCol = 0; uiCol < cSettings->NUM_TILES_XAXIS; uiCol++)
 		{
-			if (arrMapInfo[uiCurLevel][uiRow][uiCol].value == blockIndex)
+			if (arrMapInfo[uiCurLevel][uiRow][uiCol].value == blockNumber)
 			{
 				arrMapInfo[uiCurLevel][uiRow][uiCol].timer += dt;
 				if (arrMapInfo[uiCurLevel][uiRow][uiCol].timer > timer)
 				{
-					arrMapInfo[uiCurLevel][uiRow][uiCol].value = resultBlockIndex;
+					arrMapInfo[uiCurLevel][uiRow][uiCol].value = blockNumber + 1;
 					SetSaveMapInfo(uiRow, uiCol, arrMapInfo[uiCurLevel][uiRow][uiCol].value, false);
 					arrMapInfo[uiCurLevel][uiRow][uiCol].timer = 0;
 				}

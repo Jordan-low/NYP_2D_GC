@@ -231,10 +231,10 @@ void CScene2D::Update(const double dElapsedTime)
 	}
 
 	//update CMap2D
-	cMap2D->Update(dElapsedTime);
-	cMap2D->UpdateSeed("GrassTree", dElapsedTime, 100, 101, 2);
-	cMap2D->UpdateSeed("DirtTree", dElapsedTime, 102, 103, 2);
-	//cMap2D->UpdateSeed(dElapsedTime, 1, 2, 2);
+	//cMap2D->Update(dElapsedTime);
+	
+	//Update seeds timer
+	cPlayer2D->UpdateSeeds(dElapsedTime);
 
 	if (cKeyboardController->IsKeyReleased(GLFW_KEY_1))
 	{

@@ -108,11 +108,11 @@ bool CPlayer2D::Init(void)
 	// Find the indices for the player in arrMapInfo, and assign it to cPlayer2D
 	unsigned int uiRow = -1;
 	unsigned int uiCol = -1;
-	if (cMap2D->FindValue(200, uiRow, uiCol) == false)
+	if (cMap2D->FindValue(201, uiRow, uiCol) == false)
 		return false;	// Unable to find the start position of the player, so quit this game
 
 	// Erase the value of the player in the arrMapInfo
-	cMap2D->SetMapInfo(uiRow, uiCol, 0);
+	//cMap2D->SetMapInfo(uiRow, uiCol, 0);
 
 	// Set the start position of the Player to iRow and iCol
 	i32vec2Index = glm::i32vec2(uiCol, uiRow);
@@ -877,11 +877,12 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 }
 
 /**
- @brief Let player interact with the map. You can add collectibles such as powerups and health here.
+ @brief Harvest fully grown trees for item blocks
+ @param x An int for positionX to harvest
+ @param y An int for positionY to harvest
  */
 void CPlayer2D::Harvest(int x, int y)
 {
-	std::cout << "BLOCK: " << (cMap2D->GetMapInfo(y, x, false)) << std::endl;
 	switch (cMap2D->GetMapInfo(y, x, false))
 	{
 	case 101:
@@ -905,6 +906,10 @@ void CPlayer2D::Harvest(int x, int y)
 	}
 }
 
+/**
+ @brief Return the item block's quantity
+ @param itemName A string for item block name
+ */
 bool CPlayer2D::CheckQuantity(string itemName)
 {
 	cInventoryItem = cInventoryManager->GetItem(itemName);
@@ -913,14 +918,23 @@ bool CPlayer2D::CheckQuantity(string itemName)
 	return false;
 }
 
-void CPlayer2D::ReduceQuantity(string itemName)
+/**
+ @brief Reduce item block quantity by a set amount
+ @param itemName A string for item block name
+ @param quantity An int for the amount of quantity to reduce
+ */
+void CPlayer2D::ReduceQuantity(string itemName, int quantity)
 {
 	if (itemName == "none")
 		return;
 	cInventoryItem = cInventoryManager->GetItem(itemName);
-	cInventoryItem->Remove(1);
+	cInventoryItem->Remove(quantity);
 }
 
+/**
+ @brief Convert item block name to block number
+ @param itemName A string for the item name
+ */
 int CPlayer2D::ConvertItemNameToBlockNumber(string itemName)
 {
 	if (itemName == "Bedrock")
@@ -960,7 +974,10 @@ int CPlayer2D::ConvertItemNameToBlockNumber(string itemName)
 	//}
 }
 
-//Update Jump or Fall
+/**
+ @brief Update player's jump and fall
+ @param dElapsedTime A double for delta time
+ */
 void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 {
 	if (cPhysics2D.GetStatus() == CPhysics2D::STATUS::JUMP)
@@ -1066,7 +1083,9 @@ void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 	}
 }
 
-
+/**
+ @brief Check for player is in mid air
+ */
 bool CPlayer2D::IsMidAir()
 {
 	//if player is at the bottom row, skip
@@ -1080,6 +1099,10 @@ bool CPlayer2D::IsMidAir()
 	return false;
 }
 
+/**
+ @brief Check for player's collision at both the left and right ends
+ @param eDirection An enum for player's direction
+ */
 bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
 {
 	if (eDirection == LEFT)
@@ -1205,6 +1228,10 @@ bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
 	return false;
 }
 
+/**
+ @brief Check for player's collision in general central area
+ @param eDirection An enum for player's direction
+ */
 bool CPlayer2D::Collision(DIRECTION eDirection)
 {
 	if (eDirection == LEFT)
@@ -1334,6 +1361,9 @@ bool CPlayer2D::Collision(DIRECTION eDirection)
 	return false;
 }
 
+/**
+ @brief Reset player position to the door's position
+ */
 void CPlayer2D::ResetPosition()
 {
 	//reset player pos to door
@@ -1356,9 +1386,18 @@ void CPlayer2D::ResetPosition()
 	cMap2D->mapOffset_MicroSteps = glm::vec2(0.0f);
 }
 
+/**
+ @brief Update mouse clicks
+ @param mouseClick An enum for which mouse click used
+ @param dt Delta time
+ @param x A double value for mouse position X
+ @param y A double value for mouse position Y
+ */
 void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string itemName)
 {
-	if (itemName == "")
+	if (x >= cSettings->NUM_TILES_XAXIS || x < 0)
+		return;
+	else if (y >= cSettings->NUM_TILES_YAXIS || y < 0)
 		return;
 
 	int blockNumber = ConvertItemNameToBlockNumber(itemName);
@@ -1366,6 +1405,9 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 	switch (mouseClick)
 	{
 	case MOUSE_LEFT:
+		if (itemName == "")
+			return;
+
 		//do not allow for blocks to get replaced.
 		if (cMap2D->GetMapInfo(y, x, false) != 0)
 			return;
@@ -1376,14 +1418,28 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 			//set the tile to be the block
 			cMap2D->SetSaveMapInfo(y, x, blockNumber, false);
 			//reduce block quantity
-			ReduceQuantity(itemName);
+			ReduceQuantity(itemName, 1);
 		}
 		break;
 	case MOUSE_RIGHT:
 		//break blocks or trees
+		if (cMap2D->GetMapInfo(y, x, false) == 1 || cMap2D->GetMapInfo(y, x, false) == 0 || cMap2D->GetMapInfo(y, x, false) == 201)
+			return;
+
 		Harvest(x, y);
+
 		//set tile to be 0
 		cMap2D->SetSaveMapInfo(y, x, 0, false);
 		break;
 	}
+}
+
+/**
+ @brief Update all individual seed timer
+ @param dt Delta time
+ */
+void CPlayer2D::UpdateSeeds(double dt)
+{
+	cMap2D->UpdateSeed("GrassTree", dt, 100, 2);
+	cMap2D->UpdateSeed("DirtTree", dt, 102, 1);
 }

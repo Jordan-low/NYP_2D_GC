@@ -97,24 +97,10 @@ public:
 	bool GenerateNewMap(string worldName = "START");
 
 	//load a new default map
-	bool LoadNewMap(string filename, const unsigned int uiLevel = 0);
+	bool LoadNewMap(string filename);
 
-	bool LoadPresetMap();
-
-	//spawn blocks in random positions in world
-	bool SpawnRandomBlock(string filename);
-
-	//spawn blocks based on excel position
-	bool SpawnBlock(string, int, int, int);
-
-	//spawn blocks based on mouse click position
-	bool SpawnBlockByMousePosition(string, double, double, int);
-
-	//spawn blocks based on excel position
-	bool DeSpawnBlock(string, int, int, int);
-
-	//spawn blocks based on mouse click position
-	bool DeSpawnBlockByMousePosition(string, double, double);
+	//generate a randomly loaded map
+	bool GenerateRandomMap();
 
 	// Find the indices of a certain value in arrMapInfo
 	bool FindValue(const int iValue, unsigned int& uirRow, unsigned int& uirCol, const bool bInvert = true);
@@ -122,10 +108,13 @@ public:
 	//return active world path with extention
 	string GetActiveWorldPath();
 
+	//return world name list vector
 	vector<string> GetWorldNameList();
-
+	
+	//return total worlds generated
 	int GetTotalWorldsGenerated();
 
+	//set total worlds generated
 	void SetTotalWorldsGenerated(int);
 
 	//active world name
@@ -134,10 +123,12 @@ public:
 	//world names list
 	vector<string> worldNameList;
 
+	//map offset for side scrolling effect
 	glm::vec2 mapOffset;
 	glm::vec2 mapOffset_MicroSteps;
 
-	void UpdateSeed(string name, double dt, int blockIndex, int resultBlockIndex, float timer);
+	//update individual block seeds based on timing
+	void UpdateSeed(string itemName, double dt, int blockNumber, float timer);
 
 protected:
 	// The variable containing the rapidcsv::Document
