@@ -89,6 +89,8 @@ bool CPlayer2D::Init(void)
 	// Get the handler to the CMap2D instance
 	cMap2D = CMap2D::GetInstance();
 
+	health = 100.f;
+
 	//Init player colour
 	playerColour = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -147,6 +149,20 @@ bool CPlayer2D::Init(void)
 	cInventoryItem = cInventoryManager->Add("GrassBlock", "Image/Items/GrassBlock.png", 64, 10);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
+	cInventoryItem = cInventoryManager->Add("Stone", "Image/Items/Stone.png", 64, 10);
+	cInventoryItem->vec2Size = glm::vec2(25, 25);
+
+	itemList.push_back(make_pair("Bedrock", 1));
+	itemList.push_back(make_pair("GrassBlock", 2));
+	itemList.push_back(make_pair("DirtBlock", 3));
+	itemList.push_back(make_pair("Chest", 4));
+	itemList.push_back(make_pair("LavaBlock", 5));
+
+	itemList.push_back(make_pair("GrassSeed", 100));
+	itemList.push_back(make_pair("DirtSeed", 102));
+
+	itemList.push_back(make_pair("Stone", 301));
+
 	return true;
 }
 
@@ -155,6 +171,17 @@ bool CPlayer2D::Init(void)
  */
 void CPlayer2D::Update(const double dElapsedTime)
 {
+	if (reachLeftEnd || reachRightEnd)
+		playerPosition = glm::vec2(i32vec2Index.x - (int)playerOffset.x, i32vec2Index.y);
+	else
+		playerPosition = glm::vec2(cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x, i32vec2Index.y);
+
+	CollectChest(4, 4);
+	CollectItem(301, 301);
+	CollideDamageBlock(dElapsedTime, 5, 5);
+
+	cout << health << endl;
+
 	// Store the old position
 	i32vec2OldIndex = i32vec2Index;
 
@@ -168,7 +195,7 @@ void CPlayer2D::Update(const double dElapsedTime)
 
 		if (reachRightEnd || reachLeftEnd)
 		{
-			if (!CollisionEnd(LEFT))
+			if (!CollisionEnd(LEFT, 1, 99))
 			{
 				const int iOldIndex = i32vec2Index.x;
 				if (i32vec2Index.x >= 0)
@@ -187,7 +214,7 @@ void CPlayer2D::Update(const double dElapsedTime)
 		else
 		{
 			i32vec2NumMicroSteps.x = 0;
-			if (!Collision(LEFT))
+			if (!Collision(LEFT, 1, 99))
 			{
 				cMap2D->mapOffset_MicroSteps.x += cSettings->TILE_WIDTH / 2;
 				if (cMap2D->mapOffset_MicroSteps.x >= cSettings->TILE_WIDTH)
@@ -224,7 +251,7 @@ void CPlayer2D::Update(const double dElapsedTime)
 
 		if (reachLeftEnd || reachRightEnd)
 		{
-			if (!CollisionEnd(RIGHT))
+			if (!CollisionEnd(RIGHT, 1, 99))
 			{
 				const int iOldIndex = i32vec2Index.x;
 				if (i32vec2Index.x < cSettings->TILE_RATIO_XAXIS - 1)
@@ -243,7 +270,7 @@ void CPlayer2D::Update(const double dElapsedTime)
 		else
 		{
 			i32vec2NumMicroSteps.x = 0;
-			if (!Collision(RIGHT))
+			if (!Collision(RIGHT, 1, 99))
 			{
 				cMap2D->mapOffset_MicroSteps.x -= cSettings->TILE_WIDTH / 2;
 				if (cMap2D->mapOffset_MicroSteps.x <= -cSettings->TILE_WIDTH)
@@ -619,7 +646,7 @@ void CPlayer2D::Constraint(DIRECTION eDirection)
  @brief Check if a position is possible to move into
  @param eDirection A DIRECTION enumerated data type which indicates the direction to check
  */
-bool CPlayer2D::CheckPosition(DIRECTION eDirection)
+bool CPlayer2D::CheckPosition(DIRECTION eDirection, int minIndex, int maxIndex)
 {
 	if (reachLeftEnd || reachRightEnd)
 	{
@@ -629,8 +656,8 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			if (i32vec2NumMicroSteps.y == 0)
 			{
 				// If the grid is not accessible, then return false
-				if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x - 1) > 0 && 
-					cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x - 1) < 100)
+				if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x - 1) >= minIndex && 
+					cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x - 1) <= maxIndex)
 				{
 					return false;
 				}
@@ -639,11 +666,11 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			else if (i32vec2NumMicroSteps.y != 0)
 			{
 				// If the 2 grids are not accessible, then return false
-				if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x - 1) > 0) &&
-					(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x - 1) < 100) ||
+				if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x - 1) >= minIndex) &&
+					(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x - 1) <= maxIndex) ||
 
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x - 1) > 0) && 
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x - 1) < 100))
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x - 1) >= minIndex) && 
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x - 1) <= maxIndex))
 				{
 					return false;
 				}
@@ -662,8 +689,8 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			if (i32vec2NumMicroSteps.y == 0)
 			{
 				// If the grid is not accessible, then return false
-				if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) > 0 && 
-					cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) < 100)
+				if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) >= minIndex && 
+					cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) <= maxIndex)
 				{
 					return false;
 				}
@@ -672,11 +699,11 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			else if (i32vec2NumMicroSteps.y != 0)
 			{
 				// If the 2 grids are not accessible, then return false
-				if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) > 0) &&
-					(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) < 100) ||
+				if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) >= minIndex) &&
+					(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) <= maxIndex) ||
 
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) > 0) && 
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) < 100))
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) >= minIndex) && 
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) <= maxIndex))
 				{
 					return false;
 				}
@@ -696,8 +723,8 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			if (i32vec2NumMicroSteps.x == 0)
 			{
 				// If the grid is not accessible, then return false
-				if (cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) > 0 && 
-					cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) < 100)
+				if (cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) >= minIndex && 
+					cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) <= maxIndex)
 				{
 					return false;
 				}
@@ -706,11 +733,11 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			else if (i32vec2NumMicroSteps.x != 0)
 			{
 				// If the 2 grids are not accessible, then return false
-				if ((cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) > 0) &&
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) < 100) ||
+				if ((cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) >= minIndex) &&
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) <= maxIndex) ||
 
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) > 0) &&
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) < 100))
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) >= minIndex) &&
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) <= maxIndex))
 				{
 					return false;
 				}
@@ -722,8 +749,8 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			if (i32vec2NumMicroSteps.x == 0)
 			{
 				// If the grid is not accessible, then return false
-				if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) > 0 &&
-					cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) < 100)
+				if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) >= minIndex &&
+					cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) <= maxIndex)
 				{
 					return false;
 				}
@@ -732,11 +759,11 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			else if (i32vec2NumMicroSteps.x != 0)
 			{
 				// If the 2 grids are not accessible, then return false
-				if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) > 0) &&
-					(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) < 100) ||
+				if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) >= minIndex) &&
+					(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) <= maxIndex) ||
 
-					(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) > 0) && 
-					(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) < 100))
+					(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) >= minIndex) && 
+					(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) <= maxIndex))
 				{
 					return false;
 				}
@@ -757,8 +784,8 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			if (i32vec2NumMicroSteps.y == 0)
 			{
 				// If the grid is not accessible, then return false
-				if (cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x - 1) > 0 &&
-					cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x - 1) < 100)
+				if (cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x - 1) >= minIndex &&
+					cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x - 1) <= maxIndex)
 				{
 					return false;
 				}
@@ -767,11 +794,11 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			else if (i32vec2NumMicroSteps.y != 0)
 			{
 				// If the 2 grids are not accessible, then return false
-				if ((cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x - 1) > 0) &&
-					(cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x - 1) < 100) ||
+				if ((cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x - 1) >= minIndex) &&
+					(cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x - 1) <= maxIndex) ||
 
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cMap2D->mapOffset.x - (int)playerOffset.x - 2) > 0) &&
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cMap2D->mapOffset.x - (int)playerOffset.x - 2) < 100))
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cMap2D->mapOffset.x - (int)playerOffset.x - 2) >= minIndex) &&
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cMap2D->mapOffset.x - (int)playerOffset.x - 2) <= maxIndex))
 				{
 					return false;
 				}
@@ -790,8 +817,8 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			if (i32vec2NumMicroSteps.y == 0)
 			{
 				// If the grid is not accessible, then return false
-				if (cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x + 1) > 0 &&
-					cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x + 1) < 100)
+				if (cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x + 1) >= minIndex &&
+					cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x + 1) <= maxIndex)
 				{
 					return false;
 				}
@@ -800,11 +827,11 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			else if (i32vec2NumMicroSteps.y != 0)
 			{
 				// If the 2 grids are not accessible, then return false
-				if ((cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x + 1) > 0) &&
-					(cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x + 1) < 100) ||
+				if ((cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x + 1) >= minIndex) &&
+					(cMap2D->GetMapInfo(i32vec2Index.y, cMap2D->mapOffset.x - (int)playerOffset.x + 1) <= maxIndex) ||
 
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cMap2D->mapOffset.x - (int)playerOffset.x + 2) > 0) && 
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cMap2D->mapOffset.x - (int)playerOffset.x + 2) < 100))
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cMap2D->mapOffset.x - (int)playerOffset.x + 2) >= minIndex) && 
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cMap2D->mapOffset.x - (int)playerOffset.x + 2) <= maxIndex))
 				{
 					return false;
 				}
@@ -824,8 +851,8 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			if (cMap2D->mapOffset_MicroSteps.x == 0)
 			{
 				// If the grid is not accessible, then return false
-				if (cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) > 0 && 
-					cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) < 100)
+				if (cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) >= minIndex && 
+					cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) <= maxIndex)
 				{
 					return false;
 				}
@@ -834,11 +861,11 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			else if (cMap2D->mapOffset_MicroSteps.x != 0)
 			{
 				// If the 2 grids are not accessible, then return false
-				if ((cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) > 0) &&
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) < 100) ||
+				if ((cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) >= minIndex) &&
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) <= maxIndex) ||
 
-					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) > 0) && 
-						(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) < 100))
+					(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) >= minIndex) && 
+						(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) <= maxIndex))
 				{
 					return false;
 				}
@@ -850,8 +877,8 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			if (cMap2D->mapOffset_MicroSteps.x == 0)
 			{
 				// If the grid is not accessible, then return false
-				if (cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) > 0 && 
-					cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) < 100)
+				if (cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) >= minIndex && 
+					cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) <= maxIndex)
 				{
 					return false;
 				}
@@ -860,11 +887,11 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection)
 			else if (cMap2D->mapOffset_MicroSteps.x != 0)
 			{
 				// If the 2 grids are not accessible, then return false
-				if ((cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) > 0) && 
-					(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) < 100) ||
+				if ((cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) >= minIndex) && 
+					(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) <= maxIndex) ||
 
-					(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) > 0) &&
-					(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) < 100))
+					(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) >= minIndex) &&
+					(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) <= maxIndex))
 				{
 					return false;
 				}
@@ -935,49 +962,6 @@ void CPlayer2D::ReduceQuantity(string itemName, int quantity)
 }
 
 /**
- @brief Convert item block name to block number
- @param itemName A string for the item name
- */
-int CPlayer2D::ConvertItemNameToBlockNumber(string itemName)
-{
-	if (itemName == "Bedrock")
-		return 1;
-	else if (itemName == "GrassBlock")
-		return 2;
-	else if (itemName == "DirtBlock")
-		return 3;
-	else if (itemName == "GrassSeed")
-		return 100;
-	else if (itemName == "DirtSeed")
-		return 102;
-	else
-		return 0;
-
-
-	//switch (itemName)
-	//{
-	//case 1:
-	//	return "Bedrock";
-	//	break;
-	//case 2:
-	//	return "GrassBlock";
-	//	break;
-	//case 3:
-	//	return "DirtBlock";
-	//	break;
-	//case 100:
-	//	return "GrassSeed";
-	//	break;
-	//case 102:
-	//	return "DirtSeed";
-	//	break;
-	//default:
-	//	return "none";
-	//	break;
-	//}
-}
-
-/**
  @brief Update player's jump and fall
  @param dElapsedTime A double for delta time
  */
@@ -1020,7 +1004,7 @@ void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 			// Change the player's index to the current i value
 			i32vec2Index.y = i;
 			// If the new position is not feasible, then revert to old position
-			if (CheckPosition(UP) == false)
+			if (CheckPosition(UP, 1, 99) == false)
 			{
 				// Set the Physics to fall status
 				cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
@@ -1073,7 +1057,7 @@ void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 			// Change the player's index to the current i value
 			i32vec2Index.y = i;
 			// If the new position is not feasible, then revert to old position
-			if (CheckPosition(DOWN) == false)
+			if (CheckPosition(DOWN, 1, 99) == false)
 			{
 				// Revert to the previous position
 				if (i != iIndex_YAxis_OLD)
@@ -1099,6 +1083,9 @@ bool CPlayer2D::IsMidAir()
 	if ((i32vec2NumMicroSteps.x == 0) && (cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x) == 0))
 		return true;
 
+	else if ((i32vec2NumMicroSteps.x == 0) && (cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x - (int)playerOffset.x) == 0))
+		return true;
+
 	return false;
 }
 
@@ -1106,7 +1093,7 @@ bool CPlayer2D::IsMidAir()
  @brief Check for player's collision at both the left and right ends
  @param eDirection An enum for player's direction
  */
-bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
+bool CPlayer2D::CollisionEnd(DIRECTION eDirection, int minIndex, int maxIndex)
 {
 	if (eDirection == LEFT)
 	{
@@ -1114,8 +1101,8 @@ bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
 		if (i32vec2NumMicroSteps.y == 0)
 		{
 			// If the grid is not accessible, then return false
-			if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) > 0 && 
-				cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) < 100)
+			if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) >= minIndex && 
+				cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) <= maxIndex)
 			{
 				return true;
 			}
@@ -1124,11 +1111,11 @@ bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
 		else if (i32vec2NumMicroSteps.y != 0)
 		{
 			// If the 2 grids are not accessible, then return false
-			if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) > 0) && 
-				(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) < 100) ||
+			if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) >= minIndex) && 
+				(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) <= maxIndex) ||
 
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) > 0) && 
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) < 100))
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) >= minIndex) && 
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) <= maxIndex))
 			{
 				return true;
 			}
@@ -1147,7 +1134,8 @@ bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
 		if (i32vec2NumMicroSteps.y == 0)
 		{
 			// If the grid is not accessible, then return false
-			if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) > 0 && cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) < 100)
+			if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) >= minIndex &&
+				cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) <= maxIndex)
 			{
 				return true;
 			}
@@ -1156,11 +1144,11 @@ bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
 		else if (i32vec2NumMicroSteps.y != 0)
 		{
 			// If the 2 grids are not accessible, then return false
-			if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) > 0) &&
-				(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) < 100) ||
+			if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) >= minIndex) &&
+				(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) <= maxIndex) ||
 
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) > 0) && 
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) < 100))
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) >= minIndex) && 
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) <= maxIndex))
 			{
 				return true;
 			}
@@ -1180,7 +1168,8 @@ bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
 		if (i32vec2NumMicroSteps.x == 0)
 		{
 			// If the grid is not accessible, then return false
-			if (cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) > 0)
+			if ((cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) >= minIndex) && 
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) <= maxIndex))
 			{
 				return true;
 			}
@@ -1189,11 +1178,11 @@ bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
 		else if (i32vec2NumMicroSteps.x != 0)
 		{
 			// If the 2 grids are not accessible, then return false
-			if ((cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) > 0) &&
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) < 100) ||
+			if ((cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) >= minIndex) &&
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x) <= maxIndex) ||
 
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) > 0) &&
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) < 100))
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) >= minIndex) &&
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x - (int)playerOffset.x + 1) <= maxIndex))
 			{
 				return true;
 			}
@@ -1205,7 +1194,8 @@ bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
 		if (i32vec2NumMicroSteps.x == 0)
 		{
 			// If the grid is not accessible, then return false
-			if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x) > 0)
+			if ((cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x - (int)playerOffset.x) >= minIndex) &&
+				(cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x - (int)playerOffset.x) <= maxIndex))
 			{
 				return true;
 			}
@@ -1214,12 +1204,12 @@ bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
 		else if (i32vec2NumMicroSteps.x != 0)
 		{
 			// If the 2 grids are not accessible, then return false
-			if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) > 0) &&
-				((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x) < 100) ||
+			if ((cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x - (int)playerOffset.x) >= minIndex) &&
+				((cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x - (int)playerOffset.x) <= maxIndex) ||
 
-				(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) > 0) && 
-				(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x - (int)playerOffset.x + 1) < 100)))
-			{
+				(cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x - (int)playerOffset.x + 1) >= minIndex) && 
+				(cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x - (int)playerOffset.x + 1) <= maxIndex)))
+			{									   
 				return true;
 			}
 		}
@@ -1235,7 +1225,7 @@ bool CPlayer2D::CollisionEnd(DIRECTION eDirection)
  @brief Check for player's collision in general central area
  @param eDirection An enum for player's direction
  */
-bool CPlayer2D::Collision(DIRECTION eDirection)
+bool CPlayer2D::Collision(DIRECTION eDirection, int minIndex, int maxIndex)
 {
 	if (eDirection == LEFT)
 	{
@@ -1243,8 +1233,8 @@ bool CPlayer2D::Collision(DIRECTION eDirection)
 		if (i32vec2NumMicroSteps.y == 0)
 		{
 			// If the grid is not accessible, then return false
-			if (cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 1) > 0 && 
-				cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 1) < 100)
+			if (cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 1) >= minIndex && 
+				cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 1) <= maxIndex)
 			{
 				return true;
 			}
@@ -1253,11 +1243,11 @@ bool CPlayer2D::Collision(DIRECTION eDirection)
 		else if (i32vec2NumMicroSteps.y != 0)
 		{
 			// If the 2 grids are not accessible, then return false
-			if ((cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 1) > 0) &&
-				(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 1) < 100) ||
+			if ((cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 1) >= minIndex) &&
+				(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 1) <= maxIndex) ||
 
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 2) > 0) && 
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 2) < 100))
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 2) >= minIndex) && 
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x - 2) <= maxIndex))
 			{
 				return true;
 			}
@@ -1276,8 +1266,8 @@ bool CPlayer2D::Collision(DIRECTION eDirection)
 		if (i32vec2NumMicroSteps.y == 0)
 		{
 			// If the grid is not accessible, then return false
-			if (cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) > 0 && 
-				cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) < 100)
+			if (cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) >= minIndex && 
+				cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) <= maxIndex)
 			{
 				return true;
 			}
@@ -1286,11 +1276,11 @@ bool CPlayer2D::Collision(DIRECTION eDirection)
 		else if (i32vec2NumMicroSteps.y != 0)
 		{
 			// If the 2 grids are not accessible, then return false
-			if ((cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) > 0) && 
-				(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) < 100) ||
+			if ((cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) >= minIndex) && 
+				(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) <= maxIndex) ||
 
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 2) > 0) &&
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 2) < 100))
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 2) >= minIndex) &&
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 2) <= maxIndex))
 			{
 				return true;
 			}
@@ -1310,8 +1300,8 @@ bool CPlayer2D::Collision(DIRECTION eDirection)
 		if (cMap2D->mapOffset_MicroSteps.x == 0)
 		{
 			// If the grid is not accessible, then return false
-			if (cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) > 0 && 
-				cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) < 100)
+			if (cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) >= minIndex && 
+				cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) <= maxIndex)
 			{
 				return true;
 			}
@@ -1320,11 +1310,11 @@ bool CPlayer2D::Collision(DIRECTION eDirection)
 		else if (cMap2D->mapOffset_MicroSteps.x != 0)
 		{
 			// If the 2 grids are not accessible, then return false
-			if ((cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) > 0) && 
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) < 100) ||
+			if ((cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) >= minIndex) && 
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) <= maxIndex) ||
 
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) > 0) &&
-				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) < 100))
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) >= minIndex) &&
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) <= maxIndex))
 			{
 				return true;
 			}
@@ -1336,8 +1326,8 @@ bool CPlayer2D::Collision(DIRECTION eDirection)
 		if (cMap2D->mapOffset_MicroSteps.x == 0)
 		{
 			// If the grid is not accessible, then return false
-			if (cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) > 0 && 
-				cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) < 100)
+			if (cMap2D->GetMapInfo(i32vec2Index.y - 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) >= minIndex && 
+				cMap2D->GetMapInfo(i32vec2Index.y - 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) <= maxIndex)
 			{
 				return true;
 			}
@@ -1346,11 +1336,11 @@ bool CPlayer2D::Collision(DIRECTION eDirection)
 		else if (cMap2D->mapOffset_MicroSteps.x != 0)
 		{
 			// If the 2 grids are not accessible, then return false
-			if ((cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) > 0) ||
-				(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) > 0) && 
-
-				(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) < 100) ||
-				(cMap2D->GetMapInfo(i32vec2Index.y, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) < 100))
+			if ((cMap2D->GetMapInfo(i32vec2Index.y - 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) >= minIndex) ||
+				(cMap2D->GetMapInfo(i32vec2Index.y - 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x) >= minIndex) && 
+												   
+				(cMap2D->GetMapInfo(i32vec2Index.y - 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) <= maxIndex) ||
+				(cMap2D->GetMapInfo(i32vec2Index.y - 1, cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x + 1) <= maxIndex))
 			{
 				return true;
 			}
@@ -1376,7 +1366,7 @@ void CPlayer2D::ResetPosition()
 
 	i32vec2Index = glm::i32vec2(uiCol, uiRow);
 	i32vec2NumMicroSteps = glm::i32vec2(0, 0);
-	playerOffset = glm::vec2(0.0f);
+	playerOffset = glm::vec2(0.f);
 
 	reachLeftEnd = true;
 	reachRightEnd = false;
@@ -1403,7 +1393,7 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 	else if (y >= cSettings->NUM_TILES_YAXIS || y < 0)
 		return;
 
-	int blockNumber = ConvertItemNameToBlockNumber(itemName);
+	int blockNumber = GetIntItemList(itemName);
 
 	switch (mouseClick)
 	{
@@ -1445,4 +1435,199 @@ void CPlayer2D::UpdateSeeds(double dt)
 {
 	cMap2D->UpdateSeed("GrassTree", dt, 100, 2);
 	cMap2D->UpdateSeed("DirtTree", dt, 102, 1);
+}
+
+/**
+ @brief Checks if player collects chest
+ @param minIndex minimum block number to start with
+ @param maxIndex maximum block number to end with
+ */
+void CPlayer2D::CollectChest(int minIndex, int maxIndex)
+{
+	bool isBesideChest = false;
+	int offset = 0;
+
+	if (reachLeftEnd || reachRightEnd)
+	{
+		if (CollisionEnd(LEFT, minIndex, maxIndex))
+		{
+			isBesideChest = true;
+			offset = -1;
+		}
+		else if (CollisionEnd(RIGHT, minIndex, maxIndex))
+		{
+			isBesideChest = true;
+			offset = 1;
+		}
+	}
+	else
+	{
+		if (Collision(LEFT, minIndex, maxIndex))
+		{
+			isBesideChest = true;
+			offset = -1;
+		}
+		else if (Collision(RIGHT, minIndex, maxIndex))
+		{
+			isBesideChest = true;
+			offset = 1;
+		}
+	}
+	
+	if (!isBesideChest)
+		return;
+
+	if (cKeyboardController->IsKeyPressed(GLFW_KEY_E))
+	{
+		cMap2D->OpenedChest(glm::vec2(playerPosition.x + offset, playerPosition.y));
+	}
+}
+
+void CPlayer2D::CollideDamageBlock(double dt, int minIndex, int maxIndex)
+{
+	bool isBesideDamageBlock = false;
+
+	if (reachLeftEnd || reachRightEnd)
+	{
+		if (CollisionEnd(LEFT, minIndex, maxIndex))
+		{
+			isBesideDamageBlock = true;
+		}
+		else if (CollisionEnd(RIGHT, minIndex, maxIndex))
+		{
+			isBesideDamageBlock = true;
+		}
+		else if (CollisionEnd(UP, minIndex, maxIndex))
+		{
+			isBesideDamageBlock = true;
+		}
+		else if (CollisionEnd(DOWN, minIndex, maxIndex))
+		{
+			isBesideDamageBlock = true;
+		}
+	}
+	else
+	{
+		if (Collision(LEFT, minIndex, maxIndex))
+		{
+			isBesideDamageBlock = true;
+		}
+		else if (Collision(RIGHT, minIndex, maxIndex))
+		{
+			isBesideDamageBlock = true;
+		}
+		else if (Collision(LEFT, minIndex, maxIndex))
+		{
+			isBesideDamageBlock = true;
+		}
+		else if (Collision(RIGHT, minIndex, maxIndex))
+		{
+			isBesideDamageBlock = true;
+		}
+	}
+
+	if (isBesideDamageBlock)
+		health -= 0.2f;
+}
+
+/**
+ @brief Update if player has collected item from chest
+ @param minIndex minimum block number to start with
+ @param maxIndex maximum block number to end with
+ */
+void CPlayer2D::CollectItem(int minIndex, int maxIndex)
+{
+	bool isCollected = false;
+	glm::i32vec2 itemPosition;
+
+	if (reachLeftEnd || reachRightEnd)
+	{
+		if (CollisionEnd(LEFT, minIndex, maxIndex))
+		{
+			isCollected = true;
+			itemPosition = playerPosition;
+		}
+		else if (CollisionEnd(RIGHT, minIndex, maxIndex))
+		{
+			isCollected = true;
+			itemPosition = playerPosition;
+		}
+		if (CollisionEnd(UP, minIndex, maxIndex))
+		{
+			isCollected = true;
+			itemPosition = playerPosition;
+		}
+		else if (CollisionEnd(DOWN, minIndex, maxIndex))
+		{
+			isCollected = true;
+			itemPosition = playerPosition;
+		}
+	}
+	else
+	{
+		if (Collision(LEFT, minIndex, maxIndex))
+		{
+			isCollected = true;
+			itemPosition = playerPosition;
+		}
+		else if (Collision(RIGHT, minIndex, maxIndex))
+		{
+			isCollected = true;
+			itemPosition = playerPosition;
+		}
+		if (Collision(UP, minIndex, maxIndex))
+		{
+			isCollected = true;
+			itemPosition = playerPosition;
+		}
+		else if (Collision(DOWN, minIndex, maxIndex))
+		{
+			isCollected = true;
+			itemPosition = playerPosition;
+		}
+	}
+
+	if (!isCollected)
+		return;
+
+	int itemNumber = cMap2D->GetMapInfo(itemPosition.y, itemPosition.x);
+
+	string itemName = GetStringItemList(itemNumber);
+
+	if (!cInventoryManager->Check(itemName))
+		return;
+
+	cMap2D->SetSaveMapInfo(itemPosition.y, itemPosition.x, 0);
+	cInventoryItem = cInventoryManager->GetItem(itemName);
+	cInventoryItem->Add(1);
+}
+
+/**
+ @brief Get string pair from item list vector
+ @param blockNumber An int for block number
+ */
+string CPlayer2D::GetStringItemList(int blockNumber)
+{
+	string itemName = "";
+	for (int i = 0; i < itemList.size(); i++)
+	{
+		if (itemList[i].second == blockNumber)
+			itemName = itemList[i].first;
+	}
+	return itemName;
+}
+
+/**
+ @brief Get int pair from item list vector
+ @param itemName A string for item name
+ */
+int CPlayer2D::GetIntItemList(string itemName)
+{
+	int blockNumber = 0;
+	for (int i = 0; i < itemList.size(); i++)
+	{
+		if (itemList[i].first == itemName)
+			blockNumber = itemList[i].second;
+	}
+	return blockNumber;
 }

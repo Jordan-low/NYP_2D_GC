@@ -153,6 +153,11 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 		std::cout << "Failed to load dirt block texture" << std::endl;
 		return false;
 	}
+	if (LoadTexture("Image/Blocks/Lava.png", 5) == false)
+	{
+		std::cout << "Failed to load lava block texture" << std::endl;
+		return false;
+	}
 	  
 	//trees & seeds
 	if (LoadTexture("Image/Trees/GrassTreeSeed.png", 100) == false)
@@ -165,8 +170,6 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 		std::cout << "Failed to load grass tree block texture" << std::endl;
 		return false;
 	}
-
-	//trees & seeds
 	if (LoadTexture("Image/Trees/DirtTreeSeed.png", 102) == false)
 	{
 		std::cout << "Failed to load dirt tree seed block texture" << std::endl;
@@ -178,18 +181,8 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 		return false;
 	}
 
-	//Items
-	if (LoadTexture("Image/Items/DirtSeed.png", 301) == false)
-	{
-		std::cout << "Failed to load dirt seed texture" << std::endl;
-		return false;
-	}
-	if (LoadTexture("Image/Items/GrassSeed.png", 302) == false)
-	{
-		std::cout << "Failed to load grass seed texture" << std::endl;
-		return false;
-	}
-	if (LoadTexture("Image/Items/Stone.png", 303) == false)
+	//items
+	if (LoadTexture("Image/Items/Stone.png", 301) == false)
 	{
 		std::cout << "Failed to load stone block texture" << std::endl;
 		return false;
@@ -496,6 +489,9 @@ bool CMap2D::LoadNewMap(string filename)
 bool CMap2D::GenerateRandomMap()
 {
 	int current = 20;
+	int chestSpawned = 0;
+	int chestSpawnRate = 20;
+	int lavaSpawnRate = 10;
 	for (int i = 3; i < 100; i++)
 	{
 		bool done = false;
@@ -507,6 +503,20 @@ bool CMap2D::GenerateRandomMap()
 
 			if (random + 1 == current || random - 1 == current || random == current)
 			{
+				//spawn chest
+				int chestRandom = Math::RandIntMinMax(0, chestSpawnRate);
+				if (chestRandom == 0)
+				{
+					SetMapInfo(random - 1, i, 4, false);
+					chestSpawned++;
+				}
+
+				//force spawn chest
+				if (i == 99 && chestSpawned == 0)
+					SetMapInfo(random - 1, i, 4, false);
+
+				
+				//set grass and dirt floor
 				SetMapInfo(random, i, 2, false);
 				for (int j = 1; j < cSettings->NUM_TILES_YAXIS - random; j++)
 				{
@@ -515,6 +525,15 @@ bool CMap2D::GenerateRandomMap()
 					else
 						SetMapInfo(random + j, i, 3, false);
 				}
+
+				int lavaRandom = Math::RandIntMinMax(0, lavaSpawnRate);
+				if (lavaRandom == 0)
+				{
+					if (random + 1 == cSettings->NUM_TILES_YAXIS - 1)
+						continue;
+					SetMapInfo(random + 1, i, 5, false);
+				}
+
 				done = true;
 				current = random;
 			}
@@ -554,6 +573,16 @@ bool CMap2D::FindValue(const int iValue, unsigned int& uirRow, unsigned int& uir
 string CMap2D::GetActiveWorldPath()
 {
 	return "Maps/" + activeWorld + ".csv";
+}
+
+string CMap2D::OpenedChest(glm::vec2 playerPos)
+{
+	SetSaveMapInfo(playerPos.y, playerPos.x, 0);
+
+	int random = Math::RandIntMinMax(301, 301);
+	SetSaveMapInfo(playerPos.y + 1, playerPos.x, random);
+
+	return "";
 }
 
 /**

@@ -108,6 +108,9 @@ public:
 	//return active world path with extention
 	string GetActiveWorldPath();
 
+	//update chest 
+	string OpenedChest(glm::vec2);
+
 	//return world name list vector
 	vector<string> GetWorldNameList();
 	

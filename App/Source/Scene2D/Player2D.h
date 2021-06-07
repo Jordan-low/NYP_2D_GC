@@ -40,11 +40,15 @@ class CMap2D;
 //Include Inventory Manager
 #include "InventoryManager.h"
 
+#include <iostream>
+#include <vector>
 
 class CPlayer2D : public CSingletonTemplate<CPlayer2D>, public CEntity2D
 {
 	friend CSingletonTemplate<CPlayer2D>;
 public:
+	
+	std::vector<std::pair<std::string, int>> itemList;
 
 	enum MOUSE_CLICK
 	{
@@ -74,8 +78,6 @@ public:
 	bool CheckQuantity(string itemName);
 
 	void ReduceQuantity(string itemName, int quantity);
-
-	int ConvertItemNameToBlockNumber(string itemName);
 
 	void ResetPosition();
 
@@ -135,15 +137,30 @@ protected:
 	void Constraint(DIRECTION eDirection = LEFT);
 
 	// Check if a position is possible to move into
-	bool CheckPosition(DIRECTION eDirection);
+	bool CheckPosition(DIRECTION eDirection, int minIndex, int maxIndex);
 
 	//Update jump
 	void UpdateJumpFall(const double dElapsedTime = 0.0166666666666667);
 
 	bool IsMidAir();
 
-	bool Collision(DIRECTION eDirection);
-	bool CollisionEnd(DIRECTION eDirection);
+	//checks for collision
+	bool Collision(DIRECTION eDirection, int minIndex, int maxIndex);
+	bool CollisionEnd(DIRECTION eDirection, int minIndex, int maxIndex);
+
+	//checks if chest have been picked up
+	void CollectChest(int minIndex, int maxIndex);
+
+	void CollideDamageBlock(double dt, int minIndex, int maxIndex);
+
+	//checks if item has been picked up
+	void CollectItem(int minIndex, int maxIndex);
+
+	//get string item list by block number
+	string GetStringItemList(int blockNumber);
+
+	//get int item list by item name
+	int GetIntItemList(string itemName);
 
 private:
 	bool reachLeftEnd = true;
@@ -152,5 +169,7 @@ private:
 	bool reachBotEnd = false;
 
 	bool doubleJumpReady = false;
+
+	glm::vec2 playerPosition;
 };
 

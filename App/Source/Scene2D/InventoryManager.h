@@ -34,7 +34,6 @@ public:
 	bool Remove(const std::string& _name);
 	// Check if an item exists in inventoryMap
 	bool Check(const std::string& _name);
-
 	// Get an item by its name
 	CInventoryItem* GetItem(const std::string& _name);
 	// Get the number of items
