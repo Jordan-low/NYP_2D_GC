@@ -39,6 +39,19 @@ public:
 	// Get the number of items
 	int GetNumItems(void) const;
 
+	int slotNumber = 0;
+
+	CInventoryItem* currentItem;
+
+	CInventoryItem* prevCurrentItem;
+
+	CInventoryItem* inventoryArray[4];
+
+	void SwitchCurrentItem();
+	void CycleThroughInventory();
+
+	std::map<std::string, CInventoryItem*> inventoryMap;
+
 protected:
 	// Constructor
 	CInventoryManager(void);
@@ -47,5 +60,5 @@ protected:
 	virtual ~CInventoryManager(void);
 
 	// The map containing all the items
-	std::map<std::string, CInventoryItem*> inventoryMap;
+
 };

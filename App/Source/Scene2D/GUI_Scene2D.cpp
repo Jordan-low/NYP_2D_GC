@@ -182,18 +182,95 @@ void CGUI_Scene2D::Update(const double dElapsedTime)
 	//ImGui::PopStyleColor();
 	//ImGui::End();
 
+
+	//for (int i = 0; i < sizeof(cInventoryManager->inventoryArray) / sizeof(*cInventoryManager->inventoryArray); i++)
+	//{
+	//	if (cInventoryManager->inventoryArray[i] == nullptr)
+	//		break;
+
+	//	// Render the dirt seeds
+	//	ImGuiWindowFlags InventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//		ImGuiWindowFlags_NoBackground |
+	//		ImGuiWindowFlags_NoTitleBar |
+	//		ImGuiWindowFlags_NoMove |
+	//		ImGuiWindowFlags_NoResize |
+	//		ImGuiWindowFlags_NoCollapse |
+	//		ImGuiWindowFlags_NoScrollbar;
+	//	ImGui::Begin("InventoryItem", NULL, InventoryWindowFlags);
+	//	ImGui::SetWindowPos(ImVec2(1210, 270 + i * 30));
+	//	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//	cInventoryItem = cInventoryManager->inventoryArray[i];
+	//	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//		ImVec2(0, 1), ImVec2(1, 0));
+	//	ImGui::SameLine();
+	//	ImGui::SetWindowFontScale(1.5f);
+	//	ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+	//		cInventoryItem->GetCount());
+	//	ImGui::End();
+	//}
+
+	//if (cInventoryManager->currentItem != nullptr)
+	//{
+	//	// Render the dirt seeds
+	//	ImGuiWindowFlags InventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//		ImGuiWindowFlags_NoBackground |
+	//		ImGuiWindowFlags_NoTitleBar |
+	//		ImGuiWindowFlags_NoMove |
+	//		ImGuiWindowFlags_NoResize |
+	//		ImGuiWindowFlags_NoCollapse |
+	//		ImGuiWindowFlags_NoScrollbar;
+	//	ImGui::Begin("InventoryItem", NULL, InventoryWindowFlags);
+	//	ImGui::SetWindowPos(ImVec2(1210, 240));
+	//	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//	cInventoryItem = cInventoryManager->currentItem;
+	//	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//		ImVec2(0, 1), ImVec2(1, 0));
+	//	ImGui::SameLine();
+	//	ImGui::SetWindowFontScale(1.5f);
+	//	ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+	//		cInventoryItem->GetCount());
+	//	ImGui::End();
+	//}
+
+	if (cInventoryManager->currentItem != nullptr)
+	{
+		// Render the dirt seeds
+		ImGuiWindowFlags InventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+			ImGuiWindowFlags_NoBackground |
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoCollapse |
+			ImGuiWindowFlags_NoScrollbar;
+		ImGui::Begin("InventoryItem", NULL, InventoryWindowFlags);
+		ImGui::SetWindowPos(ImVec2(1210, 270));
+		ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+		cInventoryItem = cInventoryManager->currentItem;
+		ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+			ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+			ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::SameLine();
+		ImGui::SetWindowFontScale(1.5f);
+		ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+			cInventoryItem->GetCount());
+		ImGui::End();
+	}
+
+
 	// Render the dirt seeds
-	ImGuiWindowFlags dirtSeedWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	ImGuiWindowFlags SelectorWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
 		ImGuiWindowFlags_NoBackground |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoCollapse |
 		ImGuiWindowFlags_NoScrollbar;
-	ImGui::Begin("DirtSeed", NULL, dirtSeedWindowFlags);
+	ImGui::Begin("SelectorItem", NULL, SelectorWindowFlags);
 	ImGui::SetWindowPos(ImVec2(1210, 270));
 	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
-	cInventoryItem = cInventoryManager->GetItem("DirtSeed");
+	cInventoryItem = cInventoryManager->GetItem("Selector");
 	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
 		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
 		ImVec2(0, 1), ImVec2(1, 0));
@@ -203,18 +280,121 @@ void CGUI_Scene2D::Update(const double dElapsedTime)
 		cInventoryItem->GetCount());
 	ImGui::End();
 
-	// Render the dirt
-	ImGuiWindowFlags grassBlockWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+
+	//if (cInventoryManager->inventoryArray[0] != nullptr)
+	//{
+	//	// Render the dirt seeds
+	//	ImGuiWindowFlags InventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//		ImGuiWindowFlags_NoBackground |
+	//		ImGuiWindowFlags_NoTitleBar |
+	//		ImGuiWindowFlags_NoMove |
+	//		ImGuiWindowFlags_NoResize |
+	//		ImGuiWindowFlags_NoCollapse |
+	//		ImGuiWindowFlags_NoScrollbar;
+	//	ImGui::Begin("InventoryItem", NULL, InventoryWindowFlags);
+	//	ImGui::SetWindowPos(ImVec2(1210, 300));
+	//	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//	cInventoryItem = cInventoryManager->inventoryArray[0];
+	//	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//		ImVec2(0, 1), ImVec2(1, 0));
+	//	ImGui::SameLine();
+	//	ImGui::SetWindowFontScale(1.5f);
+	//	ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+	//		cInventoryItem->GetCount());
+	//	ImGui::End();
+	//}
+	//
+	//if (cInventoryManager->inventoryArray[1] != nullptr)
+	//{
+	//	// Render the dirt seeds
+	//	ImGuiWindowFlags InventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//		ImGuiWindowFlags_NoBackground |
+	//		ImGuiWindowFlags_NoTitleBar |
+	//		ImGuiWindowFlags_NoMove |
+	//		ImGuiWindowFlags_NoResize |
+	//		ImGuiWindowFlags_NoCollapse |
+	//		ImGuiWindowFlags_NoScrollbar;
+	//	ImGui::Begin("InventoryItem", NULL, InventoryWindowFlags);
+	//	ImGui::SetWindowPos(ImVec2(1210, 330));
+	//	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//	cInventoryItem = cInventoryManager->inventoryArray[1];
+	//	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//		ImVec2(0, 1), ImVec2(1, 0));
+	//	ImGui::SameLine();
+	//	ImGui::SetWindowFontScale(1.5f);
+	//	ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+	//		cInventoryItem->GetCount());
+	//	ImGui::End();
+	//}
+
+	//if (cInventoryManager->inventoryArray[2] != nullptr)
+	//{
+	//	// Render the dirt seeds
+	//	ImGuiWindowFlags InventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//		ImGuiWindowFlags_NoBackground |
+	//		ImGuiWindowFlags_NoTitleBar |
+	//		ImGuiWindowFlags_NoMove |
+	//		ImGuiWindowFlags_NoResize |
+	//		ImGuiWindowFlags_NoCollapse |
+	//		ImGuiWindowFlags_NoScrollbar;
+	//	ImGui::Begin("InventoryItem", NULL, InventoryWindowFlags);
+	//	ImGui::SetWindowPos(ImVec2(1210, 360));
+	//	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//	cInventoryItem = cInventoryManager->inventoryArray[2];
+	//	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//		ImVec2(0, 1), ImVec2(1, 0));
+	//	ImGui::SameLine();
+	//	ImGui::SetWindowFontScale(1.5f);
+	//	ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+	//		cInventoryItem->GetCount());
+	//	ImGui::End();
+	//}
+
+	//if (cInventoryManager->inventoryArray[3] != nullptr)
+	//{
+	//	// Render the dirt seeds
+	//	ImGuiWindowFlags InventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//		ImGuiWindowFlags_NoBackground |
+	//		ImGuiWindowFlags_NoTitleBar |
+	//		ImGuiWindowFlags_NoMove |
+	//		ImGuiWindowFlags_NoResize |
+	//		ImGuiWindowFlags_NoCollapse |
+	//		ImGuiWindowFlags_NoScrollbar;
+	//	ImGui::Begin("InventoryItem", NULL, InventoryWindowFlags);
+	//	ImGui::SetWindowPos(ImVec2(1210, 390));
+	//	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//	cInventoryItem = cInventoryManager->inventoryArray[3];
+	//	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//		ImVec2(0, 1), ImVec2(1, 0));
+	//	ImGui::SameLine();
+	//	ImGui::SetWindowFontScale(1.5f);
+	//	ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+	//		cInventoryItem->GetCount());
+	//	ImGui::End();
+	//}
+
+	if (cInventoryManager->prevCurrentItem == nullptr)
+	{
+		ImGui::End();
+		return;
+	}
+
+	// Render the dirt seeds
+	ImGuiWindowFlags prevInventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
 		ImGuiWindowFlags_NoBackground |
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoCollapse |
 		ImGuiWindowFlags_NoScrollbar;
-	ImGui::Begin("GrassSeed", NULL, grassBlockWindowFlags);
+	ImGui::Begin("PrevInventoryItem", NULL, prevInventoryWindowFlags);
 	ImGui::SetWindowPos(ImVec2(1210, 300));
 	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
-	cInventoryItem = cInventoryManager->GetItem("GrassSeed");
+	cInventoryItem = cInventoryManager->prevCurrentItem;
 	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
 		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
 		ImVec2(0, 1), ImVec2(1, 0));
@@ -224,68 +404,113 @@ void CGUI_Scene2D::Update(const double dElapsedTime)
 		cInventoryItem->GetCount());
 	ImGui::End();
 
-	// Render the dirt
-	ImGuiWindowFlags grassSeedWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
-		ImGuiWindowFlags_NoBackground |
-		ImGuiWindowFlags_NoTitleBar |
-		ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoCollapse |
-		ImGuiWindowFlags_NoScrollbar;
-	ImGui::Begin("GrassBlock", NULL, grassSeedWindowFlags);
-	ImGui::SetWindowPos(ImVec2(1210, 330));
-	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
-	cInventoryItem = cInventoryManager->GetItem("GrassBlock");
-	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
-		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
-		ImVec2(0, 1), ImVec2(1, 0));
-	ImGui::SameLine();
-	ImGui::SetWindowFontScale(1.5f);
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
-		cInventoryItem->GetCount());
-	ImGui::End();
+	//// Render the dirt
+	//ImGuiWindowFlags grassBlockWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//	ImGuiWindowFlags_NoBackground |
+	//	ImGuiWindowFlags_NoTitleBar |
+	//	ImGuiWindowFlags_NoMove |
+	//	ImGuiWindowFlags_NoResize |
+	//	ImGuiWindowFlags_NoCollapse |
+	//	ImGuiWindowFlags_NoScrollbar;
+	//ImGui::Begin("GrassSeed", NULL, grassBlockWindowFlags);
+	//ImGui::SetWindowPos(ImVec2(1210, 300));
+	//ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//cInventoryItem = cInventoryManager->GetItem("GrassSeed");
+	//ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//	ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//	ImVec2(0, 1), ImVec2(1, 0));
+	//ImGui::SameLine();
+	//ImGui::SetWindowFontScale(1.5f);
+	//ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+	//	cInventoryItem->GetCount());
+	//ImGui::End();
 
-	// Render the dirt block
-	ImGuiWindowFlags dirtBlockWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
-		ImGuiWindowFlags_NoBackground |
-		ImGuiWindowFlags_NoTitleBar |
-		ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoCollapse |
-		ImGuiWindowFlags_NoScrollbar;
-	ImGui::Begin("DirtBlock", NULL, dirtBlockWindowFlags);
-	ImGui::SetWindowPos(ImVec2(1210, 360));
-	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
-	cInventoryItem = cInventoryManager->GetItem("DirtBlock");
-	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
-		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
-		ImVec2(0, 1), ImVec2(1, 0));
-	ImGui::SameLine();
-	ImGui::SetWindowFontScale(1.5f);
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
-		cInventoryItem->GetCount());
-	ImGui::End();
+	//// Render the dirt
+	//ImGuiWindowFlags grassSeedWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//	ImGuiWindowFlags_NoBackground |
+	//	ImGuiWindowFlags_NoTitleBar |
+	//	ImGuiWindowFlags_NoMove |
+	//	ImGuiWindowFlags_NoResize |
+	//	ImGuiWindowFlags_NoCollapse |
+	//	ImGuiWindowFlags_NoScrollbar;
+	//ImGui::Begin("GrassBlock", NULL, grassSeedWindowFlags);
+	//ImGui::SetWindowPos(ImVec2(1210, 330));
+	//ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//cInventoryItem = cInventoryManager->GetItem("GrassBlock");
+	//ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//	ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//	ImVec2(0, 1), ImVec2(1, 0));
+	//ImGui::SameLine();
+	//ImGui::SetWindowFontScale(1.5f);
+	//ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+	//	cInventoryItem->GetCount());
+	//ImGui::End();
 
-	// Render the dirt block
-	ImGuiWindowFlags StoneWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
-		ImGuiWindowFlags_NoBackground |
-		ImGuiWindowFlags_NoTitleBar |
-		ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoCollapse |
-		ImGuiWindowFlags_NoScrollbar;
-	ImGui::Begin("Stone", NULL, StoneWindowFlags);
-	ImGui::SetWindowPos(ImVec2(1210, 390));
-	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
-	cInventoryItem = cInventoryManager->GetItem("Stone");
-	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
-		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
-		ImVec2(0, 1), ImVec2(1, 0));
-	ImGui::SameLine();
-	ImGui::SetWindowFontScale(1.5f);
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
-		cInventoryItem->GetCount());
-	ImGui::End();
+	//// Render the dirt block
+	//ImGuiWindowFlags dirtBlockWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//	ImGuiWindowFlags_NoBackground |
+	//	ImGuiWindowFlags_NoTitleBar |
+	//	ImGuiWindowFlags_NoMove |
+	//	ImGuiWindowFlags_NoResize |
+	//	ImGuiWindowFlags_NoCollapse |
+	//	ImGuiWindowFlags_NoScrollbar;
+	//ImGui::Begin("DirtBlock", NULL, dirtBlockWindowFlags);
+	//ImGui::SetWindowPos(ImVec2(1210, 360));
+	//ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//cInventoryItem = cInventoryManager->GetItem("DirtBlock");
+	//ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//	ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//	ImVec2(0, 1), ImVec2(1, 0));
+	//ImGui::SameLine();
+	//ImGui::SetWindowFontScale(1.5f);
+	//ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+	//	cInventoryItem->GetCount());
+	//ImGui::End();
+
+	//// Render the dirt block
+	//ImGuiWindowFlags StoneWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//	ImGuiWindowFlags_NoBackground |
+	//	ImGuiWindowFlags_NoTitleBar |
+	//	ImGuiWindowFlags_NoMove |
+	//	ImGuiWindowFlags_NoResize |
+	//	ImGuiWindowFlags_NoCollapse |
+	//	ImGuiWindowFlags_NoScrollbar;
+	//ImGui::Begin("Stone", NULL, StoneWindowFlags);
+	//ImGui::SetWindowPos(ImVec2(1210, 390));
+	//ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//cInventoryItem = cInventoryManager->GetItem("Stone");
+	//ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//	ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//	ImVec2(0, 1), ImVec2(1, 0));
+	//ImGui::SameLine();
+	//ImGui::SetWindowFontScale(1.5f);
+	//ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
+	//	cInventoryItem->GetCount());
+	//ImGui::End();
+	//
+
+	//float selectorPos = 270;
+	//for (int i = 0; i < cInventoryManager->slotNumber; i++)
+	//{
+	//	selectorPos += 30;
+	//}
+
+	//// Render the inventory selector
+	//ImGuiWindowFlags InventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+	//	ImGuiWindowFlags_NoBackground |
+	//	ImGuiWindowFlags_NoTitleBar |
+	//	ImGuiWindowFlags_NoMove |
+	//	ImGuiWindowFlags_NoResize |
+	//	ImGuiWindowFlags_NoCollapse |
+	//	ImGuiWindowFlags_NoScrollbar;
+	//ImGui::Begin("Inventory", NULL, InventoryWindowFlags);
+	//ImGui::SetWindowPos(ImVec2(1210, selectorPos));
+	//ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	//cInventoryItem = cInventoryManager->GetItem("Selector");
+	//ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+	//	ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+	//	ImVec2(0, 1), ImVec2(1, 0));
+	//ImGui::End();
 
 	ImGui::End();
 }	

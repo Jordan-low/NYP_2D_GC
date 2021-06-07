@@ -6,6 +6,12 @@
 */
 CInventoryManager::CInventoryManager(void) 
 {
+	currentItem = nullptr;
+	prevCurrentItem = nullptr;
+	for (int i = 0; i < sizeof(inventoryArray) / sizeof(*inventoryArray); i++)
+	{
+		inventoryArray[i] = nullptr;
+	}
 }
 
 /**
@@ -15,6 +21,85 @@ CInventoryManager::~CInventoryManager(void)
 {
 	// Clear the memory
 	Exit();
+}
+
+
+void CInventoryManager::SwitchCurrentItem()
+{
+	CInventoryItem* oldCurrent = currentItem;
+	bool cycled = false;
+	for (const auto& p : inventoryMap)
+	{
+		if (currentItem == nullptr)
+		{
+			currentItem = GetItem(p.first);
+			break;
+		}
+		if (p.first == "Selector")
+			continue;
+		if (currentItem == GetItem((--inventoryMap.end())->first))
+		{
+			currentItem = GetItem((inventoryMap.begin())->first);
+			cycled = true;
+			break;
+		}
+		if (cycled)
+		{
+			currentItem = GetItem(p.first);
+			break;
+		}
+		else if (currentItem->sName == p.first)
+		{
+			cycled = true;
+			continue;
+		}
+	}
+	prevCurrentItem = oldCurrent;
+	/*CInventoryItem* oldCurrentItem = currentItem;
+	bool cycled = false;
+	for (const auto& p : inventoryMap)
+	{
+		if (currentItem == nullptr)
+		{
+			currentItem = GetItem(p.first);
+			break;
+		}
+		if (p.first == "Selector")
+			continue;
+		if (currentItem == GetItem((--inventoryMap.end())->first))
+		{
+			currentItem = GetItem((inventoryMap.begin())->first);
+			cycled = true;
+			break;
+		}
+		if (cycled)
+		{
+			currentItem = GetItem(p.first);
+			break;
+		}
+		else if (currentItem->sName == p.first)
+		{
+			cycled = true;
+			continue;
+		}
+	}
+	if (cycled)
+	{
+		for (int i = sizeof(inventoryArray) / sizeof(*inventoryArray) - 1; i > 0; i--)
+		{
+			inventoryArray[i] = inventoryArray[i - 1];
+		}
+		inventoryArray[0] = oldCurrentItem;
+	}*/
+
+
+
+	//CycleThroughInventory();
+}
+
+void CInventoryManager::CycleThroughInventory()
+{
+	
 }
 
 /**
@@ -93,7 +178,8 @@ void CInventoryManager::Exit(void)
 }
 
 /**
-@brief Add a Scene to this Inventory Manager
+@brief 
+a Scene to this Inventory Manager
 */
 CInventoryItem* CInventoryManager::Add(	const std::string& _name,
 								const char* imagePath,
@@ -110,11 +196,10 @@ CInventoryItem* CInventoryManager::Add(	const std::string& _name,
 	CInventoryItem* cNewItem = new CInventoryItem(imagePath);
 	cNewItem->iItemMaxCount = iItemMaxCount;
 	cNewItem->iItemCount = iItemCount;
+	cNewItem->sName = _name;
 
 	// Nothing wrong, add the scene to our map
 	inventoryMap[_name] = cNewItem;
-
-
 
 	return cNewItem;
 }

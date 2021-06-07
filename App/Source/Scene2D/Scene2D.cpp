@@ -135,7 +135,6 @@ void CScene2D::Update(const double dElapsedTime)
 	//update gui
 	cGUI->Update(dElapsedTime);
 	cGUI->playerHealth = cPlayer2D->health;
-	std::cout << cGUI->playerHealth << std::endl;
 	cGUI2->Update(dElapsedTime);
 	//update player
 	if (!enableTyping)
@@ -265,12 +264,12 @@ void CScene2D::Update(const double dElapsedTime)
 	//get mouse updates
 	if (cMouseController->IsButtonPressed(GLFW_MOUSE_BUTTON_1))
 	{
-		cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_LEFT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), itemName);
+		cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_LEFT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), cPlayer2D->activeItem->sName);
 	}
 
 	if (cMouseController->IsButtonPressed(GLFW_MOUSE_BUTTON_2))
 	{
-		cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_RIGHT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), itemName);
+		cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_RIGHT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), cPlayer2D->activeItem->sName);
 	}
 }
 

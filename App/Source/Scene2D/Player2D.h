@@ -87,6 +87,8 @@ public:
 
 	glm::vec2 playerOffset;
 
+	CInventoryItem* activeItem;
+
 protected:
 	enum DIRECTION
 	{
@@ -151,7 +153,11 @@ protected:
 	//checks if chest have been picked up
 	void CollectChest(int minIndex, int maxIndex);
 
+	//checks if player hits damage blocks (lava, etc)
 	void CollideDamageBlock(double dt, int minIndex, int maxIndex);
+
+	//change invetory selector on ui
+	void SetInventorySelector();
 
 	//checks if item has been picked up
 	void CollectItem(int minIndex, int maxIndex);

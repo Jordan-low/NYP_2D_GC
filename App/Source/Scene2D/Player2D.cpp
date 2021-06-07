@@ -31,6 +31,7 @@ CPlayer2D::CPlayer2D(void)
 	, playerOffset(glm::vec2(0.0f))
 	, cInventoryManager(NULL)
 	, cInventoryItem(NULL)
+	, activeItem(nullptr)
 {
 	transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
 
@@ -135,18 +136,22 @@ bool CPlayer2D::Init(void)
 
 	cInventoryManager = CInventoryManager::GetInstance();
 
+	//add selector
+	cInventoryItem = cInventoryManager->Add("Selector", "Image/UI/selector.png", 1, 1);
+	cInventoryItem->vec2Size = glm::vec2(25, 25);
+
 	//add dirt item
 	cInventoryItem = cInventoryManager->Add("DirtSeed", "Image/Items/DirtSeed.png", 64, 10);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
 	//add dirt item
-	cInventoryItem = cInventoryManager->Add("DirtBlock", "Image/Items/DirtBlock.png", 64, 10);
+	cInventoryItem = cInventoryManager->Add("DirtBlock", "Image/Blocks/DirtBlock.png", 64, 10);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
 	cInventoryItem = cInventoryManager->Add("GrassSeed", "Image/Items/GrassSeed.png", 64, 10);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
-	cInventoryItem = cInventoryManager->Add("GrassBlock", "Image/Items/GrassBlock.png", 64, 10);
+	cInventoryItem = cInventoryManager->Add("GrassBlock", "Image/Blocks/GrassBlock.png", 64, 10);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
 	cInventoryItem = cInventoryManager->Add("Stone", "Image/Items/Stone.png", 64, 10);
@@ -179,8 +184,9 @@ void CPlayer2D::Update(const double dElapsedTime)
 	CollectChest(4, 4);
 	CollectItem(301, 301);
 	CollideDamageBlock(dElapsedTime, 5, 5);
+	SetInventorySelector();
 
-	cout << health << endl;
+	activeItem = cInventoryManager->currentItem;
 
 	// Store the old position
 	i32vec2OldIndex = i32vec2Index;
@@ -1528,6 +1534,40 @@ void CPlayer2D::CollideDamageBlock(double dt, int minIndex, int maxIndex)
 
 	if (isBesideDamageBlock)
 		health -= 0.1f;
+}
+
+void CPlayer2D::SetInventorySelector()
+{
+	if (cKeyboardController->IsKeyPressed(GLFW_KEY_TAB))
+	{
+		cInventoryManager->SwitchCurrentItem();
+	}
+	if (cKeyboardController->IsKeyPressed(GLFW_KEY_1))
+	{
+		CInventoryItem* oldCurrent = cInventoryManager->currentItem;
+		cInventoryManager->currentItem = cInventoryManager->prevCurrentItem;
+		cInventoryManager->prevCurrentItem = oldCurrent;
+	}
+	//if (cKeyboardController->IsKeyPressed(GLFW_KEY_1))
+	//{
+	//	if (cInventoryManager->inventoryArray[0] != nullptr)
+	//		cInventoryManager->currentItem = cInventoryManager->inventoryArray[0];
+	//}
+	//else if (cKeyboardController->IsKeyPressed(GLFW_KEY_2))
+	//{
+	//	if (cInventoryManager->inventoryArray[1] != nullptr)
+	//		cInventoryManager->currentItem = cInventoryManager->inventoryArray[1];
+	//}
+	//else if (cKeyboardController->IsKeyPressed(GLFW_KEY_3))
+	//{
+	//	if (cInventoryManager->inventoryArray[2] != nullptr)
+	//		cInventoryManager->currentItem = cInventoryManager->inventoryArray[2];
+	//}
+	//else if (cKeyboardController->IsKeyPressed(GLFW_KEY_4))
+	//{
+	//	if (cInventoryManager->inventoryArray[3] != nullptr)
+	//		cInventoryManager->currentItem = cInventoryManager->inventoryArray[3];
+	//}
 }
 
 /**
