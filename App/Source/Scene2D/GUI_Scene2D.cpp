@@ -101,6 +101,7 @@ void CGUI_Scene2D::Update(const double dElapsedTime)
 
 	ImVec4 col = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), "FPS: %d", cFPSCounter->GetFrameRate());
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "HEALTH: %d", (int)playerHealth);
 	
 	//m_fProgressBar += 0.001f;
 	//if (m_fProgressBar > 1.0f)

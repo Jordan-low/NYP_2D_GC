@@ -61,6 +61,8 @@ public:
 	// PostRender
 	void PostRender(void);
 
+	float playerHealth = 100.f;
+
 protected:
 	// Constructor
 	CGUI_Scene2D(void);

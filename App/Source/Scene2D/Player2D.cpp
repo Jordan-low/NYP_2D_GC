@@ -1497,7 +1497,7 @@ void CPlayer2D::CollideDamageBlock(double dt, int minIndex, int maxIndex)
 		{
 			isBesideDamageBlock = true;
 		}
-		else if (CollisionEnd(UP, minIndex, maxIndex))
+		if (CollisionEnd(UP, minIndex, maxIndex))
 		{
 			isBesideDamageBlock = true;
 		}
@@ -1516,7 +1516,7 @@ void CPlayer2D::CollideDamageBlock(double dt, int minIndex, int maxIndex)
 		{
 			isBesideDamageBlock = true;
 		}
-		else if (Collision(LEFT, minIndex, maxIndex))
+		if (Collision(LEFT, minIndex, maxIndex))
 		{
 			isBesideDamageBlock = true;
 		}
@@ -1527,7 +1527,7 @@ void CPlayer2D::CollideDamageBlock(double dt, int minIndex, int maxIndex)
 	}
 
 	if (isBesideDamageBlock)
-		health -= 0.2f;
+		health -= 0.1f;
 }
 
 /**
