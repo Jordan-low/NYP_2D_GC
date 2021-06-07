@@ -90,7 +90,7 @@ bool CPlayer2D::Init(void)
 	cMap2D = CMap2D::GetInstance();
 
 	//Init player colour
-	playerColour = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+	playerColour = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	//CS:: Create the animated sprite and setup the animation
 	animatedSprites = CMeshBuilder::GenerateSpriteAnimation(3, 3,
@@ -125,7 +125,7 @@ bool CPlayer2D::Init(void)
 	quadMesh = CMeshBuilder::GenerateQuad(glm::vec4(1, 1, 1, 1), cSettings->TILE_WIDTH, cSettings->TILE_HEIGHT);
 
 	// Load the player texture
-	if (LoadTexture("Image/scene2d_player.png", iTextureID) == false)
+	if (LoadTexture("Image/player.png", iTextureID) == false)
 	{
 		std::cout << "Failed to load player tile texture" << std::endl;
 		return false;
@@ -213,7 +213,7 @@ void CPlayer2D::Update(const double dElapsedTime)
 
 		//CS: Play left animation
 		animatedSprites->PlayAnimation("left", -1, 1.0f);
-		playerColour = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		//playerColour = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 	else if (cKeyboardController->IsKeyDown(GLFW_KEY_D))
 	{
@@ -268,9 +268,12 @@ void CPlayer2D::Update(const double dElapsedTime)
 
 		//CS: Play right animation
 		animatedSprites->PlayAnimation("right", -1, 1.0f);
-		playerColour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+		//playerColour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
 	}
-	
+	else
+	{
+		animatedSprites->PlayAnimation("idle", -1, 1.0f);
+	}
 	/*if (cKeyboardController->IsKeyDown(GLFW_KEY_W))
 	{
 		const int iOldIndex = i32vec2Index.y;
