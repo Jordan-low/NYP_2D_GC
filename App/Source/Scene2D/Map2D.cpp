@@ -133,47 +133,70 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 	//generate the quad mesh using the meshbuilder
 	quadMesh = CMeshBuilder::GenerateQuad(glm::vec4(1, 1, 1, 1), cSettings->TILE_WIDTH, cSettings->TILE_HEIGHT);
 	//default blocks
-	if (LoadTexture("Image/Bedrock.png", 1) == false)
+	if (LoadTexture("Image/Blocks/Bedrock.png", 1) == false)
 	{
 		std::cout << "Failed to load bedrock block texture" << std::endl;
 		return false;
 	}
-	if (LoadTexture("Image/GrassBlock.png", 2) == false)
+	if (LoadTexture("Image/Blocks/GrassBlock.png", 2) == false)
 	{
 		std::cout << "Failed to load grass block texture" << std::endl;
 		return false;
 	}
-	if (LoadTexture("Image/DirtBlock.png", 3) == false)
+	if (LoadTexture("Image/Blocks/DirtBlock.png", 3) == false)
+	{
+		std::cout << "Failed to load dirt block texture" << std::endl;
+		return false;
+	}
+	if (LoadTexture("Image/Blocks/Chest.png", 4) == false)
 	{
 		std::cout << "Failed to load dirt block texture" << std::endl;
 		return false;
 	}
 	  
 	//trees & seeds
-	if (LoadTexture("Image/GrassTreeSeed.png", 100) == false)
+	if (LoadTexture("Image/Trees/GrassTreeSeed.png", 100) == false)
 	{
 		std::cout << "Failed to load grass tree seed block texture" << std::endl;
 		return false;
 	}
-	if (LoadTexture("Image/GrassTree.png", 101) == false)
+	if (LoadTexture("Image/Trees/GrassTree.png", 101) == false)
 	{
 		std::cout << "Failed to load grass tree block texture" << std::endl;
 		return false;
 	}
+
 	//trees & seeds
-	if (LoadTexture("Image/DirtTreeSeed.png", 102) == false)
+	if (LoadTexture("Image/Trees/DirtTreeSeed.png", 102) == false)
 	{
 		std::cout << "Failed to load dirt tree seed block texture" << std::endl;
 		return false;
 	}
-	if (LoadTexture("Image/DirtTree.png", 103) == false)
+	if (LoadTexture("Image/Trees/DirtTree.png", 103) == false)
 	{
 		std::cout << "Failed to load dirt tree block texture" << std::endl;
 		return false;
 	}
 
+	//Items
+	if (LoadTexture("Image/Items/DirtSeed.png", 301) == false)
+	{
+		std::cout << "Failed to load dirt seed texture" << std::endl;
+		return false;
+	}
+	if (LoadTexture("Image/Items/GrassSeed.png", 302) == false)
+	{
+		std::cout << "Failed to load grass seed texture" << std::endl;
+		return false;
+	}
+	if (LoadTexture("Image/Items/Stone.png", 303) == false)
+	{
+		std::cout << "Failed to load stone block texture" << std::endl;
+		return false;
+	}
+
 	//background items
-	if (LoadTexture("Image/Door.png", 201) == false)
+	if (LoadTexture("Image/Blocks/Door.png", 201) == false)
 	{
 		std::cout << "Failed to load door texture" << std::endl;
 		return false;

@@ -125,7 +125,7 @@ bool CPlayer2D::Init(void)
 	quadMesh = CMeshBuilder::GenerateQuad(glm::vec4(1, 1, 1, 1), cSettings->TILE_WIDTH, cSettings->TILE_HEIGHT);
 
 	// Load the player texture
-	if (LoadTexture("Image/player.png", iTextureID) == false)
+	if (LoadTexture("Image/Characters/player.png", iTextureID) == false)
 	{
 		std::cout << "Failed to load player tile texture" << std::endl;
 		return false;
@@ -134,17 +134,17 @@ bool CPlayer2D::Init(void)
 	cInventoryManager = CInventoryManager::GetInstance();
 
 	//add dirt item
-	cInventoryItem = cInventoryManager->Add("DirtSeed", "Image/DirtSeed.png", 64, 10);
+	cInventoryItem = cInventoryManager->Add("DirtSeed", "Image/Items/DirtSeed.png", 64, 10);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
 	//add dirt item
-	cInventoryItem = cInventoryManager->Add("DirtBlock", "Image/DirtBlock.png", 64, 10);
+	cInventoryItem = cInventoryManager->Add("DirtBlock", "Image/Items/DirtBlock.png", 64, 10);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
-	cInventoryItem = cInventoryManager->Add("GrassSeed", "Image/GrassSeed.png", 64, 10);
+	cInventoryItem = cInventoryManager->Add("GrassSeed", "Image/Items/GrassSeed.png", 64, 10);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
-	cInventoryItem = cInventoryManager->Add("GrassBlock", "Image/GrassBlock.png", 64, 10);
+	cInventoryItem = cInventoryManager->Add("GrassBlock", "Image/Items/GrassBlock.png", 64, 10);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
 	return true;
