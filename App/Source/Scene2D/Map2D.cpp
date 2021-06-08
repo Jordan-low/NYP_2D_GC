@@ -578,11 +578,17 @@ bool CMap2D::FindValue(const int iValue, unsigned int& uirRow, unsigned int& uir
 	return false;
 }
 
+/**
+@brief Get current active world path
+*/
 string CMap2D::GetActiveWorldPath()
 {
 	return "Maps/" + activeWorld + ".csv";
 }
 
+/**
+@brief Update open chest
+*/
 string CMap2D::OpenedChest(glm::vec2 playerPos)
 {
 	SetSaveMapInfo(playerPos.y, playerPos.x, 0);
@@ -714,6 +720,10 @@ void CMap2D::UpdateSeed(string itemName, double dt, int blockNumber, float timer
 	}
 }
 
+/**
+@brief Get block type
+@param blockNumber An int for block number
+*/
 CMap2D::BLOCK_TYPE CMap2D::GetBlockType(int blockNumber)
 {
 	if (blockNumber >= 1 && blockNumber < 100)

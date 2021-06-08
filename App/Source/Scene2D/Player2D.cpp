@@ -1466,6 +1466,7 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 		if (cMap2D->GetMapInfo(y, x, false) == 1 || cMap2D->GetMapInfo(y, x, false) == 0 || cMap2D->GetMapInfo(y, x, false) == 201)
 			return;
 
+		//harvest item
 		Harvest(x, y);
 
 		//set tile to be 0
@@ -1474,6 +1475,11 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 	}
 }
 
+/**
+ @brief Update collectable type blocks
+ @param blockNumber An int for block number
+ @param position A vec2 for position to be placed
+ */
 bool CPlayer2D::UpdateCollectableItem(string itemName)
 {
 	if (itemName == "Cheese")
@@ -1484,6 +1490,11 @@ bool CPlayer2D::UpdateCollectableItem(string itemName)
 	return false;
 }
 
+/**
+ @brief Update tree type item block
+ @param blockNumber An int for block number
+ @param position A vec2 for position to be placed
+ */
 bool CPlayer2D::UpdateTreeItem(int blockNumber, glm::vec2 position)
 {
 	int getBlockBelow = cMap2D->GetMapInfo(position.y + 1, position.x, false);
@@ -1497,6 +1508,11 @@ bool CPlayer2D::UpdateTreeItem(int blockNumber, glm::vec2 position)
 	return false;
 }
 
+/**
+ @brief Update block item
+ @param blockNumber An int for block number
+ @param position A vec2 for position to be placed
+ */
 bool CPlayer2D::UpdateBlockItem(int blockNumber, glm::vec2 position)
 {			
 	//set the tile to be the block
@@ -1752,16 +1768,3 @@ int CPlayer2D::GetIntItemList(string itemName)
 	}
 	return blockNumber;
 }
-
-bool CPlayer2D::CheckBlockType(int blockNumber)
-{
-	switch (cMap2D->GetBlockType(blockNumber))
-	{
-	case CMap2D::BLOCK_TYPE::BLOCKS:
-		break;
-	case CMap2D::BLOCK_TYPE::TREES:
-		break;
-	}
-	return false;
-}
-

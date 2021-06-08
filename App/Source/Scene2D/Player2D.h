@@ -171,8 +171,7 @@ protected:
 
 	std::map<std::string, std::string> MapOfTreesToBlocks;
 
-	bool CheckBlockType(int blockNumber);
-
+	//update different block items
 	bool UpdateCollectableItem(string itemName);
 	bool UpdateTreeItem(int blockNumber, glm::vec2 position);
 	bool UpdateBlockItem(int blockNumber, glm::vec2 position);

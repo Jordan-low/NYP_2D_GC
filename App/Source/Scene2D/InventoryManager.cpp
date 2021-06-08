@@ -7,7 +7,6 @@
 CInventoryManager::CInventoryManager(void) 
 {
 	currentItem = nullptr;
-	prevCurrentItem = nullptr;
 	for (int i = 0; i < sizeof(inventoryArray) / sizeof(*inventoryArray); i++)
 	{
 		inventoryArray[i] = nullptr;
@@ -23,6 +22,9 @@ CInventoryManager::~CInventoryManager(void)
 	Exit();
 }
 
+/**
+@brief Cycle through inventoryMap
+*/
 void CInventoryManager::CycleThroughInventory()
 {
 	if (inventoryArray[0] != nullptr)
