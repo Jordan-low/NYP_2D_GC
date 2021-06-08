@@ -90,6 +90,7 @@ bool CPlayer2D::Init(void)
 	cMap2D = CMap2D::GetInstance();
 
 	health = 100.f;
+	maxHealth = 100.f;
 
 	//Init player colour
 	playerColour = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -142,7 +143,7 @@ bool CPlayer2D::Init(void)
 	cInventoryItem = cInventoryManager->Add("DirtBlock", "Image/Blocks/DirtBlockUI.png", 64, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
-	cInventoryItem = cInventoryManager->Add("GrassSeed", "Image/Items/GrassSeed.png", 64, 10);
+	cInventoryItem = cInventoryManager->Add("GrassSeed", "Image/Items/GrassSeed.png", 64, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
 	cInventoryItem = cInventoryManager->Add("GrassBlock", "Image/Blocks/GrassBlock.png", 64, 0);
@@ -191,6 +192,8 @@ bool CPlayer2D::Init(void)
  */
 void CPlayer2D::Update(const double dElapsedTime)
 {
+	health = Math::Clamp(health, 0.f, maxHealth);
+
 	if (reachLeftEnd || reachRightEnd)
 		playerPosition = glm::vec2(i32vec2Index.x - (int)playerOffset.x, i32vec2Index.y);
 	else

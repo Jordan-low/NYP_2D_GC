@@ -136,6 +136,7 @@ void CScene2D::Update(const double dElapsedTime)
 	//update gui
 	cGUI->Update(dElapsedTime);
 	cGUI->playerHealth = cPlayer2D->health;
+	cGUI->playerMaxHealth = cPlayer2D->maxHealth;
 	cGUI2->Update(dElapsedTime);
 	//update player
 	if (!enableTyping)

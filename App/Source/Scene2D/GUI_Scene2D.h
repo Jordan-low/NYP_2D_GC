@@ -62,6 +62,7 @@ public:
 	void PostRender(void);
 
 	float playerHealth = 100.f;
+	float playerMaxHealth = playerHealth;
 
 protected:
 	// Constructor
