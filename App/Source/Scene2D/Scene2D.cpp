@@ -86,6 +86,7 @@ bool CScene2D::Init(void)
 	// Store the keyboard and mouse controller singleton instance here
 	cKeyboardController = CKeyboardController::GetInstance();
 	cMouseController = CMouseController::GetInstance();
+	cInventoryManager = CInventoryManager::GetInstance();
 
 	// Setup cGUI
 	cGUI = CGUI_Scene2D::GetInstance();
@@ -237,39 +238,20 @@ void CScene2D::Update(const double dElapsedTime)
 	//Update seeds timer
 	cPlayer2D->UpdateSeeds(dElapsedTime);
 
-	if (cKeyboardController->IsKeyReleased(GLFW_KEY_1))
-	{
-		itemName = "";
-	}
-	if (cKeyboardController->IsKeyReleased(GLFW_KEY_2))
-	{
-		itemName = "GrassBlock";
-	}
-	else if (cKeyboardController->IsKeyReleased(GLFW_KEY_3))
-	{
-		itemName = "DirtBlock";
-	}
-	else if (cKeyboardController->IsKeyReleased(GLFW_KEY_4))
-	{
-		itemName = "GrassSeed";
-	}
-	else if (cKeyboardController->IsKeyReleased(GLFW_KEY_5))
-	{
-		itemName = "DirtSeed";
-	}
-
 	cMouseController->mouseOffset.x = cPlayer2D->playerOffset.x;
 	cMouseController->mouseOffset.y = cPlayer2D->playerOffset.y;
 
 	//get mouse updates
 	if (cMouseController->IsButtonPressed(GLFW_MOUSE_BUTTON_1))
 	{
-		cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_LEFT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), cPlayer2D->activeItem->sName);
+		if (cInventoryManager->currentItem != nullptr)
+			cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_LEFT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), cInventoryManager->currentItem->sName);
 	}
 
 	if (cMouseController->IsButtonPressed(GLFW_MOUSE_BUTTON_2))
 	{
-		cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_RIGHT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), cPlayer2D->activeItem->sName);
+		if (cInventoryManager->currentItem != nullptr)
+			cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_RIGHT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), cInventoryManager->currentItem->sName);
 	}
 }
 

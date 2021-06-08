@@ -23,83 +23,48 @@ CInventoryManager::~CInventoryManager(void)
 	Exit();
 }
 
-
-void CInventoryManager::SwitchCurrentItem()
-{
-	CInventoryItem* oldCurrent = currentItem;
-	bool cycled = false;
-	for (const auto& p : inventoryMap)
-	{
-		if (currentItem == nullptr)
-		{
-			currentItem = GetItem(p.first);
-			break;
-		}
-		if (p.first == "Selector")
-			continue;
-		if (currentItem == GetItem((--inventoryMap.end())->first))
-		{
-			currentItem = GetItem((inventoryMap.begin())->first);
-			cycled = true;
-			break;
-		}
-		if (cycled)
-		{
-			currentItem = GetItem(p.first);
-			break;
-		}
-		else if (currentItem->sName == p.first)
-		{
-			cycled = true;
-			continue;
-		}
-	}
-	prevCurrentItem = oldCurrent;
-	/*CInventoryItem* oldCurrentItem = currentItem;
-	bool cycled = false;
-	for (const auto& p : inventoryMap)
-	{
-		if (currentItem == nullptr)
-		{
-			currentItem = GetItem(p.first);
-			break;
-		}
-		if (p.first == "Selector")
-			continue;
-		if (currentItem == GetItem((--inventoryMap.end())->first))
-		{
-			currentItem = GetItem((inventoryMap.begin())->first);
-			cycled = true;
-			break;
-		}
-		if (cycled)
-		{
-			currentItem = GetItem(p.first);
-			break;
-		}
-		else if (currentItem->sName == p.first)
-		{
-			cycled = true;
-			continue;
-		}
-	}
-	if (cycled)
-	{
-		for (int i = sizeof(inventoryArray) / sizeof(*inventoryArray) - 1; i > 0; i--)
-		{
-			inventoryArray[i] = inventoryArray[i - 1];
-		}
-		inventoryArray[0] = oldCurrentItem;
-	}*/
-
-
-
-	//CycleThroughInventory();
-}
-
 void CInventoryManager::CycleThroughInventory()
 {
-	
+	if (inventoryArray[0] != nullptr)
+	{
+		for (int i = 1; i < sizeof(inventoryArray) / sizeof(*inventoryArray); i++)
+		{
+			if (inventoryArray[0] == inventoryArray[i])
+				return;
+		}
+	}
+
+	for (int i = sizeof(inventoryArray) / sizeof(*inventoryArray) - 1; i > 0; i--)
+	{		
+		inventoryArray[i] = inventoryArray[i - 1];
+	}
+
+	bool cycle = false;
+	for (const auto& p : inventoryMap)
+	{
+		if (inventoryArray[0] == nullptr) //check if first inventory array is nullptr, then set first item to that
+		{
+			inventoryArray[0] = p.second;
+			break;
+		}
+		if (p.second->sName == "Selector") //skip selector
+			continue;
+		if (cycle) //cycle to next item in inventoryMap
+		{
+			inventoryArray[0] = p.second;
+			break;
+		}
+		else if (p.second == inventoryArray[0]) //check if first inventory array is current p 
+		{
+			cycle = true; //next p iteration, set the first inventory array to be that (basically cycle to next item)
+			continue;
+		}
+		else if (inventoryArray[0] == (--inventoryMap.end())->second) //check if first inventory array == last element in inventoryMap
+		{
+			inventoryArray[0] = inventoryMap.begin()->second; //if yes, set it back to the first element
+			break;
+		}
+	}
 }
 
 /**

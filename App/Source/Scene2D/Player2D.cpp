@@ -31,7 +31,6 @@ CPlayer2D::CPlayer2D(void)
 	, playerOffset(glm::vec2(0.0f))
 	, cInventoryManager(NULL)
 	, cInventoryItem(NULL)
-	, activeItem(nullptr)
 {
 	transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
 
@@ -140,7 +139,7 @@ bool CPlayer2D::Init(void)
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
 	//add dirt item
-	cInventoryItem = cInventoryManager->Add("DirtBlock", "Image/Blocks/DirtBlock.png", 64, 0);
+	cInventoryItem = cInventoryManager->Add("DirtBlock", "Image/Blocks/DirtBlockUI.png", 64, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
 	cInventoryItem = cInventoryManager->Add("GrassSeed", "Image/Items/GrassSeed.png", 64, 10);
@@ -149,8 +148,12 @@ bool CPlayer2D::Init(void)
 	cInventoryItem = cInventoryManager->Add("GrassBlock", "Image/Blocks/GrassBlock.png", 64, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
+	cInventoryItem = cInventoryManager->Add("Cheese", "Image/Items/Cheese.png", 32, 0);
+	cInventoryItem->vec2Size = glm::vec2(25, 25);
+
 	cInventoryItem = cInventoryManager->Add("Stone", "Image/Items/Stone.png", 64, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
+
 	//add selector
 	cInventoryItem = cInventoryManager->Add("Selector", "Image/UI/selector.png", 1, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
@@ -166,15 +169,19 @@ bool CPlayer2D::Init(void)
 	itemList.push_back(make_pair("DirtSeed", 102));
 	itemList.push_back(make_pair("DirtTreeGrown", 103));
 	itemList.push_back(make_pair("Stone", 301));
-	itemList.push_back(make_pair("GrassItem", 302));
-	itemList.push_back(make_pair("DirtItem", 303));
+	itemList.push_back(make_pair("Cheese", 302));
 	
-	//seeds and tree blocks
+	//for seeds and tree blocks maps
 	MapOfBlocksToSeeds.insert(make_pair("DirtTreeGrown", "DirtBlock"));
 	MapOfBlocksToSeeds.insert(make_pair("GrassTreeGrown", "GrassBlock"));
 
 	MapOfTreesToBlocks.insert(make_pair("GrassSeed", "GrassTreeGrown"));
 	MapOfTreesToBlocks.insert(make_pair("DirtSeed", "DirtTreeGrown"));
+
+	for (int i = 0; i < 5; i++)
+		cInventoryManager->CycleThroughInventory();
+
+	cInventoryManager->currentItem = cInventoryManager->inventoryArray[0];
 
 	return true;
 }
@@ -190,11 +197,9 @@ void CPlayer2D::Update(const double dElapsedTime)
 		playerPosition = glm::vec2(cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x, i32vec2Index.y);
 
 	CollectChest(4, 4);
-	CollectItem(301, 301);
+	CollectItem(301, 302);
 	CollideDamageBlock(dElapsedTime, 5, 5);
 	SetInventorySelector();
-
-	activeItem = cInventoryManager->currentItem;
 
 	// Store the old position
 	i32vec2OldIndex = i32vec2Index;
@@ -1438,10 +1443,22 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 		//check if player has enough block quantity
 		if (CheckQuantity(itemName))
 		{
-			//set the tile to be the block
-			cMap2D->SetSaveMapInfo(y, x, blockNumber, false);
-			//reduce block quantity
-			ReduceQuantity(itemName, 1);
+
+			switch (cMap2D->GetBlockType(blockNumber))
+			{
+			case CMap2D::BLOCK_TYPE::BLOCKS:
+				if (UpdateBlockItem(blockNumber, glm::vec2(x, y)))
+					ReduceQuantity(itemName, 1);
+				break;
+			case CMap2D::BLOCK_TYPE::TREES:
+				if (UpdateTreeItem(blockNumber, glm::vec2(x, y)))
+					ReduceQuantity(itemName, 1);
+				break;
+			case CMap2D::BLOCK_TYPE::COLLECTABLES:
+				if (UpdateCollectableItem(itemName))
+					ReduceQuantity(itemName, 1);
+				break;
+			}
 		}
 		break;
 	case MOUSE_RIGHT:
@@ -1456,6 +1473,37 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 		break;
 	}
 }
+
+bool CPlayer2D::UpdateCollectableItem(string itemName)
+{
+	if (itemName == "Cheese")
+	{
+		health += 50;
+		return true;
+	}
+	return false;
+}
+
+bool CPlayer2D::UpdateTreeItem(int blockNumber, glm::vec2 position)
+{
+	int getBlockBelow = cMap2D->GetMapInfo(position.y + 1, position.x, false);
+	CMap2D::BLOCK_TYPE temp = cMap2D->GetBlockType(getBlockBelow);
+
+	if (temp == CMap2D::BLOCK_TYPE::BLOCKS)
+	{
+		cMap2D->SetSaveMapInfo(position.y, position.x, blockNumber, false);
+		return true;
+	}
+	return false;
+}
+
+bool CPlayer2D::UpdateBlockItem(int blockNumber, glm::vec2 position)
+{			
+	//set the tile to be the block
+	cMap2D->SetSaveMapInfo(position.y, position.x, blockNumber, false);
+	return true;
+}
+
 
 /**
  @brief Update all individual seed timer
@@ -1564,34 +1612,43 @@ void CPlayer2D::SetInventorySelector()
 {
 	if (cKeyboardController->IsKeyPressed(GLFW_KEY_TAB))
 	{
-		cInventoryManager->SwitchCurrentItem();
+		cInventoryManager->CycleThroughInventory();
 	}
 	if (cKeyboardController->IsKeyPressed(GLFW_KEY_1))
 	{
-		CInventoryItem* oldCurrent = cInventoryManager->currentItem;
-		cInventoryManager->currentItem = cInventoryManager->prevCurrentItem;
-		cInventoryManager->prevCurrentItem = oldCurrent;
+		if (cInventoryManager->inventoryArray[0] != nullptr)
+			cInventoryManager->currentItem = cInventoryManager->inventoryArray[0];
 	}
-	//if (cKeyboardController->IsKeyPressed(GLFW_KEY_1))
-	//{
-	//	if (cInventoryManager->inventoryArray[0] != nullptr)
-	//		cInventoryManager->currentItem = cInventoryManager->inventoryArray[0];
-	//}
-	//else if (cKeyboardController->IsKeyPressed(GLFW_KEY_2))
-	//{
-	//	if (cInventoryManager->inventoryArray[1] != nullptr)
-	//		cInventoryManager->currentItem = cInventoryManager->inventoryArray[1];
-	//}
-	//else if (cKeyboardController->IsKeyPressed(GLFW_KEY_3))
-	//{
-	//	if (cInventoryManager->inventoryArray[2] != nullptr)
-	//		cInventoryManager->currentItem = cInventoryManager->inventoryArray[2];
-	//}
-	//else if (cKeyboardController->IsKeyPressed(GLFW_KEY_4))
-	//{
-	//	if (cInventoryManager->inventoryArray[3] != nullptr)
-	//		cInventoryManager->currentItem = cInventoryManager->inventoryArray[3];
-	//}
+	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_2))
+	{
+		if (cInventoryManager->inventoryArray[1] != nullptr)
+			cInventoryManager->currentItem = cInventoryManager->inventoryArray[1];
+	}
+	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_3))
+	{
+		if (cInventoryManager->inventoryArray[2] != nullptr)
+			cInventoryManager->currentItem = cInventoryManager->inventoryArray[2];
+	}
+	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_4))
+	{
+		if (cInventoryManager->inventoryArray[3] != nullptr)
+			cInventoryManager->currentItem = cInventoryManager->inventoryArray[3];
+	}
+	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_5))
+	{
+		if (cInventoryManager->inventoryArray[4] != nullptr)
+			cInventoryManager->currentItem = cInventoryManager->inventoryArray[4];
+	}
+	if (cKeyboardController->IsKeyPressed(GLFW_KEY_CAPS_LOCK))
+	{
+		for (int i = 0; i < sizeof(cInventoryManager->inventoryArray) / sizeof(*cInventoryManager->inventoryArray); i++)
+		{
+			if (cInventoryManager->inventoryArray[i] != nullptr)
+				std::cout << "ELEMENT " << i << ": " << cInventoryManager->inventoryArray[i]->sName << std::endl;
+		}
+		if (cInventoryManager->currentItem != nullptr)
+			std::cout << "CURRENT: " << cInventoryManager->currentItem->sName << std::endl;
+	}
 }
 
 /**
@@ -1695,3 +1752,16 @@ int CPlayer2D::GetIntItemList(string itemName)
 	}
 	return blockNumber;
 }
+
+bool CPlayer2D::CheckBlockType(int blockNumber)
+{
+	switch (cMap2D->GetBlockType(blockNumber))
+	{
+	case CMap2D::BLOCK_TYPE::BLOCKS:
+		break;
+	case CMap2D::BLOCK_TYPE::TREES:
+		break;
+	}
+	return false;
+}
+

@@ -18,6 +18,8 @@
 #include <vector>
 using namespace std;
 string CMap2D::activeWorld = "START";
+CMap2D::BLOCK_TYPE blockType;
+
 /**
  @brief Constructor This constructor has protected access modifier as this class will be a Singleton
  */
@@ -188,12 +190,7 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 		std::cout << "Failed to load stone block texture" << std::endl;
 		return false;
 	}
-	if (LoadTexture("Image/Items/GrassSeed.png", 302) == false)
-	{
-		std::cout << "Failed to load grass seed drop texture" << std::endl;
-		return false;
-	}
-	if (LoadTexture("Image/Items/DirtSeed.png", 303) == false)
+	if (LoadTexture("Image/Items/Cheese.png", 302) == false)
 	{
 		std::cout << "Failed to load dirt seed drop texture" << std::endl;
 		return false;
@@ -590,7 +587,7 @@ string CMap2D::OpenedChest(glm::vec2 playerPos)
 {
 	SetSaveMapInfo(playerPos.y, playerPos.x, 0);
 
-	int random = Math::RandIntMinMax(301, 301);
+	int random = Math::RandIntMinMax(301, 302);
 	SetSaveMapInfo(playerPos.y + 1, playerPos.x, random);
 
 	return "";
@@ -715,4 +712,18 @@ void CMap2D::UpdateSeed(string itemName, double dt, int blockNumber, float timer
 			}
 		}
 	}
+}
+
+CMap2D::BLOCK_TYPE CMap2D::GetBlockType(int blockNumber)
+{
+	if (blockNumber >= 1 && blockNumber < 100)
+		return BLOCKS;
+	else if (blockNumber >= 100 && blockNumber < 200)
+		return TREES;
+	else if (blockNumber >= 200 && blockNumber < 300)
+		return BACKGROUND_BLOCKS;
+	else if (blockNumber >= 300 && blockNumber < 400)
+		return COLLECTABLES;
+	else
+		return TOTAL_BLOCK_TYPE;
 }

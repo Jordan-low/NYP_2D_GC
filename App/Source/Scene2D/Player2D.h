@@ -88,8 +88,6 @@ public:
 
 	glm::vec2 playerOffset;
 
-	CInventoryItem* activeItem;
-
 protected:
 	enum DIRECTION
 	{
@@ -173,6 +171,11 @@ protected:
 
 	std::map<std::string, std::string> MapOfTreesToBlocks;
 
+	bool CheckBlockType(int blockNumber);
+
+	bool UpdateCollectableItem(string itemName);
+	bool UpdateTreeItem(int blockNumber, glm::vec2 position);
+	bool UpdateBlockItem(int blockNumber, glm::vec2 position);
 
 private:
 	bool reachLeftEnd = true;

@@ -45,9 +45,8 @@ public:
 
 	CInventoryItem* prevCurrentItem;
 
-	CInventoryItem* inventoryArray[4];
+	CInventoryItem* inventoryArray[5];
 
-	void SwitchCurrentItem();
 	void CycleThroughInventory();
 
 	std::map<std::string, CInventoryItem*> inventoryMap;

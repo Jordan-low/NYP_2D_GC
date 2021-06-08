@@ -82,6 +82,8 @@ protected:
 	//Player
 	CPlayer2D* cPlayer2D;
 
+	CInventoryManager* cInventoryManager;
+
 private:
 	bool enableTyping = false;
 

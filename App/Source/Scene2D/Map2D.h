@@ -59,6 +59,18 @@ class CMap2D : public CSingletonTemplate<CMap2D>, public CEntity2D
 {
 	friend CSingletonTemplate<CMap2D>;
 public:
+
+	enum BLOCK_TYPE
+	{
+		BLOCKS = 0,
+		TREES,
+		BACKGROUND_BLOCKS,
+		COLLECTABLES,
+		TOTAL_BLOCK_TYPE
+	};
+
+	static BLOCK_TYPE blockType;
+
 	// Init
 	bool Init(	const unsigned int uiNumLevels = 1,
 				const unsigned int uiNumRows = 24,
@@ -134,7 +146,10 @@ public:
 	//update individual block seeds based on timing
 	void UpdateSeed(string itemName, double dt, int blockNumber, float timer);
 
+	BLOCK_TYPE GetBlockType(int blockNumber);
+
 protected:
+
 	// The variable containing the rapidcsv::Document
 	// We will load the CSV file's content into this Document
 	rapidcsv::Document doc;
