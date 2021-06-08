@@ -437,12 +437,12 @@ void CPlayer2D::Update(const double dElapsedTime)
 		{
 			doubleJumpReady = true;
 			cPhysics2D.SetStatus(CPhysics2D::STATUS::JUMP);
-			cPhysics2D.SetInitialVelocity(glm::vec2(0.0f, 2.0f));
+			cPhysics2D.SetInitialVelocity(glm::vec2(0.0f, 3.0f));
 		}
 		else if (doubleJumpReady)
 		{
 			cPhysics2D.SetStatus(CPhysics2D::STATUS::JUMP);
-			cPhysics2D.SetInitialVelocity(glm::vec2(0.0f, 2.0f));
+			cPhysics2D.SetInitialVelocity(glm::vec2(0.0f, 3.0f));
 			doubleJumpReady = false;
 		}
 	}
@@ -1005,7 +1005,7 @@ void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 	if (cPhysics2D.GetStatus() == CPhysics2D::STATUS::JUMP)
 	{
 		// Update the elapsed time to the physics engine
-		cPhysics2D.AddElapsedTime((float)dElapsedTime);
+		cPhysics2D.SetTime((float)dElapsedTime);
 		// Call the physics engine update method to calculate the final velocity and displacement
 		cPhysics2D.Update();
 		// Get the displacement from the physics engine
@@ -1014,22 +1014,19 @@ void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 		// Store the current i32vec2Index.y
 		int iIndex_YAxis_OLD = i32vec2Index.y;
 
-		// Translate the displacement from pixels to indices
-		int iDisplacement = (int)(v2Displacement.y / cSettings->TILE_HEIGHT);
-		int iDisplacement_MicroSteps = (int)((v2Displacement.y * cSettings->iWindowHeight) - iDisplacement) /
-			(int)cSettings->NUM_STEPS_PER_TILE_YAXIS;
-		if (iDisplacement_MicroSteps > 0)
+		int iDisplacement_MicroSteps = (int)(v2Displacement.y / cSettings->MICRO_STEP_YAXIS);
+		if (i32vec2Index.y < (int)cSettings->NUM_TILES_YAXIS)
 		{
-			iDisplacement++;
+			i32vec2NumMicroSteps.y += iDisplacement_MicroSteps;
+			if (i32vec2NumMicroSteps.y > cSettings->NUM_STEPS_PER_TILE_YAXIS)
+			{
+				i32vec2NumMicroSteps.y -= cSettings->NUM_STEPS_PER_TILE_YAXIS;
+				i32vec2Index.y++;
+			}
 		}
-
-		// Update the indices
-		i32vec2Index.y += iDisplacement;
-		i32vec2NumMicroSteps.y = 0;
 
 		// Constraint the player's position within the screen boundary
 		Constraint(UP);
-		cout << i32vec2Index.y << endl;
 
 		// Iterate through all rows until the proposed row
 		// Check if the player will hit a tile; stop jump if so.
@@ -1058,7 +1055,7 @@ void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 	else if (cPhysics2D.GetStatus() == CPhysics2D::STATUS::FALL)
 	{
 		// Update the elapsed time to the physics engine
-		cPhysics2D.AddElapsedTime((float)dElapsedTime);
+		cPhysics2D.SetTime((float)dElapsedTime);
 		// Call the physics engine update method to calculate the final velocity and displacement
 		cPhysics2D.Update();
 		// Get the displacement from the physics engine
@@ -1067,19 +1064,19 @@ void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 		// Store the current i32vec2Index.y
 		int iIndex_YAxis_OLD = i32vec2Index.y;
 
-		// Translate the displacement from pixels to indices
-		int iDisplacement = (int)(v2Displacement.y / cSettings->TILE_HEIGHT);
-		int iDisplacement_MicroSteps = (int)((v2Displacement.y * cSettings->iWindowHeight) - iDisplacement) /
-			(int)cSettings->NUM_STEPS_PER_TILE_YAXIS;
+		//Distance per steps
+		int iDisplacement_MicroSteps = (int)(v2Displacement.y / cSettings->MICRO_STEP_YAXIS);
 
-		if (iDisplacement_MicroSteps > 0)
+		if (i32vec2Index.y >= 0)
 		{
-			iDisplacement++;
+			i32vec2NumMicroSteps.y -= fabs(iDisplacement_MicroSteps);
+			if (i32vec2NumMicroSteps.y < 0)
+			{
+				i32vec2NumMicroSteps.y = ((int)cSettings->NUM_STEPS_PER_TILE_YAXIS) - 1;
+				i32vec2Index.y--;
+			}
 		}
 
-		// Update the indices
-		i32vec2Index.y += iDisplacement;
-		i32vec2NumMicroSteps.y = 0;
 
 		// Constraint the player's position within the screen boundary
 		Constraint(DOWN);
@@ -1099,11 +1096,117 @@ void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 					i32vec2Index.y = i + 1;
 				// Set the Physics to idle status
 				cPhysics2D.SetStatus(CPhysics2D::STATUS::IDLE);
+
+				i32vec2NumMicroSteps.y = 0;
 				break;
 			}
 		}
 	}
 }
+//void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
+//{
+//	if (cPhysics2D.GetStatus() == CPhysics2D::STATUS::JUMP)
+//	{
+//		// Update the elapsed time to the physics engine
+//		cPhysics2D.AddElapsedTime((float)dElapsedTime);
+//		// Call the physics engine update method to calculate the final velocity and displacement
+//		cPhysics2D.Update();
+//		// Get the displacement from the physics engine
+//		glm::vec2 v2Displacement = cPhysics2D.GetDisplacement();
+//
+//		// Store the current i32vec2Index.y
+//		int iIndex_YAxis_OLD = i32vec2Index.y;
+//
+//		// Translate the displacement from pixels to indices
+//		int iDisplacement = (int)(v2Displacement.y / cSettings->TILE_HEIGHT);
+//		int iDisplacement_MicroSteps = (int)((v2Displacement.y * cSettings->iWindowHeight) - iDisplacement) /
+//			(int)cSettings->NUM_STEPS_PER_TILE_YAXIS;
+//		if (iDisplacement_MicroSteps > 0)
+//		{
+//			iDisplacement++;
+//		}
+//
+//		// Update the indices
+//		i32vec2Index.y += iDisplacement;
+//		i32vec2NumMicroSteps.y = 0;
+//
+//		// Constraint the player's position within the screen boundary
+//		Constraint(UP);
+//		cout << i32vec2Index.y << endl;
+//
+//		// Iterate through all rows until the proposed row
+//		// Check if the player will hit a tile; stop jump if so.
+//		int iIndex_YAxis_Proposed = i32vec2Index.y;
+//		for (int i = iIndex_YAxis_OLD; i <= iIndex_YAxis_Proposed; i++)
+//		{
+//			// Change the player's index to the current i value
+//			i32vec2Index.y = i;
+//			// If the new position is not feasible, then revert to old position
+//			if (CheckPosition(UP, 1, 99) == false)
+//			{
+//				// Set the Physics to fall status
+//				cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
+//				break;
+//			}
+//		}
+//
+//		// If the player is still jumping and the initial velocity has reached zero or below zero, 
+//		// then it has reach the peak of its jump
+//		if ((cPhysics2D.GetStatus() == CPhysics2D::STATUS::JUMP) && (cPhysics2D.GetInitialVelocity().y <= 0.0f))
+//		{
+//			// Set status to fall
+//			cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
+//		}
+//	}
+//	else if (cPhysics2D.GetStatus() == CPhysics2D::STATUS::FALL)
+//	{
+//		// Update the elapsed time to the physics engine
+//		cPhysics2D.AddElapsedTime((float)dElapsedTime);
+//		// Call the physics engine update method to calculate the final velocity and displacement
+//		cPhysics2D.Update();
+//		// Get the displacement from the physics engine
+//		glm::vec2 v2Displacement = cPhysics2D.GetDisplacement();
+//
+//		// Store the current i32vec2Index.y
+//		int iIndex_YAxis_OLD = i32vec2Index.y;
+//
+//		// Translate the displacement from pixels to indices
+//		int iDisplacement = (int)(v2Displacement.y / cSettings->TILE_HEIGHT);
+//		int iDisplacement_MicroSteps = (int)((v2Displacement.y * cSettings->iWindowHeight) - iDisplacement) /
+//			(int)cSettings->NUM_STEPS_PER_TILE_YAXIS;
+//
+//		if (iDisplacement_MicroSteps > 0)
+//		{
+//			iDisplacement++;
+//		}
+//
+//		// Update the indices
+//		i32vec2Index.y += iDisplacement;
+//		i32vec2NumMicroSteps.y = 0;
+//
+//		// Constraint the player's position within the screen boundary
+//		Constraint(DOWN);
+//
+//		// Iterate through all rows until the proposed row
+//		// Check if the player will hit a tile; stop fall if so.
+//		int iIndex_YAxis_Proposed = i32vec2Index.y;
+//		for (int i = iIndex_YAxis_OLD; i >= iIndex_YAxis_Proposed; i--)
+//		{
+//			// Change the player's index to the current i value
+//			i32vec2Index.y = i;
+//			// If the new position is not feasible, then revert to old position
+//			if (CheckPosition(DOWN, 1, 99) == false)
+//			{
+//				// Revert to the previous position
+//				if (i != iIndex_YAxis_OLD)
+//					i32vec2Index.y = i + 1;
+//				// Set the Physics to idle status
+//				cPhysics2D.SetStatus(CPhysics2D::STATUS::IDLE);
+//				break;
+//			}
+//		}
+//	}
+//}
 
 /**
  @brief Check for player is in mid air
