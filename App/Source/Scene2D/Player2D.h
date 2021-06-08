@@ -42,6 +42,7 @@ class CMap2D;
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 class CPlayer2D : public CSingletonTemplate<CPlayer2D>, public CEntity2D
 {
@@ -167,6 +168,11 @@ protected:
 
 	//get int item list by item name
 	int GetIntItemList(string itemName);
+
+	std::map<std::string, std::string> MapOfBlocksToSeeds;
+
+	std::map<std::string, std::string> MapOfTreesToBlocks;
+
 
 private:
 	bool reachLeftEnd = true;

@@ -135,38 +135,46 @@ bool CPlayer2D::Init(void)
 	}
 
 	cInventoryManager = CInventoryManager::GetInstance();
-
-	//add selector
-	cInventoryItem = cInventoryManager->Add("Selector", "Image/UI/selector.png", 1, 1);
+	//add dirt item
+	cInventoryItem = cInventoryManager->Add("DirtSeed", "Image/Items/DirtSeed.png", 64, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
 	//add dirt item
-	cInventoryItem = cInventoryManager->Add("DirtSeed", "Image/Items/DirtSeed.png", 64, 10);
-	cInventoryItem->vec2Size = glm::vec2(25, 25);
-
-	//add dirt item
-	cInventoryItem = cInventoryManager->Add("DirtBlock", "Image/Blocks/DirtBlock.png", 64, 10);
+	cInventoryItem = cInventoryManager->Add("DirtBlock", "Image/Blocks/DirtBlock.png", 64, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
 	cInventoryItem = cInventoryManager->Add("GrassSeed", "Image/Items/GrassSeed.png", 64, 10);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
-	cInventoryItem = cInventoryManager->Add("GrassBlock", "Image/Blocks/GrassBlock.png", 64, 10);
+	cInventoryItem = cInventoryManager->Add("GrassBlock", "Image/Blocks/GrassBlock.png", 64, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
-	cInventoryItem = cInventoryManager->Add("Stone", "Image/Items/Stone.png", 64, 10);
+	cInventoryItem = cInventoryManager->Add("Stone", "Image/Items/Stone.png", 64, 0);
+	cInventoryItem->vec2Size = glm::vec2(25, 25);
+	//add selector
+	cInventoryItem = cInventoryManager->Add("Selector", "Image/UI/selector.png", 1, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
+	//block items
 	itemList.push_back(make_pair("Bedrock", 1));
 	itemList.push_back(make_pair("GrassBlock", 2));
 	itemList.push_back(make_pair("DirtBlock", 3));
 	itemList.push_back(make_pair("Chest", 4));
 	itemList.push_back(make_pair("LavaBlock", 5));
-
 	itemList.push_back(make_pair("GrassSeed", 100));
+	itemList.push_back(make_pair("GrassTreeGrown", 101));
 	itemList.push_back(make_pair("DirtSeed", 102));
-
+	itemList.push_back(make_pair("DirtTreeGrown", 103));
 	itemList.push_back(make_pair("Stone", 301));
+	itemList.push_back(make_pair("GrassItem", 302));
+	itemList.push_back(make_pair("DirtItem", 303));
+	
+	//seeds and tree blocks
+	MapOfBlocksToSeeds.insert(make_pair("DirtTreeGrown", "DirtBlock"));
+	MapOfBlocksToSeeds.insert(make_pair("GrassTreeGrown", "GrassBlock"));
+
+	MapOfTreesToBlocks.insert(make_pair("GrassSeed", "GrassTreeGrown"));
+	MapOfTreesToBlocks.insert(make_pair("DirtSeed", "DirtTreeGrown"));
 
 	return true;
 }
@@ -919,27 +927,43 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection, int minIndex, int maxIndex)
  */
 void CPlayer2D::Harvest(int x, int y)
 {
-	switch (cMap2D->GetMapInfo(y, x, false))
+	string harvestItemName = GetStringItemList(cMap2D->GetMapInfo(y, x, false));
+
+	//get seed name or get block name for item harvested
+	string dropName = "";
+	bool changeToSeed = false;
+	for (auto const& x : MapOfBlocksToSeeds)
 	{
-	case 101:
-		cInventoryItem = cInventoryManager->GetItem("GrassBlock");
-		cInventoryItem->Add(rand() % 4 + 1);
-		break;
-	case 103:
-		cInventoryItem = cInventoryManager->GetItem("DirtBlock");
-		cInventoryItem->Add(rand() % 4 + 1);
-		break;
-	case 2:
-		cInventoryItem = cInventoryManager->GetItem("GrassSeed");
-		cInventoryItem->Add(rand() % 2 + 1);
-		break;
-	case 3:
-		cInventoryItem = cInventoryManager->GetItem("DirtSeed");
-		cInventoryItem->Add(rand() % 2 + 1);
-		break;
-	default:
-		break;
+		if (harvestItemName == x.first)
+		{
+			dropName = x.second;
+			break;
+		}
+		else if (harvestItemName == x.second)
+		{
+			dropName = x.first;
+			changeToSeed = true;
+			break;
+		}
 	}
+
+	if (changeToSeed)
+	{
+		for (auto const& x : MapOfTreesToBlocks)
+		{
+			if (dropName == x.second)
+			{
+				dropName = x.first;
+				break;
+			}
+		}
+	}
+
+	if (!cInventoryManager->Check(dropName))
+		return;
+
+	cInventoryItem = cInventoryManager->GetItem(dropName);
+	cInventoryItem->Add(Math::RandIntMinMax(1, 4));
 }
 
 /**

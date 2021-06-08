@@ -79,6 +79,7 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 			{
 				arrMapInfo[uiLevel][uiRow][uiCol].value = 0;
 				arrMapInfo[uiLevel][uiRow][uiCol].timer = 0;
+				arrMapInfo[uiLevel][uiRow][uiCol].updated = false;
 			}
 		}
 	}
@@ -160,31 +161,41 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 	}
 	  
 	//trees & seeds
-	if (LoadTexture("Image/Trees/GrassTreeSeed.png", 100) == false)
+	if (LoadTexture("Image/Trees/GrassTree.png", 100) == false)
 	{
 		std::cout << "Failed to load grass tree seed block texture" << std::endl;
 		return false;
 	}
-	if (LoadTexture("Image/Trees/GrassTree.png", 101) == false)
+	if (LoadTexture("Image/Trees/GrassTreeGrown.png", 101) == false)
 	{
 		std::cout << "Failed to load grass tree block texture" << std::endl;
 		return false;
 	}
-	if (LoadTexture("Image/Trees/DirtTreeSeed.png", 102) == false)
+	if (LoadTexture("Image/Trees/DirtTree.png", 102) == false)
 	{
 		std::cout << "Failed to load dirt tree seed block texture" << std::endl;
 		return false;
 	}
-	if (LoadTexture("Image/Trees/DirtTree.png", 103) == false)
+	if (LoadTexture("Image/Trees/DirtTreeGrown.png", 103) == false)
 	{
 		std::cout << "Failed to load dirt tree block texture" << std::endl;
 		return false;
 	}
 
-	//items
+	//drop items
 	if (LoadTexture("Image/Items/Stone.png", 301) == false)
 	{
 		std::cout << "Failed to load stone block texture" << std::endl;
+		return false;
+	}
+	if (LoadTexture("Image/Items/GrassSeed.png", 302) == false)
+	{
+		std::cout << "Failed to load grass seed drop texture" << std::endl;
+		return false;
+	}
+	if (LoadTexture("Image/Items/DirtSeed.png", 303) == false)
+	{
+		std::cout << "Failed to load dirt seed drop texture" << std::endl;
 		return false;
 	}
 

@@ -46,6 +46,7 @@ struct MapSize {
 struct Grid {
 	unsigned int value;
 	float timer;
+	bool updated;
 
 	// Row and Column index of its parent
 	// Note that 0 <= i < uiRowSize & 0 <= j < uiColSize
