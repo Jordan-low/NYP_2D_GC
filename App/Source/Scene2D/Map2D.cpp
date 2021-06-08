@@ -500,6 +500,8 @@ bool CMap2D::GenerateRandomMap()
 	int chestSpawned = 0;
 	int chestSpawnRate = 20;
 	int lavaSpawnRate = 10;
+	int treeSpawnRate = 8;
+
 	for (int i = 3; i < 100; i++)
 	{
 		bool done = false;
@@ -511,6 +513,24 @@ bool CMap2D::GenerateRandomMap()
 
 			if (random + 1 == current || random - 1 == current || random == current)
 			{
+				//spawn trees
+				int treeRandom = Math::RandIntMinMax(0, treeSpawnRate);
+				if (treeRandom == 0)
+				{
+					int treeType = Math::RandIntMinMax(1, 2);
+					switch (treeType)
+					{
+					case 1:
+						SetMapInfo(random - 1, i, 100, false);
+						break;
+					case 2:
+						SetMapInfo(random - 1, i, 102, false);
+						break;
+					default:
+						break;
+					}
+				}
+
 				//spawn chest
 				int chestRandom = Math::RandIntMinMax(0, chestSpawnRate);
 				if (chestRandom == 0)
@@ -523,7 +543,6 @@ bool CMap2D::GenerateRandomMap()
 				if (i == 99 && chestSpawned == 0)
 					SetMapInfo(random - 1, i, 4, false);
 
-				
 				//set grass and dirt floor
 				SetMapInfo(random, i, 2, false);
 				for (int j = 1; j < cSettings->NUM_TILES_YAXIS - random; j++)

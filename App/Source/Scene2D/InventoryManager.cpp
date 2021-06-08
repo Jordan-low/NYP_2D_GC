@@ -27,15 +27,7 @@ CInventoryManager::~CInventoryManager(void)
 */
 void CInventoryManager::CycleThroughInventory()
 {
-	if (inventoryArray[0] != nullptr)
-	{
-		for (int i = 1; i < sizeof(inventoryArray) / sizeof(*inventoryArray); i++)
-		{
-			if (inventoryArray[0] == inventoryArray[i])
-				return;
-		}
-	}
-
+	//cycle backwards the array
 	for (int i = sizeof(inventoryArray) / sizeof(*inventoryArray) - 1; i > 0; i--)
 	{		
 		inventoryArray[i] = inventoryArray[i - 1];
