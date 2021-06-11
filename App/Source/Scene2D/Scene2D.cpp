@@ -245,13 +245,13 @@ void CScene2D::Update(const double dElapsedTime)
 	//get mouse updates
 	if (cMouseController->IsButtonPressed(GLFW_MOUSE_BUTTON_1))
 	{
-		if (cInventoryManager->currentItem != nullptr)
+		if (cInventoryManager->currentItem != cInventoryManager->currentWeapon)
 			cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_LEFT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), cInventoryManager->currentItem->sName);
 	}
 
 	if (cMouseController->IsButtonPressed(GLFW_MOUSE_BUTTON_2))
 	{
-		if (cInventoryManager->currentItem != nullptr)
+		if (cInventoryManager->currentItem != cInventoryManager->currentWeapon)
 			cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_RIGHT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), cInventoryManager->currentItem->sName);
 	}
 }

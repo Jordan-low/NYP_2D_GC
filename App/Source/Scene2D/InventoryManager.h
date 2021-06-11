@@ -40,6 +40,8 @@ public:
 	int GetNumItems(void) const;
 
 	int slotNumber = 0;
+	
+	CInventoryItem* currentWeapon;
 
 	CInventoryItem* currentItem;
 
@@ -51,6 +53,7 @@ public:
 	std::map<std::string, CInventoryItem*> inventoryMap;
 
 	bool renderShop = false;
+
 protected:
 	// Constructor
 	CInventoryManager(void);

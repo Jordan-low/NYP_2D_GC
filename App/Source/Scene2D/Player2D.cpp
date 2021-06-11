@@ -155,10 +155,14 @@ bool CPlayer2D::Init(void)
 	cInventoryItem = cInventoryManager->Add("Cheese", "Image/Items/Cheese.png", 32, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
-	cInventoryItem = cInventoryManager->Add("Stone", "Image/Items/Stone.png", 64, 0);
+	cInventoryItem = cInventoryManager->Add("Stone", "Image/Items/Stone.png", 64, 5);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
-	//add gun
+	//add fist
+	cInventoryItem = cInventoryManager->Add("Fist", "Image/Items/Fist.png", 1, 1);
+	cInventoryItem->vec2Size = glm::vec2(25, 25);
+
+	//add sword
 	cInventoryItem = cInventoryManager->Add("StoneSword", "Image/Items/StoneSword.png", 1, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
@@ -189,7 +193,8 @@ bool CPlayer2D::Init(void)
 	for (int i = 0; i < 5; i++)
 		cInventoryManager->CycleThroughInventory();
 
-	cInventoryManager->currentItem = cInventoryManager->inventoryArray[0];
+	cInventoryManager->currentWeapon = cInventoryManager->GetItem("Fist");
+	cInventoryManager->currentItem = cInventoryManager->currentWeapon;
 
 	return true;
 }
@@ -1760,6 +1765,20 @@ void CPlayer2D::AttackEnemy(int minIndex, int maxIndex)
 
 void CPlayer2D::Shop()
 {
+	if (cInventoryManager->renderShop)
+	{
+		if (cKeyboardController->IsKeyPressed(GLFW_KEY_E))
+		{
+			cInventoryItem = cInventoryManager->GetItem("Stone");
+			if (cInventoryItem->GetCount() >= 5)
+			{
+				cInventoryManager->currentWeapon = cInventoryManager->GetItem("StoneSword");
+				cInventoryManager->currentItem = cInventoryManager->currentWeapon;
+				cInventoryItem->Remove(5);
+			}
+		}
+	}
+
 	bool isBesideShop = false;
 	int offset = 0;
 
@@ -1791,7 +1810,10 @@ void CPlayer2D::Shop()
 	}
 
 	if (!isBesideShop)
+	{
+		cInventoryManager->renderShop = false;
 		return;
+	}
 
 	if (cKeyboardController->IsKeyPressed(GLFW_KEY_E))
 	{
@@ -1854,25 +1876,30 @@ void CPlayer2D::SetInventorySelector()
 	}
 	if (cKeyboardController->IsKeyPressed(GLFW_KEY_1))
 	{
+		if (cInventoryManager->currentWeapon != nullptr)
+			cInventoryManager->currentItem = cInventoryManager->currentWeapon;
+	}
+	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_2))
+	{
 		if (cInventoryManager->inventoryArray[0] != nullptr)
 			cInventoryManager->currentItem = cInventoryManager->inventoryArray[0];
 	}
-	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_2))
+	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_3))
 	{
 		if (cInventoryManager->inventoryArray[1] != nullptr)
 			cInventoryManager->currentItem = cInventoryManager->inventoryArray[1];
 	}
-	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_3))
+	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_4))
 	{
 		if (cInventoryManager->inventoryArray[2] != nullptr)
 			cInventoryManager->currentItem = cInventoryManager->inventoryArray[2];
 	}
-	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_4))
+	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_5))
 	{
 		if (cInventoryManager->inventoryArray[3] != nullptr)
 			cInventoryManager->currentItem = cInventoryManager->inventoryArray[3];
 	}
-	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_5))
+	else if (cKeyboardController->IsKeyPressed(GLFW_KEY_6))
 	{
 		if (cInventoryManager->inventoryArray[4] != nullptr)
 			cInventoryManager->currentItem = cInventoryManager->inventoryArray[4];
@@ -2006,7 +2033,7 @@ void CPlayer2D::RenderBlockRangeTiles()
 			foundAll = true;
 	}
 
-	if (cInventoryManager->currentItem == nullptr)
+	if (cInventoryManager->currentItem == cInventoryManager->currentWeapon)
 		return;
 
 	for (int i = i32vec2Index.x - (int)playerOffset.x - hitRange; i < i32vec2Index.x - (int)playerOffset.x + hitRange; i++)

@@ -11,6 +11,7 @@ CInventoryManager::CInventoryManager(void)
 	{
 		inventoryArray[i] = nullptr;
 	}
+	currentWeapon = nullptr;
 }
 
 /**
@@ -41,7 +42,7 @@ void CInventoryManager::CycleThroughInventory()
 			inventoryArray[0] = p.second;
 			break;
 		}
-		if (p.second->sName == "Selector") //skip selector
+		if (p.second->sName == "Selector" || p.second->sName == "Fist" || p.second->sName == "StoneSword") //skip selector
 			continue;
 		if (cycle) //cycle to next item in inventoryMap
 		{
@@ -60,7 +61,7 @@ void CInventoryManager::CycleThroughInventory()
 		}
 	}
 
-	currentItem = nullptr;
+	currentItem = currentWeapon;
 }
 
 /**

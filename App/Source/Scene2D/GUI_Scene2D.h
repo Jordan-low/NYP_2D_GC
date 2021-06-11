@@ -87,4 +87,6 @@ protected:
 	float m_fProgressBar;
 
 	void RenderShop();
+
+	void RenderWeapon();
 };

@@ -57,8 +57,37 @@ void CGUI_Scene2D::RenderShop()
 	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
 		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
 		ImVec2(0, 1), ImVec2(1, 0));
-	ImGui::End();
+	cInventoryItem = cInventoryManager->GetItem("Stone");
+	ImGui::SetWindowFontScale(1.5f);
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Stone: %d / %d",
+		cInventoryItem->GetCount(), 5);
 
+	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Press E to buy");
+	ImGui::End();
+}
+
+void CGUI_Scene2D::RenderWeapon()
+{
+	if (cInventoryManager->currentWeapon == nullptr)
+		return;
+
+	//Render the inventory
+	ImGuiWindowFlags InventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+		ImGuiWindowFlags_NoBackground |
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoScrollbar;
+
+	ImGui::Begin("WEAPON", NULL, InventoryWindowFlags);
+	ImGui::SetWindowPos(ImVec2(1210, 200));
+	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	cInventoryItem = cInventoryManager->currentWeapon;
+	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+		ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::End();
 }
 
 /**
@@ -74,6 +103,7 @@ bool CGUI_Scene2D::Init(void)
 
 	//init inven manager
 	cInventoryManager = CInventoryManager::GetInstance();
+
 	//add tree to inven item
 	//cInventoryItem = cInventoryManager->Add("DirtTree", "Image/Scene2D_TreeTile.tga", 5, 0);
 	//cInventoryItem = cInventoryManager->Add("Dirt", "Image/DirtBlock.png", 5, 50);
@@ -155,12 +185,16 @@ void CGUI_Scene2D::Update(const double dElapsedTime)
 
 	if (cInventoryManager->currentItem != nullptr)
 	{
-		float currentItemPosY = 240;
-		for (int i = 0; i < sizeof(cInventoryManager->inventoryArray) / sizeof(*cInventoryManager->inventoryArray); i++)
+		float currentItemPosY = 200;
+		if (cInventoryManager->currentItem != cInventoryManager->currentWeapon)
 		{
-			if (cInventoryManager->currentItem == cInventoryManager->inventoryArray[i])
-				break;
-			currentItemPosY += 30;
+			currentItemPosY = 240;
+			for (int i = 0; i < sizeof(cInventoryManager->inventoryArray) / sizeof(*cInventoryManager->inventoryArray); i++)
+			{
+				if (cInventoryManager->currentItem == cInventoryManager->inventoryArray[i])
+					break;
+				currentItemPosY += 30;
+			}
 		}
 
 		//Render the current item box
@@ -203,6 +237,8 @@ void CGUI_Scene2D::Update(const double dElapsedTime)
 	ImGui::PopStyleColor();
 	ImGui::PopStyleColor();
 	ImGui::End();
+
+	RenderWeapon();
 
 	ImGui::End();
 }	
