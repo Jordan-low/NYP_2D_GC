@@ -1759,7 +1759,10 @@ void CPlayer2D::AttackEnemy(int minIndex, int maxIndex)
 	health -= 0.1f;
 	if (cKeyboardController->IsKeyPressed(GLFW_KEY_E))
 	{
-		cMap2D->KilledEnemy(glm::vec2(playerPosition.x + offset, playerPosition.y));
+		float damage = 25.f;
+		if (cInventoryManager->currentWeapon == cInventoryManager->GetItem("StoneSword"))
+			damage = 50.f;
+		cMap2D->KilledEnemy(glm::vec2(playerPosition.x + offset, playerPosition.y), damage);
 	}
 }
 

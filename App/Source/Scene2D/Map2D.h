@@ -124,7 +124,7 @@ public:
 	//update chest 
 	string OpenedChest(glm::vec2);
 
-	string KilledEnemy(glm::vec2);
+	string KilledEnemy(glm::vec2, float damage);
 
 	//return world name list vector
 	vector<string> GetWorldNameList();

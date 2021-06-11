@@ -648,9 +648,9 @@ string CMap2D::OpenedChest(glm::vec2 playerPos)
 	return "";
 }
 
-string CMap2D::KilledEnemy(glm::vec2 playerPos)
+string CMap2D::KilledEnemy(glm::vec2 playerPos, float damage)
 {
-	arrMapInfo[0][(int)playerPos.y][(int)playerPos.x].health -= 30.f;
+	arrMapInfo[0][(int)playerPos.y][(int)playerPos.x].health -= damage;
 	
 	if (arrMapInfo[0][(int)playerPos.y][(int)playerPos.x].health <= 0.f)
 	{
