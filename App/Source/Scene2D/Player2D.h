@@ -152,6 +152,10 @@ protected:
 	//checks if chest have been picked up
 	void CollectChest(int minIndex, int maxIndex);
 
+	void AttackEnemy(int minIndex, int maxIndex);
+
+	void Shop();
+
 	//checks if player hits damage blocks (lava, etc)
 	void CollideDamageBlock(double dt, int minIndex, int maxIndex);
 
@@ -166,6 +170,8 @@ protected:
 
 	//get int item list by item name
 	int GetIntItemList(string itemName);
+
+	void RenderBlockRangeTiles();
 
 	std::map<std::string, std::string> MapOfBlocksToSeeds;
 
@@ -183,6 +189,10 @@ private:
 	bool reachBotEnd = false;
 
 	bool doubleJumpReady = false;
+
+	DIRECTION lastMovementInput;
+
+	int hitRange = 3;
 
 	glm::vec2 playerPosition;
 };

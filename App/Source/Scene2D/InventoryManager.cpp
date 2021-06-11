@@ -59,6 +59,8 @@ void CInventoryManager::CycleThroughInventory()
 			break;
 		}
 	}
+
+	currentItem = nullptr;
 }
 
 /**

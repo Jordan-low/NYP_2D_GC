@@ -46,7 +46,7 @@ struct MapSize {
 struct Grid {
 	unsigned int value;
 	float timer;
-	bool updated;
+	float health;
 
 	// Row and Column index of its parent
 	// Note that 0 <= i < uiRowSize & 0 <= j < uiColSize
@@ -123,6 +123,8 @@ public:
 
 	//update chest 
 	string OpenedChest(glm::vec2);
+
+	string KilledEnemy(glm::vec2);
 
 	//return world name list vector
 	vector<string> GetWorldNameList();

@@ -85,4 +85,6 @@ protected:
 
 	ImGuiWindowFlags window_flags;
 	float m_fProgressBar;
+
+	void RenderShop();
 };

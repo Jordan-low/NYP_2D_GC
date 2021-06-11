@@ -81,7 +81,7 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 			{
 				arrMapInfo[uiLevel][uiRow][uiCol].value = 0;
 				arrMapInfo[uiLevel][uiRow][uiCol].timer = 0;
-				arrMapInfo[uiLevel][uiRow][uiCol].updated = false;
+				arrMapInfo[uiLevel][uiRow][uiCol].health = 100.f;
 			}
 		}
 	}
@@ -161,6 +161,11 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 		std::cout << "Failed to load lava block texture" << std::endl;
 		return false;
 	}
+	if (LoadTexture("Image/Blocks/Shop.png", 6) == false)
+	{
+		std::cout << "Failed to load shop block texture" << std::endl;
+		return false;
+	}
 	  
 	//trees & seeds
 	if (LoadTexture("Image/Trees/GrassTree.png", 100) == false)
@@ -200,6 +205,19 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 	if (LoadTexture("Image/Blocks/Door.png", 201) == false)
 	{
 		std::cout << "Failed to load door texture" << std::endl;
+		return false;
+	}
+	//background items
+	if (LoadTexture("Image/UI/blockRange.png", 202) == false)
+	{
+		std::cout << "Failed to load block range texture" << std::endl;
+		return false;
+	}
+
+	//Enemy
+	if (LoadTexture("Image/Characters/Enemy.png", 401) == false)
+	{
+		std::cout << "Failed to load enemy texture" << std::endl;
 		return false;
 	}
 
@@ -388,10 +406,13 @@ void CMap2D::SetSaveMapInfo(const unsigned int uiRow, const unsigned int uiCol, 
  */
 int CMap2D::GetMapInfo(const unsigned int uiRow, const int unsigned uiCol, const bool bInvert) const
 {
-	if (bInvert)
-		return arrMapInfo[uiCurLevel][cSettings->NUM_TILES_YAXIS - uiRow - 1][uiCol].value;
-	else
-		return arrMapInfo[uiCurLevel][uiRow][uiCol].value;
+	if (uiRow >= 0 && uiRow < cSettings->NUM_TILES_YAXIS && uiCol >= 0 && uiCol < cSettings->NUM_TILES_XAXIS) //check if its within screen
+	{
+		if (bInvert)
+			return arrMapInfo[uiCurLevel][cSettings->NUM_TILES_YAXIS - uiRow - 1][uiCol].value;
+		else
+			return arrMapInfo[uiCurLevel][uiRow][uiCol].value;
+	}
 }
 
 /**
@@ -501,6 +522,7 @@ bool CMap2D::GenerateRandomMap()
 	int chestSpawnRate = 20;
 	int lavaSpawnRate = 10;
 	int treeSpawnRate = 8;
+	int enemySpawnRate = 20;
 
 	for (int i = 3; i < 100; i++)
 	{
@@ -537,6 +559,14 @@ bool CMap2D::GenerateRandomMap()
 				{
 					SetMapInfo(random - 1, i, 4, false);
 					chestSpawned++;
+				}
+
+				//spawn enemies
+				//spawn chest
+				int enemyRandom = Math::RandIntMinMax(0, enemySpawnRate);
+				if (enemyRandom == 0)
+				{
+					SetMapInfo(random - 1, i, 401, false);
 				}
 
 				//force spawn chest
@@ -614,6 +644,21 @@ string CMap2D::OpenedChest(glm::vec2 playerPos)
 
 	int random = Math::RandIntMinMax(301, 302);
 	SetSaveMapInfo(playerPos.y + 1, playerPos.x, random);
+
+	return "";
+}
+
+string CMap2D::KilledEnemy(glm::vec2 playerPos)
+{
+	arrMapInfo[0][(int)playerPos.y][(int)playerPos.x].health -= 30.f;
+	
+	if (arrMapInfo[0][(int)playerPos.y][(int)playerPos.x].health <= 0.f)
+	{
+		SetSaveMapInfo(playerPos.y, playerPos.x, 0);
+
+		int random = Math::RandIntMinMax(301, 301);
+		SetSaveMapInfo(playerPos.y + 1, playerPos.x, random);
+	}
 
 	return "";
 }

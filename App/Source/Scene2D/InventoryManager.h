@@ -50,6 +50,7 @@ public:
 
 	std::map<std::string, CInventoryItem*> inventoryMap;
 
+	bool renderShop = false;
 protected:
 	// Constructor
 	CInventoryManager(void);

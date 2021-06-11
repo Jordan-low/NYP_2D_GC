@@ -89,6 +89,8 @@ bool CPlayer2D::Init(void)
 	// Get the handler to the CMap2D instance
 	cMap2D = CMap2D::GetInstance();
 
+
+
 	health = 100.f;
 	maxHealth = 100.f;
 
@@ -96,14 +98,15 @@ bool CPlayer2D::Init(void)
 	playerColour = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	//CS:: Create the animated sprite and setup the animation
-	animatedSprites = CMeshBuilder::GenerateSpriteAnimation(3, 3,
+	animatedSprites = CMeshBuilder::GenerateSpriteAnimation(4, 3,
 		cSettings->TILE_WIDTH, cSettings->TILE_HEIGHT);
-	animatedSprites->AddAnimation("idle", 0, 2);
+	animatedSprites->AddAnimation("idleright", 0, 2);
+	animatedSprites->AddAnimation("idleleft", 9, 11);
 	animatedSprites->AddAnimation("right", 3, 5);
 	animatedSprites->AddAnimation("left", 6, 8);
 
 	//CS: Play the "idle" animation as default
-	animatedSprites->PlayAnimation("idle", -1, 1.0f);
+	animatedSprites->PlayAnimation("idleright", -1, 1.0f);
 
 	cPhysics2D.Init();
 	cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
@@ -155,6 +158,10 @@ bool CPlayer2D::Init(void)
 	cInventoryItem = cInventoryManager->Add("Stone", "Image/Items/Stone.png", 64, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
 
+	//add gun
+	cInventoryItem = cInventoryManager->Add("StoneSword", "Image/Items/StoneSword.png", 1, 0);
+	cInventoryItem->vec2Size = glm::vec2(25, 25);
+
 	//add selector
 	cInventoryItem = cInventoryManager->Add("Selector", "Image/UI/selector.png", 1, 0);
 	cInventoryItem->vec2Size = glm::vec2(25, 25);
@@ -192,6 +199,8 @@ bool CPlayer2D::Init(void)
  */
 void CPlayer2D::Update(const double dElapsedTime)
 {
+
+	RenderBlockRangeTiles();
 	health = Math::Clamp(health, 0.f, maxHealth);
 
 	if (reachLeftEnd || reachRightEnd)
@@ -199,7 +208,9 @@ void CPlayer2D::Update(const double dElapsedTime)
 	else
 		playerPosition = glm::vec2(cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x, i32vec2Index.y);
 
+	Shop();
 	CollectChest(4, 4);
+	AttackEnemy(401, 401);
 	CollectItem(301, 302);
 	CollideDamageBlock(dElapsedTime, 5, 5);
 	SetInventorySelector();
@@ -210,6 +221,8 @@ void CPlayer2D::Update(const double dElapsedTime)
 	// Get keyboard updates
 	if (cKeyboardController->IsKeyDown(GLFW_KEY_A))
 	{
+		lastMovementInput = LEFT;
+
 		if (reachRightEnd && i32vec2Index.x < 17)
 		{
 			reachRightEnd = false;
@@ -217,7 +230,7 @@ void CPlayer2D::Update(const double dElapsedTime)
 
 		if (reachRightEnd || reachLeftEnd)
 		{
-			if (!CollisionEnd(LEFT, 1, 99))
+			if (!CollisionEnd(LEFT, 1, 99) && !CollisionEnd(LEFT, 401, 499))
 			{
 				const int iOldIndex = i32vec2Index.x;
 				if (i32vec2Index.x >= 0)
@@ -236,9 +249,9 @@ void CPlayer2D::Update(const double dElapsedTime)
 		else
 		{
 			i32vec2NumMicroSteps.x = 0;
-			if (!Collision(LEFT, 1, 99))
+			if (!Collision(LEFT, 1, 99) && !Collision(LEFT, 401, 499))
 			{
-				cMap2D->mapOffset_MicroSteps.x += cSettings->TILE_WIDTH / 2;
+				cMap2D->mapOffset_MicroSteps.x += cSettings->TILE_WIDTH / 16;
 				if (cMap2D->mapOffset_MicroSteps.x >= cSettings->TILE_WIDTH)
 				{
 					cMap2D->mapOffset.x += cSettings->TILE_WIDTH;
@@ -266,6 +279,7 @@ void CPlayer2D::Update(const double dElapsedTime)
 	}
 	else if (cKeyboardController->IsKeyDown(GLFW_KEY_D))
 	{
+		lastMovementInput = RIGHT;
 		if (reachLeftEnd && i32vec2Index.x > 15)
 		{
 			reachLeftEnd = false;
@@ -273,7 +287,7 @@ void CPlayer2D::Update(const double dElapsedTime)
 
 		if (reachLeftEnd || reachRightEnd)
 		{
-			if (!CollisionEnd(RIGHT, 1, 99))
+			if (!CollisionEnd(RIGHT, 1, 99) && !CollisionEnd(RIGHT, 401, 499))
 			{
 				const int iOldIndex = i32vec2Index.x;
 				if (i32vec2Index.x < cSettings->TILE_RATIO_XAXIS - 1)
@@ -292,9 +306,9 @@ void CPlayer2D::Update(const double dElapsedTime)
 		else
 		{
 			i32vec2NumMicroSteps.x = 0;
-			if (!Collision(RIGHT, 1, 99))
+			if (!Collision(RIGHT, 1, 99) && !Collision(RIGHT, 401, 499))
 			{
-				cMap2D->mapOffset_MicroSteps.x -= cSettings->TILE_WIDTH / 2;
+				cMap2D->mapOffset_MicroSteps.x -= cSettings->TILE_WIDTH / 16;
 				if (cMap2D->mapOffset_MicroSteps.x <= -cSettings->TILE_WIDTH)
 				{
 					cMap2D->mapOffset.x -= cSettings->TILE_WIDTH;
@@ -321,7 +335,15 @@ void CPlayer2D::Update(const double dElapsedTime)
 	}
 	else
 	{
-		animatedSprites->PlayAnimation("idle", -1, 1.0f);
+		switch (lastMovementInput)
+		{
+		case LEFT:
+			animatedSprites->PlayAnimation("idleleft", -1, 1.0f);
+			break;
+		case RIGHT:
+			animatedSprites->PlayAnimation("idleright", -1, 1.0f);
+			break;
+		}
 	}
 	/*if (cKeyboardController->IsKeyDown(GLFW_KEY_W))
 	{
@@ -1039,7 +1061,7 @@ void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 			// Change the player's index to the current i value
 			i32vec2Index.y = i;
 			// If the new position is not feasible, then revert to old position
-			if (CheckPosition(UP, 1, 99) == false)
+			if (!CheckPosition(UP, 1, 99))
 			{
 				// Set the Physics to fall status
 				cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
@@ -1092,7 +1114,7 @@ void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 			// Change the player's index to the current i value
 			i32vec2Index.y = i;
 			// If the new position is not feasible, then revert to old position
-			if (CheckPosition(DOWN, 1, 99) == false)
+			if (!CheckPosition(DOWN, 1, 99))
 			{
 				// Revert to the previous position
 				if (i != iIndex_YAxis_OLD)
@@ -1221,10 +1243,10 @@ bool CPlayer2D::IsMidAir()
 		return false;
 	
 	//check if the tile below the player's current pos is empty
-	if ((i32vec2NumMicroSteps.x == 0) && (cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x) == 0))
+	if ((i32vec2NumMicroSteps.x == 0) && (cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x) == 0) || (cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x) == 202))
 		return true;
 
-	else if ((i32vec2NumMicroSteps.x == 0) && (cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x - (int)playerOffset.x) == 0))
+	else if ((i32vec2NumMicroSteps.x == 0) && (cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x - (int)playerOffset.x) == 0) || (cMap2D->GetMapInfo(i32vec2Index.y - 1, i32vec2Index.x - (int)playerOffset.x) == 202))
 		return true;
 
 	return false;
@@ -1529,6 +1551,13 @@ void CPlayer2D::ResetPosition()
  */
 void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string itemName)
 {
+	//check for player hit range
+	if (x > i32vec2Index.x - (int)playerOffset.x + hitRange || x < i32vec2Index.x - (int)playerOffset.x - hitRange)
+		return;
+	if (y > cSettings->NUM_TILES_YAXIS - i32vec2Index.y + hitRange || y < cSettings->NUM_TILES_YAXIS - i32vec2Index.y - hitRange)
+		return;
+
+	//check for mouse hit outside screen space
 	if (x >= cSettings->NUM_TILES_XAXIS || x < 0)
 		return;
 	else if (y >= cSettings->NUM_TILES_YAXIS || y < 0)
@@ -1543,7 +1572,11 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 			return;
 
 		//do not allow for blocks to get replaced.
-		if (cMap2D->GetMapInfo(y, x, false) != 0)
+		if (cMap2D->GetMapInfo(y, x, false) == 202)
+		{
+
+		}
+		else if (cMap2D->GetMapInfo(y, x, false) != 0)
 			return;
 
 		//check if player has enough block quantity
@@ -1680,6 +1713,89 @@ void CPlayer2D::CollectChest(int minIndex, int maxIndex)
 	if (cKeyboardController->IsKeyPressed(GLFW_KEY_E))
 	{
 		cMap2D->OpenedChest(glm::vec2(playerPosition.x + offset, playerPosition.y));
+	}
+}
+
+void CPlayer2D::AttackEnemy(int minIndex, int maxIndex)
+{
+	bool isBesideEenmy = false;
+	int offset = 0;
+
+	if (reachLeftEnd || reachRightEnd)
+	{
+		if (CollisionEnd(LEFT, minIndex, maxIndex))
+		{
+			isBesideEenmy = true;
+			offset = -1;
+		}
+		else if (CollisionEnd(RIGHT, minIndex, maxIndex))
+		{
+			isBesideEenmy = true;
+			offset = 1;
+		}
+	}
+	else
+	{
+		if (Collision(LEFT, minIndex, maxIndex))
+		{
+			isBesideEenmy = true;
+			offset = -1;
+		}
+		else if (Collision(RIGHT, minIndex, maxIndex))
+		{
+			isBesideEenmy = true;
+			offset = 1;
+		}
+	}
+
+	if (!isBesideEenmy)
+		return;
+
+	health -= 0.1f;
+	if (cKeyboardController->IsKeyPressed(GLFW_KEY_E))
+	{
+		cMap2D->KilledEnemy(glm::vec2(playerPosition.x + offset, playerPosition.y));
+	}
+}
+
+void CPlayer2D::Shop()
+{
+	bool isBesideShop = false;
+	int offset = 0;
+
+	if (reachLeftEnd || reachRightEnd)
+	{
+		if (CollisionEnd(LEFT, 6, 6))
+		{
+			isBesideShop = true;
+			offset = -1;
+		}
+		else if (CollisionEnd(RIGHT, 6, 6))
+		{
+			isBesideShop = true;
+			offset = 1;
+		}
+	}
+	else
+	{
+		if (Collision(LEFT, 6, 6))
+		{
+			isBesideShop = true;
+			offset = -1;
+		}
+		else if (Collision(RIGHT, 6, 6))
+		{
+			isBesideShop = true;
+			offset = 1;
+		}
+	}
+
+	if (!isBesideShop)
+		return;
+
+	if (cKeyboardController->IsKeyPressed(GLFW_KEY_E))
+	{
+		cInventoryManager->renderShop = true;
 	}
 }
 
@@ -1873,4 +1989,34 @@ int CPlayer2D::GetIntItemList(string itemName)
 			blockNumber = itemList[i].second;
 	}
 	return blockNumber;
+}
+
+void CPlayer2D::RenderBlockRangeTiles()
+{
+	bool foundAll = false;
+	while (!foundAll)
+	{
+		unsigned int col = -1;
+		unsigned int row = -1;
+		if (cMap2D->FindValue(202, row, col))
+		{
+			cMap2D->SetMapInfo(row, col, 0);
+		}
+		else
+			foundAll = true;
+	}
+
+	if (cInventoryManager->currentItem == nullptr)
+		return;
+
+	for (int i = i32vec2Index.x - (int)playerOffset.x - hitRange; i < i32vec2Index.x - (int)playerOffset.x + hitRange; i++)
+	{
+		for (int j = cSettings->NUM_TILES_YAXIS - i32vec2Index.y - hitRange; j < cSettings->NUM_TILES_YAXIS - i32vec2Index.y + hitRange; j++)
+		{
+			if (cMap2D->GetMapInfo(j, i, false) == 0)
+			{
+				cMap2D->SetMapInfo(j, i, 202, false);
+			}
+		}
+	}
 }

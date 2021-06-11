@@ -39,6 +39,28 @@ CGUI_Scene2D::~CGUI_Scene2D(void)
 	ImGui::DestroyContext();
 }
 
+void CGUI_Scene2D::RenderShop()
+{
+	//render shop gun
+	ImGuiWindowFlags InventoryWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
+		ImGuiWindowFlags_NoBackground |
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoScrollbar;
+
+	ImGui::Begin("CurrentItem", NULL, InventoryWindowFlags);
+	ImGui::SetWindowPos(ImVec2(605, 270));
+	ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
+	cInventoryItem = cInventoryManager->GetItem("StoneSword");
+	ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
+		ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
+		ImVec2(0, 1), ImVec2(1, 0));
+	ImGui::End();
+
+}
+
 /**
   @brief Initialise this instance
   */
@@ -159,6 +181,9 @@ void CGUI_Scene2D::Update(const double dElapsedTime)
 			ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
 	}
+
+	if (cInventoryManager->renderShop)
+		RenderShop();
 
 	// Render the Health
 	ImGuiWindowFlags healthWindowFlags = ImGuiWindowFlags_AlwaysAutoResize |
