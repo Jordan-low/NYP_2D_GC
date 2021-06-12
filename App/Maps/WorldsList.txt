@@ -1,5 +1,2 @@
 START
 MAIN
-AD
-DASD
-DD
