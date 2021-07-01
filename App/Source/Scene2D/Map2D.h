@@ -35,6 +35,8 @@
 #include "Primitives/Mesh.h"
 #include "Primitives/MeshBuilder.h"
 
+#include "Player2D.h"
+
 // A structure storing information about Map Sizes
 struct MapSize {
 	unsigned int uiRowSize;
@@ -150,6 +152,8 @@ public:
 
 	BLOCK_TYPE GetBlockType(int blockNumber);
 
+	//unsigned getCurrX(void);
+
 protected:
 
 	// The variable containing the rapidcsv::Document
@@ -185,6 +189,9 @@ protected:
 
 	// Render a tile
 	void RenderTile(const unsigned int uiRow, const unsigned int uiCol);
+
+	unsigned int xList; //column
+	unsigned int yList; //row
 
 private:
 	//total worlds generated

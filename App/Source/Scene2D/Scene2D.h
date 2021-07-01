@@ -37,6 +37,9 @@
 //Player
 #include "Player2D.h"
 
+//Sound
+#include "..\SoundController\SoundController.h"
+
 #include <sstream>
 
 class CScene2D : public CSingletonTemplate<CScene2D>
@@ -68,6 +71,8 @@ protected:
 
 	// Mouse Controller singleton instance
 	CMouseController* cMouseController;
+
+	CSoundController* cSoundController;
 
 	// A transformation matrix for controlling where to render the entities
 	glm::mat4 transform;

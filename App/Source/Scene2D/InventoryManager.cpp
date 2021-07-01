@@ -44,7 +44,7 @@ void CInventoryManager::CycleThroughInventory()
 		}
 		if (p.second->sName == "Selector" || p.second->sName == "Fist" || p.second->sName == "StoneSword") //skip selector
 			continue;
-		if (cycle) //cycle to next item in inventoryMap
+		if (cycle) //cycle to next item in inventoryMap 
 		{
 			inventoryArray[0] = p.second;
 			break;

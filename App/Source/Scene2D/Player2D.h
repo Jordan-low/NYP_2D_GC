@@ -138,7 +138,7 @@ protected:
 	void Constraint(DIRECTION eDirection = LEFT);
 
 	// Check if a position is possible to move into
-	bool CheckPosition(DIRECTION eDirection, int minIndex, int maxIndex);
+	bool CheckPosition(DIRECTION eDirection);
 
 	//Update jump
 	void UpdateJumpFall(const double dElapsedTime = 0.0166666666666667);

@@ -21,6 +21,9 @@
 #include "Inputs\KeyboardController.h"
 #include "Inputs\MouseController.h"
 
+// Include SoundController
+#include "SoundController/SoundController.h"
+
 #include <iostream>
 using namespace std;
 
@@ -131,6 +134,7 @@ bool Application::Init(void)
 
 	// Get the CSettings instance
 	cSettings = CSettings::GetInstance();
+	CSoundController::GetInstance()->Init();
 
 	// Set the file location for the digital assets
 	// This is backup, in case filesystem cannot find the current directory
@@ -279,6 +283,7 @@ void Application::Destroy(void)
 {
 	// Destroy the keyboard instance
 	CKeyboardController::GetInstance()->Destroy();
+	CSoundController::GetInstance()->Destroy();
 
 	// Destroy the CFPSCounter instance
 	if (cFPSCounter)

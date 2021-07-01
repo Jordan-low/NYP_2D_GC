@@ -12,6 +12,9 @@
     <Filter Include="Scene2D">
       <UniqueIdentifier>{00ee21e2-220a-4747-9b43-42c3e8ebc898}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SoundController">
+      <UniqueIdentifier>{882c1798-344d-4324-b662-9f94e663345b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp">
@@ -41,6 +44,12 @@
     <ClCompile Include="Source\Scene2D\Physics2D.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
+    <ClCompile Include="Source\SoundController\SoundController.cpp">
+      <Filter>SoundController</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SoundController\SoundInfo.cpp">
+      <Filter>SoundController</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h">
@@ -66,6 +75,12 @@
     </ClInclude>
     <ClInclude Include="Source\Scene2D\Physics2D.h">
       <Filter>Scene2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SoundController\SoundController.h">
+      <Filter>SoundController</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SoundController\SoundInfo.h">
+      <Filter>SoundController</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

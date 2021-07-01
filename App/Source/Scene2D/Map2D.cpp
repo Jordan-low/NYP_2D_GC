@@ -96,6 +96,16 @@ bool CMap2D::Init(	const unsigned int uiNumLevels,
 	cSettings->NUM_TILES_YAXIS = uiNumRows;
 	cSettings->UpdateSpecifications();
 
+	//yList = -1;
+	//xList = -1;
+	//for (int i = 0; i < uiNumLevels; i++)
+	//{
+	//	xList.push_back(-1);
+	//	yList.push_back(-1);
+
+	//	arrMapInfo.push_back(nullptr);
+	//}
+
 
 	//// set up vertex data (and buffer(s)) and configure vertex attributes
 	//float vertices[] = {	// positions          // texture coords
@@ -282,10 +292,22 @@ void CMap2D::Render(void)
 	{
 		for (unsigned int uiCol = 0; uiCol < cSettings->NUM_TILES_XAXIS; uiCol++)
 		{
+			float xOffset = 0.f;
+			if (CPlayer2D::GetInstance()->i32vec2Index.x > cSettings->TILE_RATIO_XAXIS / 2)
+				xOffset = (CPlayer2D::GetInstance()->i32vec2Index.x + (CPlayer2D::GetInstance()->i32vec2NumMicroSteps.x / cSettings->NUM_STEPS_PER_TILE_XAXIS)) - cSettings->TILE_RATIO_XAXIS / 2;
+
+			if (CPlayer2D::GetInstance()->i32vec2Index.x > cSettings->NUM_TILES_XAXIS - cSettings->TILE_RATIO_XAXIS / 2)
+				xOffset = cSettings->NUM_TILES_XAXIS - cSettings->TILE_RATIO_XAXIS;
+
 			transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-			transform = glm::translate(transform, glm::vec3(cSettings->ConvertIndexToUVSpace(cSettings->x, uiCol, false, 0) + mapOffset.x,
-															cSettings->ConvertIndexToUVSpace(cSettings->y, uiRow, true, 0),
-															0.0f));
+			transform = glm::translate(transform, glm::vec3(cSettings->ConvertIndexToUVSpace(cSettings->x, uiCol - xOffset, false, 0),
+				cSettings->ConvertIndexToUVSpace(cSettings->y, uiRow, true, 0),
+				0.0f));
+
+			//transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+			//transform = glm::translate(transform, glm::vec3(cSettings->ConvertIndexToUVSpace(cSettings->x, uiCol, false, 0) + mapOffset.x,
+			//												cSettings->ConvertIndexToUVSpace(cSettings->y, uiRow, true, 0),
+			//												0.0f));
 			//transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
 			// Update the shaders with the latest transform
@@ -296,6 +318,11 @@ void CMap2D::Render(void)
 		}
 	}
 }
+
+//unsigned CMap2D::getCurrX(void) {
+//	return xList[uiCurLevel];
+//}
+
 
 /**
  @brief PostRender Set up the OpenGL display environment after rendering.

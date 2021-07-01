@@ -27,6 +27,7 @@ CScene2D::CScene2D(void)
 	, cGUI2(NULL)
 	, cMap2D(NULL)
 	, cPlayer2D(NULL)
+	, cSoundController(NULL)
 {
 }
 
@@ -58,6 +59,13 @@ CScene2D::~CScene2D(void)
 		cPlayer2D->Destroy();
 		cPlayer2D = NULL;
 	}
+
+	if (cSoundController)
+	{
+		cSoundController->Destroy();
+		cSoundController = NULL;
+	}
+
 	// We won't delete this since it was created elsewhere
 	cKeyboardController = NULL;
 	cMouseController = NULL;
@@ -105,6 +113,12 @@ bool CScene2D::Init(void)
 	//set shader
 	cPlayer2D->SetShader("2DColorShader");
 
+	cSoundController = CSoundController::GetInstance();
+	cSoundController->Init();
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\Sound_Bell.ogg"), "bell", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\Sound_Explosion.ogg"), "explosion", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\Sound_Jump.ogg"), "jump", true);
+
 	//init map instance
 	if (cMap2D->Init(1, 24, 100) == false)
 	{
@@ -145,7 +159,10 @@ void CScene2D::Update(const double dElapsedTime)
 	if (cKeyboardController->IsKeyPressed(GLFW_KEY_ENTER))
 	{
 		if (cGUI2->worldInput.length() == 0)
+		{
 			enableTyping = !enableTyping;
+			cSoundController->PlaySoundByName("explosion");
+		}
 	}
 
 	if (enableTyping)

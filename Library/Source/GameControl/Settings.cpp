@@ -10,8 +10,8 @@ CSettings::CSettings(void)
 	, NUM_TILES_YAXIS(24)
 	, TILE_WIDTH(0.0625f)
 	, TILE_HEIGHT(0.08333f)
-	, NUM_STEPS_PER_TILE_XAXIS(16.0f)
-	, NUM_STEPS_PER_TILE_YAXIS(16.0f)
+	, NUM_STEPS_PER_TILE_XAXIS(8.0f)
+	, NUM_STEPS_PER_TILE_YAXIS(8.0f)
 	, MICRO_STEP_XAXIS(0.015625f)
 	, MICRO_STEP_YAXIS(0.0208325f)
 	, TILE_RATIO_XAXIS(32)
@@ -28,7 +28,7 @@ CSettings::~CSettings(void)
 /**
 @brief Convert an index number of a tile to a coordinate in UV Space
 */
-float CSettings::ConvertIndexToUVSpace(const AXIS sAxis, const int iIndex, const bool bInvert, const float fOffset)
+float CSettings::ConvertIndexToUVSpace(const AXIS sAxis, const float iIndex, const bool bInvert, const float fOffset)
 {
 	float fResult = 0.0f;
 	if (sAxis == x)

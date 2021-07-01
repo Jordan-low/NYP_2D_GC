@@ -204,14 +204,13 @@ bool CPlayer2D::Init(void)
  */
 void CPlayer2D::Update(const double dElapsedTime)
 {
-
 	RenderBlockRangeTiles();
 	health = Math::Clamp(health, 0.f, maxHealth);
 
-	if (reachLeftEnd || reachRightEnd)
-		playerPosition = glm::vec2(i32vec2Index.x - (int)playerOffset.x, i32vec2Index.y);
-	else
-		playerPosition = glm::vec2(cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x, i32vec2Index.y);
+	////if (reachLeftEnd || reachRightEnd)
+	////	playerPosition = glm::vec2(i32vec2Index.x - (int)playerOffset.x, i32vec2Index.y);
+	////else
+	////	playerPosition = glm::vec2(cSettings->TILE_RATIO_XAXIS / 2 - (int)playerOffset.x, i32vec2Index.y);
 
 	Shop();
 	CollectChest(4, 4);
@@ -224,119 +223,193 @@ void CPlayer2D::Update(const double dElapsedTime)
 	i32vec2OldIndex = i32vec2Index;
 
 	// Get keyboard updates
+	//if (cKeyboardController->IsKeyDown(GLFW_KEY_A))
+	//{
+	//	lastMovementInput = LEFT;
+
+	//	if (reachRightEnd && i32vec2Index.x < 17)
+	//	{
+	//		reachRightEnd = false;
+	//	}
+
+	//	if (reachRightEnd || reachLeftEnd)
+	//	{
+	//		if (!CollisionEnd(LEFT, 1, 99) && !CollisionEnd(LEFT, 401, 499))
+	//		{
+	//			const int iOldIndex = i32vec2Index.x;
+	//			if (i32vec2Index.x >= 0)
+	//			{
+	//				i32vec2NumMicroSteps.x--;
+	//				if (i32vec2NumMicroSteps.x < 0)
+	//				{
+	//					i32vec2NumMicroSteps.x = ((int)cSettings->NUM_STEPS_PER_TILE_XAXIS);
+	//					i32vec2Index.x--;
+	//				}
+	//			}
+	//		}
+	//		if (reachLeftEnd)
+	//			playerOffset.x = 0;
+	//	}
+	//	else
+	//	{
+	//		i32vec2NumMicroSteps.x = 0;
+	//		if (!Collision(LEFT, 1, 99) && !Collision(LEFT, 401, 499))
+	//		{
+	//			cMap2D->mapOffset_MicroSteps.x += cSettings->TILE_WIDTH / 16;
+	//			if (cMap2D->mapOffset_MicroSteps.x >= cSettings->TILE_WIDTH)
+	//			{
+	//				cMap2D->mapOffset.x += cSettings->TILE_WIDTH;
+	//				cMap2D->mapOffset_MicroSteps.x = 0;
+	//				playerOffset.x++;
+	//			}
+	//		}
+	//	}
+	//	Constraint(LEFT);
+
+	//	/*if (!CheckPosition(LEFT))
+	//	{
+	//		i32vec2Index = i32vec2OldIndex;
+	//		i32vec2NumMicroSteps.x = 0;
+	//	}*/
+
+	//	if (IsMidAir() && cPhysics2D.GetStatus() != CPhysics2D::STATUS::JUMP)
+	//	{
+	//		cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
+	//	}
+
+	//	//CS: Play left animation
+	//	animatedSprites->PlayAnimation("left", -1, 1.0f);
+	//	//playerColour = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	//}
+	//else if (cKeyboardController->IsKeyDown(GLFW_KEY_D))
+	//{
+	//	lastMovementInput = RIGHT;
+	//	if (reachLeftEnd && i32vec2Index.x > 15)
+	//	{
+	//		reachLeftEnd = false;
+	//	}
+
+	//	if (reachLeftEnd || reachRightEnd)
+	//	{
+	//		if (!CollisionEnd(RIGHT, 1, 99) && !CollisionEnd(RIGHT, 401, 499))
+	//		{
+	//			const int iOldIndex = i32vec2Index.x;
+	//			if (i32vec2Index.x < cSettings->TILE_RATIO_XAXIS - 1)
+	//			{
+	//				i32vec2NumMicroSteps.x++;
+	//				if (i32vec2NumMicroSteps.x >= cSettings->NUM_STEPS_PER_TILE_XAXIS)
+	//				{
+	//					i32vec2NumMicroSteps.x = 0;
+	//					i32vec2Index.x++;
+	//				}
+	//			}
+	//		}
+	//		if (reachRightEnd)
+	//			playerOffset.x = (float)cSettings->TILE_RATIO_XAXIS - cSettings->NUM_TILES_XAXIS;
+	//	}
+	//	else
+	//	{
+	//		i32vec2NumMicroSteps.x = 0;
+	//		if (!Collision(RIGHT, 1, 99) && !Collision(RIGHT, 401, 499))
+	//		{
+	//			cMap2D->mapOffset_MicroSteps.x -= cSettings->TILE_WIDTH / 16;
+	//			if (cMap2D->mapOffset_MicroSteps.x <= -cSettings->TILE_WIDTH)
+	//			{
+	//				cMap2D->mapOffset.x -= cSettings->TILE_WIDTH;
+	//				cMap2D->mapOffset_MicroSteps.x = 0;
+	//				playerOffset.x--;
+	//			}
+	//		}
+	//	}
+	//	Constraint(RIGHT);
+
+	//	/*if (!CheckPosition(RIGHT))
+	//	{
+	//		i32vec2NumMicroSteps.x = 0;
+	//	}*/
+
+	//	if (IsMidAir() && cPhysics2D.GetStatus() != CPhysics2D::STATUS::JUMP)
+	//	{
+	//		cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
+	//	}
+
+	//	//CS: Play right animation
+	//	animatedSprites->PlayAnimation("right", -1, 1.0f);
+	//	//playerColour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+	//}
 	if (cKeyboardController->IsKeyDown(GLFW_KEY_A))
 	{
 		lastMovementInput = LEFT;
-
-		if (reachRightEnd && i32vec2Index.x < 17)
+		// Calculate the new position to the left
+		if (i32vec2Index.x >= 0)
 		{
-			reachRightEnd = false;
-		}
-
-		if (reachRightEnd || reachLeftEnd)
-		{
-			if (!CollisionEnd(LEFT, 1, 99) && !CollisionEnd(LEFT, 401, 499))
+			i32vec2NumMicroSteps.x--;
+			if (i32vec2NumMicroSteps.x < 0)
 			{
-				const int iOldIndex = i32vec2Index.x;
-				if (i32vec2Index.x >= 0)
-				{
-					i32vec2NumMicroSteps.x--;
-					if (i32vec2NumMicroSteps.x < 0)
-					{
-						i32vec2NumMicroSteps.x = ((int)cSettings->NUM_STEPS_PER_TILE_XAXIS);
-						i32vec2Index.x--;
-					}
-				}
-			}
-			if (reachLeftEnd)
-				playerOffset.x = 0;
-		}
-		else
-		{
-			i32vec2NumMicroSteps.x = 0;
-			if (!Collision(LEFT, 1, 99) && !Collision(LEFT, 401, 499))
-			{
-				cMap2D->mapOffset_MicroSteps.x += cSettings->TILE_WIDTH / 16;
-				if (cMap2D->mapOffset_MicroSteps.x >= cSettings->TILE_WIDTH)
-				{
-					cMap2D->mapOffset.x += cSettings->TILE_WIDTH;
-					cMap2D->mapOffset_MicroSteps.x = 0;
-					playerOffset.x++;
-				}
+				i32vec2NumMicroSteps.x = ((int)cSettings->NUM_STEPS_PER_TILE_XAXIS) - 1;
+				i32vec2Index.x--;
 			}
 		}
+
+		// Constraint the player's position within the screen boundary
 		Constraint(LEFT);
 
-		/*if (!CheckPosition(LEFT))
+		// If the new position is not feasible, then revert to old position
+		if (CheckPosition(LEFT) == false)
 		{
 			i32vec2Index = i32vec2OldIndex;
 			i32vec2NumMicroSteps.x = 0;
-		}*/
-
-		if (IsMidAir() && cPhysics2D.GetStatus() != CPhysics2D::STATUS::JUMP)
-		{
-			cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
 		}
 
-		//CS: Play left animation
+		// Check if player is in mid-air, such as walking off a platform
+		if (IsMidAir() == true)
+		{
+			if (cPhysics2D.GetStatus() != CPhysics2D::STATUS::JUMP)
+				cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
+		}
+
+		//CS: Play the "left" animation
 		animatedSprites->PlayAnimation("left", -1, 1.0f);
-		//playerColour = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+		//CS: Change Color
+		//currentColor = glm::vec4(1.0, 0.0, 0.0, 1.0);
 	}
 	else if (cKeyboardController->IsKeyDown(GLFW_KEY_D))
 	{
 		lastMovementInput = RIGHT;
-		if (reachLeftEnd && i32vec2Index.x > 15)
+		// Calculate the new position to the right
+		if (i32vec2Index.x < cSettings->NUM_TILES_XAXIS)
 		{
-			reachLeftEnd = false;
+			i32vec2NumMicroSteps.x++;
+
+			if (i32vec2NumMicroSteps.x >= cSettings->NUM_STEPS_PER_TILE_XAXIS)
+			{
+				i32vec2NumMicroSteps.x = 0;
+				i32vec2Index.x++;
+			}
 		}
 
-		if (reachLeftEnd || reachRightEnd)
-		{
-			if (!CollisionEnd(RIGHT, 1, 99) && !CollisionEnd(RIGHT, 401, 499))
-			{
-				const int iOldIndex = i32vec2Index.x;
-				if (i32vec2Index.x < cSettings->TILE_RATIO_XAXIS - 1)
-				{
-					i32vec2NumMicroSteps.x++;
-					if (i32vec2NumMicroSteps.x >= cSettings->NUM_STEPS_PER_TILE_XAXIS)
-					{
-						i32vec2NumMicroSteps.x = 0;
-						i32vec2Index.x++;
-					}
-				}
-			}
-			if (reachRightEnd)
-				playerOffset.x = (float)cSettings->TILE_RATIO_XAXIS - cSettings->NUM_TILES_XAXIS;
-		}
-		else
-		{
-			i32vec2NumMicroSteps.x = 0;
-			if (!Collision(RIGHT, 1, 99) && !Collision(RIGHT, 401, 499))
-			{
-				cMap2D->mapOffset_MicroSteps.x -= cSettings->TILE_WIDTH / 16;
-				if (cMap2D->mapOffset_MicroSteps.x <= -cSettings->TILE_WIDTH)
-				{
-					cMap2D->mapOffset.x -= cSettings->TILE_WIDTH;
-					cMap2D->mapOffset_MicroSteps.x = 0;
-					playerOffset.x--;
-				}
-			}
-		}
+		// Constraint the player's position within the screen boundary
 		Constraint(RIGHT);
 
-		/*if (!CheckPosition(RIGHT))
+		// If the new position is not feasible, then revert to old position
+		if (CheckPosition(RIGHT) == false)
 		{
 			i32vec2NumMicroSteps.x = 0;
-		}*/
-
-		if (IsMidAir() && cPhysics2D.GetStatus() != CPhysics2D::STATUS::JUMP)
-		{
-			cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
 		}
 
-		//CS: Play right animation
+		// Check if player is in mid-air, such as walking off a platform
+		if (IsMidAir() == true)
+		{
+			if (cPhysics2D.GetStatus() != CPhysics2D::STATUS::JUMP)
+				cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
+		}
+
+		//CS: Play the "right" animation
 		animatedSprites->PlayAnimation("right", -1, 1.0f);
-		//playerColour = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+
+		//CS: Change Color
+		//currentColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
 	}
 	else
 	{
@@ -484,9 +557,21 @@ void CPlayer2D::Update(const double dElapsedTime)
 	animatedSprites->Update(dElapsedTime);
 
 	// Update the UV Coordinates
-	vec2UVCoordinate.x = cSettings->ConvertIndexToUVSpace(cSettings->x, i32vec2Index.x, false, i32vec2NumMicroSteps.x*cSettings->MICRO_STEP_XAXIS);
-	vec2UVCoordinate.y = cSettings->ConvertIndexToUVSpace(cSettings->y, i32vec2Index.y, false, i32vec2NumMicroSteps.y*cSettings->MICRO_STEP_YAXIS);
+	unsigned int xOffset = 1;
+	float xAxis = i32vec2Index.x;
+	if (i32vec2Index.x > cSettings->NUM_TILES_XAXIS - cSettings->TILE_RATIO_XAXIS / 2) { //player at right end
+		int offset = cSettings->NUM_TILES_XAXIS - i32vec2Index.x;
+		xAxis = cSettings->TILE_RATIO_XAXIS - offset;
+	}
+	else if (i32vec2Index.x > cSettings->TILE_RATIO_XAXIS / 2) //player in center area
+	{
+		std::cout << "MOVED" << std::endl;
+		xAxis = cSettings->TILE_RATIO_XAXIS / 2;
+		xOffset = 0;
+	}
 
+	vec2UVCoordinate.x = cSettings->ConvertIndexToUVSpace(cSettings->x, xAxis, false, xOffset * i32vec2NumMicroSteps.x * cSettings->MICRO_STEP_XAXIS);
+	vec2UVCoordinate.y = cSettings->ConvertIndexToUVSpace(cSettings->y, i32vec2Index.y, false, i32vec2NumMicroSteps.y * cSettings->MICRO_STEP_YAXIS);
 }
 
 /**
@@ -594,86 +679,48 @@ bool CPlayer2D::LoadTexture(const char* filename, GLuint& iTextureID)
  */
 void CPlayer2D::Constraint(DIRECTION eDirection)
 {
-	if (eDirection == LEFT)
-	{
-		if (cMap2D->mapOffset.x > 0)
-		{
-			reachLeftEnd = true;
-			cMap2D->mapOffset.x = 0;
-			cMap2D->mapOffset_MicroSteps.x = 0;
-		}
-		if (reachLeftEnd)
-		{
-			if (i32vec2Index.x < 0)
-			{
-				//cMap2D->offset += 0.065f * 0.1;
-				i32vec2Index.x = 0;
-				i32vec2NumMicroSteps.x = 0;
-			}
-		}
-	}
-	else if (eDirection == RIGHT)
-	{
-		float maxOffset = ((int)cSettings->TILE_RATIO_XAXIS - (int)cSettings->NUM_TILES_XAXIS) * cSettings->TILE_WIDTH;
-		if (cMap2D->mapOffset.x <= maxOffset)
-		{
-			reachRightEnd = true;
-			cMap2D->mapOffset.x = maxOffset;
-			cMap2D->mapOffset_MicroSteps.x = 0;
-		}
-
-		if (reachRightEnd)
-		{
-			if (i32vec2Index.x >= ((int)cSettings->NUM_TILES_XAXIS) - 1)
-			{
-				i32vec2Index.x = ((int)cSettings->NUM_TILES_XAXIS) - 1;
-				i32vec2NumMicroSteps.x = 0;
-			}
-		}
-	}
-	else if (eDirection == UP)
-	{
-		if (i32vec2Index.y >= ((int)cSettings->TILE_RATIO_YAXIS) - 1)
-		{
-			i32vec2Index.y = ((int)cSettings->TILE_RATIO_YAXIS) - 1;
-			i32vec2NumMicroSteps.y = 0;
-		}
-	}
-	else if (eDirection == DOWN)
-	{
-		if (i32vec2Index.y < 0)
-		{
-			i32vec2Index.y = 0;
-			i32vec2NumMicroSteps.y = 0;
-		}
-	}
-	else
-	{
-		cout << "CPlayer2D::Constraint: Unknown direction." << endl;
-	}
 	//if (eDirection == LEFT)
 	//{
-	//	if (i32vec2Index.x < 0)
+	//	if (cMap2D->mapOffset.x > 0)
 	//	{
-	//		//cMap2D->offset += 0.065f * 0.1;
-	//		i32vec2Index.x = 0;
-	//		i32vec2NumMicroSteps.x = 0;
+	//		reachLeftEnd = true;
+	//		cMap2D->mapOffset.x = 0;
+	//		cMap2D->mapOffset_MicroSteps.x = 0;
+	//	}
+	//	if (reachLeftEnd)
+	//	{
+	//		if (i32vec2Index.x < 0)
+	//		{
+	//			//cMap2D->offset += 0.065f * 0.1;
+	//			i32vec2Index.x = 0;
+	//			i32vec2NumMicroSteps.x = 0;
+	//		}
 	//	}
 	//}
 	//else if (eDirection == RIGHT)
 	//{
-	//	if (i32vec2Index.x >= ((int)cSettings->NUM_TILES_XAXIS) - 1)
+	//	float maxOffset = ((int)cSettings->TILE_RATIO_XAXIS - (int)cSettings->NUM_TILES_XAXIS) * cSettings->TILE_WIDTH;
+	//	if (cMap2D->mapOffset.x <= maxOffset)
 	//	{
-	//		//cMap2D->offset -= 0.065f * 0.1;
-	//		i32vec2Index.x = ((int)cSettings->NUM_TILES_XAXIS) - 1;
-	//		i32vec2NumMicroSteps.x = 0;
+	//		reachRightEnd = true;
+	//		cMap2D->mapOffset.x = maxOffset;
+	//		cMap2D->mapOffset_MicroSteps.x = 0;
+	//	}
+
+	//	if (reachRightEnd)
+	//	{
+	//		if (i32vec2Index.x >= ((int)cSettings->NUM_TILES_XAXIS) - 1)
+	//		{
+	//			i32vec2Index.x = ((int)cSettings->NUM_TILES_XAXIS) - 1;
+	//			i32vec2NumMicroSteps.x = 0;
+	//		}
 	//	}
 	//}
 	//else if (eDirection == UP)
 	//{
-	//	if (i32vec2Index.y >= ((int)cSettings->NUM_TILES_YAXIS) - 1)
+	//	if (i32vec2Index.y >= ((int)cSettings->TILE_RATIO_YAXIS) - 1)
 	//	{
-	//		i32vec2Index.y = ((int)cSettings->NUM_TILES_YAXIS) - 1;
+	//		i32vec2Index.y = ((int)cSettings->TILE_RATIO_YAXIS) - 1;
 	//		i32vec2NumMicroSteps.y = 0;
 	//	}
 	//}
@@ -689,12 +736,161 @@ void CPlayer2D::Constraint(DIRECTION eDirection)
 	//{
 	//	cout << "CPlayer2D::Constraint: Unknown direction." << endl;
 	//}
+	if (eDirection == LEFT)
+	{
+		if (i32vec2Index.x < 0)
+		{
+			i32vec2Index.x = 0;
+			i32vec2NumMicroSteps.x = 0;
+		}
+	}
+	else if (eDirection == RIGHT)
+	{
+		if (i32vec2Index.x >= cSettings->NUM_TILES_XAXIS - 1)
+		{
+			i32vec2Index.x = (cSettings->NUM_TILES_XAXIS - 1);
+			i32vec2NumMicroSteps.x = 0;
+		}
+	}
+	else if (eDirection == UP)
+	{
+		if (i32vec2Index.y >= (int)cSettings->NUM_TILES_YAXIS - 1)
+		{
+			i32vec2Index.y = ((int)cSettings->NUM_TILES_YAXIS) - 1;
+			i32vec2NumMicroSteps.y = 0;
+		}
+	}
+	else if (eDirection == DOWN)
+	{
+		if (i32vec2Index.y < 0)
+		{
+			i32vec2Index.y = 0;
+			i32vec2NumMicroSteps.y = 0;
+		}
+	}
+	else
+	{
+		cout << "CPlayer2D::Constraint: Unknown direction." << endl;
+	}
 }
 
 /**
  @brief Check if a position is possible to move into
  @param eDirection A DIRECTION enumerated data type which indicates the direction to check
  */
+bool CPlayer2D::CheckPosition(DIRECTION eDirection)
+{
+	if (eDirection == LEFT)
+	{
+		// If the new position is fully within a row, then check this row only
+		if (i32vec2NumMicroSteps.y == 0)
+		{
+			// If the grid is not accessible, then return false
+			if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x) >= 100)
+			{
+				return false;
+			}
+		}
+		// If the new position is between 2 rows, then check both rows as well
+		else if (i32vec2NumMicroSteps.y != 0)
+		{
+			// If the 2 grids are not accessible, then return false
+			if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x) >= 100) ||
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x) >= 100))
+			{
+				return false;
+			}
+		}
+	}
+	else if (eDirection == RIGHT)
+	{
+		// If the new position is at the top row, then return true
+		if (i32vec2Index.x >= cSettings->NUM_TILES_XAXIS - 1)
+		{
+			i32vec2NumMicroSteps.x = 0;
+			return true;
+		}
+
+		// If the new position is fully within a row, then check this row only
+		if (i32vec2NumMicroSteps.y == 0)
+		{
+			// If the grid is not accessible, then return false
+			if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x + 1) >= 100)
+			{
+				return false;
+			}
+		}
+		// If the new position is between 2 rows, then check both rows as well
+		else if (i32vec2NumMicroSteps.y != 0)
+		{
+			// If the 2 grids are not accessible, then return false
+			if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x + 1) >= 100) ||
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x + 1) >= 100))
+			{
+				return false;
+			}
+		}
+
+	}
+	else if (eDirection == UP)
+	{
+		// If the new position is at the top row, then return true
+		if (i32vec2Index.y >= cSettings->NUM_TILES_YAXIS - 1)
+		{
+			i32vec2NumMicroSteps.y = 0;
+			return true;
+		}
+
+		// If the new position is fully within a column, then check this column only
+		if (i32vec2NumMicroSteps.x == 0)
+		{
+			// If the grid is not accessible, then return false
+			if (cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x) >= 100)
+			{
+				return false;
+			}
+		}
+		// If the new position is between 2 columns, then check both columns as well
+		else if (i32vec2NumMicroSteps.x != 0)
+		{
+			// If the 2 grids are not accessible, then return false
+			if ((cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x) >= 100) ||
+				(cMap2D->GetMapInfo(i32vec2Index.y + 1, i32vec2Index.x + 1) >= 100))
+			{
+				return false;
+			}
+		}
+	}
+	else if (eDirection == DOWN)
+	{
+		// If the new position is fully within a column, then check this column only
+		if (i32vec2NumMicroSteps.x == 0)
+		{
+			// If the grid is not accessible, then return false
+			if (cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x) >= 100)
+			{
+				return false;
+			}
+		}
+		// If the new position is between 2 columns, then check both columns as well
+		else if (i32vec2NumMicroSteps.x != 0)
+		{
+			// If the 2 grids are not accessible, then return false
+			if ((cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x) >= 100) ||
+				(cMap2D->GetMapInfo(i32vec2Index.y, i32vec2Index.x + 1) >= 100))
+			{
+				return false;
+			}
+		}
+	}
+	else
+	{
+		cout << "CPlayer2D::CheckPosition: Unknown direction." << endl;
+	}
+
+	return true;
+}
+/*
 bool CPlayer2D::CheckPosition(DIRECTION eDirection, int minIndex, int maxIndex)
 {
 	if (reachLeftEnd || reachRightEnd)
@@ -954,6 +1150,7 @@ bool CPlayer2D::CheckPosition(DIRECTION eDirection, int minIndex, int maxIndex)
 		return true;
 	}
 }
+*/
 
 /**
  @brief Harvest fully grown trees for item blocks
@@ -1032,106 +1229,106 @@ void CPlayer2D::ReduceQuantity(string itemName, int quantity)
  */
 void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 {
-	if (cPhysics2D.GetStatus() == CPhysics2D::STATUS::JUMP)
-	{
-		// Update the elapsed time to the physics engine
-		cPhysics2D.SetTime((float)dElapsedTime);
-		// Call the physics engine update method to calculate the final velocity and displacement
-		cPhysics2D.Update();
-		// Get the displacement from the physics engine
-		glm::vec2 v2Displacement = cPhysics2D.GetDisplacement();
+	//if (cPhysics2D.GetStatus() == CPhysics2D::STATUS::JUMP)
+	//{
+	//	// Update the elapsed time to the physics engine
+	//	cPhysics2D.SetTime((float)dElapsedTime);
+	//	// Call the physics engine update method to calculate the final velocity and displacement
+	//	cPhysics2D.Update();
+	//	// Get the displacement from the physics engine
+	//	glm::vec2 v2Displacement = cPhysics2D.GetDisplacement();
 
-		// Store the current i32vec2Index.y
-		int iIndex_YAxis_OLD = i32vec2Index.y;
+	//	// Store the current i32vec2Index.y
+	//	int iIndex_YAxis_OLD = i32vec2Index.y;
 
-		int iDisplacement_MicroSteps = (int)(v2Displacement.y / cSettings->MICRO_STEP_YAXIS);
-		if (i32vec2Index.y < (int)cSettings->NUM_TILES_YAXIS)
-		{
-			i32vec2NumMicroSteps.y += iDisplacement_MicroSteps;
-			if (i32vec2NumMicroSteps.y > cSettings->NUM_STEPS_PER_TILE_YAXIS)
-			{
-				i32vec2NumMicroSteps.y -= cSettings->NUM_STEPS_PER_TILE_YAXIS;
-				i32vec2Index.y++;
-			}
-		}
+	//	int iDisplacement_MicroSteps = (int)(v2Displacement.y / cSettings->MICRO_STEP_YAXIS);
+	//	if (i32vec2Index.y < (int)cSettings->NUM_TILES_YAXIS)
+	//	{
+	//		i32vec2NumMicroSteps.y += iDisplacement_MicroSteps;
+	//		if (i32vec2NumMicroSteps.y > cSettings->NUM_STEPS_PER_TILE_YAXIS)
+	//		{
+	//			i32vec2NumMicroSteps.y -= cSettings->NUM_STEPS_PER_TILE_YAXIS;
+	//			i32vec2Index.y++;
+	//		}
+	//	}
 
-		// Constraint the player's position within the screen boundary
-		Constraint(UP);
+	//	// Constraint the player's position within the screen boundary
+	//	Constraint(UP);
 
-		// Iterate through all rows until the proposed row
-		// Check if the player will hit a tile; stop jump if so.
-		int iIndex_YAxis_Proposed = i32vec2Index.y;
-		for (int i = iIndex_YAxis_OLD; i <= iIndex_YAxis_Proposed; i++)
-		{
-			// Change the player's index to the current i value
-			i32vec2Index.y = i;
-			// If the new position is not feasible, then revert to old position
-			if (!CheckPosition(UP, 1, 99))
-			{
-				// Set the Physics to fall status
-				cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
-				break;
-			}
-		}
+	//	// Iterate through all rows until the proposed row
+	//	// Check if the player will hit a tile; stop jump if so.
+	//	int iIndex_YAxis_Proposed = i32vec2Index.y;
+	//	for (int i = iIndex_YAxis_OLD; i <= iIndex_YAxis_Proposed; i++)
+	//	{
+	//		// Change the player's index to the current i value
+	//		i32vec2Index.y = i;
+	//		// If the new position is not feasible, then revert to old position
+	//		if (!CheckPosition(UP, 1, 99))
+	//		{
+	//			// Set the Physics to fall status
+	//			cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
+	//			break;
+	//		}
+	//	}
 
-		// If the player is still jumping and the initial velocity has reached zero or below zero, 
-		// then it has reach the peak of its jump
-		if ((cPhysics2D.GetStatus() == CPhysics2D::STATUS::JUMP) && (cPhysics2D.GetInitialVelocity().y <= 0.0f))
-		{
-			// Set status to fall
-			cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
-		}
-	}
-	else if (cPhysics2D.GetStatus() == CPhysics2D::STATUS::FALL)
-	{
-		// Update the elapsed time to the physics engine
-		cPhysics2D.SetTime((float)dElapsedTime);
-		// Call the physics engine update method to calculate the final velocity and displacement
-		cPhysics2D.Update();
-		// Get the displacement from the physics engine
-		glm::vec2 v2Displacement = cPhysics2D.GetDisplacement();
+	//	// If the player is still jumping and the initial velocity has reached zero or below zero, 
+	//	// then it has reach the peak of its jump
+	//	if ((cPhysics2D.GetStatus() == CPhysics2D::STATUS::JUMP) && (cPhysics2D.GetInitialVelocity().y <= 0.0f))
+	//	{
+	//		// Set status to fall
+	//		cPhysics2D.SetStatus(CPhysics2D::STATUS::FALL);
+	//	}
+	//}
+	//else if (cPhysics2D.GetStatus() == CPhysics2D::STATUS::FALL)
+	//{
+	//	// Update the elapsed time to the physics engine
+	//	cPhysics2D.SetTime((float)dElapsedTime);
+	//	// Call the physics engine update method to calculate the final velocity and displacement
+	//	cPhysics2D.Update();
+	//	// Get the displacement from the physics engine
+	//	glm::vec2 v2Displacement = cPhysics2D.GetDisplacement();
 
-		// Store the current i32vec2Index.y
-		int iIndex_YAxis_OLD = i32vec2Index.y;
+	//	// Store the current i32vec2Index.y
+	//	int iIndex_YAxis_OLD = i32vec2Index.y;
 
-		//Distance per steps
-		int iDisplacement_MicroSteps = (int)(v2Displacement.y / cSettings->MICRO_STEP_YAXIS);
+	//	//Distance per steps
+	//	int iDisplacement_MicroSteps = (int)(v2Displacement.y / cSettings->MICRO_STEP_YAXIS);
 
-		if (i32vec2Index.y >= 0)
-		{
-			i32vec2NumMicroSteps.y -= fabs(iDisplacement_MicroSteps);
-			if (i32vec2NumMicroSteps.y < 0)
-			{
-				i32vec2NumMicroSteps.y = ((int)cSettings->NUM_STEPS_PER_TILE_YAXIS) - 1;
-				i32vec2Index.y--;
-			}
-		}
+	//	if (i32vec2Index.y >= 0)
+	//	{
+	//		i32vec2NumMicroSteps.y -= fabs(iDisplacement_MicroSteps);
+	//		if (i32vec2NumMicroSteps.y < 0)
+	//		{
+	//			i32vec2NumMicroSteps.y = ((int)cSettings->NUM_STEPS_PER_TILE_YAXIS) - 1;
+	//			i32vec2Index.y--;
+	//		}
+	//	}
 
 
-		// Constraint the player's position within the screen boundary
-		Constraint(DOWN);
+	//	// Constraint the player's position within the screen boundary
+	//	Constraint(DOWN);
 
-		// Iterate through all rows until the proposed row
-		// Check if the player will hit a tile; stop fall if so.
-		int iIndex_YAxis_Proposed = i32vec2Index.y;
-		for (int i = iIndex_YAxis_OLD; i >= iIndex_YAxis_Proposed; i--)
-		{
-			// Change the player's index to the current i value
-			i32vec2Index.y = i;
-			// If the new position is not feasible, then revert to old position
-			if (!CheckPosition(DOWN, 1, 99))
-			{
-				// Revert to the previous position
-				if (i != iIndex_YAxis_OLD)
-					i32vec2Index.y = i + 1;
-				// Set the Physics to idle status
-				cPhysics2D.SetStatus(CPhysics2D::STATUS::IDLE);
+	//	// Iterate through all rows until the proposed row
+	//	// Check if the player will hit a tile; stop fall if so.
+	//	int iIndex_YAxis_Proposed = i32vec2Index.y;
+	//	for (int i = iIndex_YAxis_OLD; i >= iIndex_YAxis_Proposed; i--)
+	//	{
+	//		// Change the player's index to the current i value
+	//		i32vec2Index.y = i;
+	//		// If the new position is not feasible, then revert to old position
+	//		if (!CheckPosition(DOWN, 1, 99))
+	//		{
+	//			// Revert to the previous position
+	//			if (i != iIndex_YAxis_OLD)
+	//				i32vec2Index.y = i + 1;
+	//			// Set the Physics to idle status
+	//			cPhysics2D.SetStatus(CPhysics2D::STATUS::IDLE);
 
-				i32vec2NumMicroSteps.y = 0;
-				break;
-			}
-		}
-	}
+	//			i32vec2NumMicroSteps.y = 0;
+	//			break;
+	//		}
+	//	}
+	//}
 }
 //void CPlayer2D::UpdateJumpFall(const double dElapsedTime)
 //{
