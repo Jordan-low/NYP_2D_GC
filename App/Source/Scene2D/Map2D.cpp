@@ -627,6 +627,102 @@ bool CMap2D::GenerateRandomMap()
 	return true;
 }
 
+bool CMap2D::ProceduralGeneration()
+{
+	cSettings->NUM_TILES_XAXIS += 5;
+	std::cout << cSettings->NUM_TILES_XAXIS << std::endl;
+
+	int current = 20;
+	int chestSpawned = 0;
+	int chestSpawnRate = 20;
+	int lavaSpawnRate = 10;
+	int treeSpawnRate = 8;
+	int enemySpawnRate = 20;
+
+	for (int i = cSettings->NUM_TILES_XAXIS - 5; i < cSettings->NUM_TILES_XAXIS; i++)
+	{
+		for (int j = 0; j < cSettings->NUM_TILES_YAXIS; j++)
+		{
+			SetSaveMapInfo(j, i, 0, false);
+		}
+	}
+
+	for (int i = cSettings->NUM_TILES_XAXIS - 5; i < cSettings->NUM_TILES_XAXIS; i++)
+	{
+		bool done = false;
+		while (!done)
+		{
+			int random = Math::RandIntMinMax(18, 24);
+			if (random + 1 > cSettings->NUM_TILES_YAXIS - 1 || random - 1 < 0)
+				continue;
+
+			if (random + 1 == current || random - 1 == current || random == current)
+			{
+				//spawn trees
+				int treeRandom = Math::RandIntMinMax(0, treeSpawnRate);
+				if (treeRandom == 0)
+				{
+					int treeType = Math::RandIntMinMax(1, 2);
+					switch (treeType)
+					{
+					case 1:
+						SetSaveMapInfo(random - 1, i, 100, false);
+						break;
+					case 2:
+						SetSaveMapInfo(random - 1, i, 102, false);
+						break;
+					default:
+						break;
+					}
+				}
+
+				//spawn chest
+				int chestRandom = Math::RandIntMinMax(0, chestSpawnRate);
+				if (chestRandom == 0)
+				{
+					SetSaveMapInfo(random - 1, i, 4, false);
+					chestSpawned++;
+				}
+
+				//spawn enemies
+				//spawn chest
+				int enemyRandom = Math::RandIntMinMax(0, enemySpawnRate);
+				if (enemyRandom == 0)
+				{
+					SetSaveMapInfo(random - 1, i, 401, false);
+				}
+
+				//force spawn chest
+				if (i == 99 && chestSpawned == 0)
+					SetSaveMapInfo(random - 1, i, 4, false);
+
+				//set grass and dirt floor
+				SetMapInfo(random, i, 2, false);
+				for (int j = 1; j < cSettings->NUM_TILES_YAXIS - random; j++)
+				{
+					if (j == cSettings->NUM_TILES_YAXIS - random - 1)
+						SetSaveMapInfo(random + j, i, 1, false);
+					else
+						SetSaveMapInfo(random + j, i, 3, false);
+				}
+
+				int lavaRandom = Math::RandIntMinMax(0, lavaSpawnRate);
+				if (lavaRandom == 0)
+				{
+					if (random + 1 == cSettings->NUM_TILES_YAXIS - 1)
+						continue;
+					SetSaveMapInfo(random + 1, i, 5, false);
+				}
+
+				done = true;
+				current = random;
+			}
+		}
+	}
+	
+	return false;
+}
+
 /**
 @brief Find the indices of a certain value in arrMapInfo
 @param iValue A const int variable containing the row index of the found element
@@ -749,14 +845,29 @@ void CMap2D::RenderTile(const unsigned int uiRow, const unsigned int uiCol)
 
 	if (arrMapInfo[uiCurLevel][uiRow][uiCol].value != 0)
 	{
-		if (arrMapInfo[uiCurLevel][uiRow][uiCol].value < totalTextures)
-			glBindTexture(GL_TEXTURE_2D, MapOfTextureIDs.at(arrMapInfo[uiCurLevel][uiRow][uiCol].value));
-		
-		glBindVertexArray(VAO);
-		// Render the tile
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		quadMesh->Render();
-		glBindVertexArray(0);
+		try {
+			if (arrMapInfo[uiCurLevel][uiRow][uiCol].value < totalTextures)
+				glBindTexture(GL_TEXTURE_2D, MapOfTextureIDs.at(arrMapInfo[uiCurLevel][uiRow][uiCol].value));
+
+			glBindVertexArray(VAO);
+			// Render the tile
+			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			quadMesh->Render();
+			glBindVertexArray(0);
+		}
+		catch (exception e)
+		{
+			arrMapInfo[uiCurLevel][uiRow][uiCol].value = 0;
+			if (arrMapInfo[uiCurLevel][uiRow][uiCol].value < totalTextures)
+				glBindTexture(GL_TEXTURE_2D, MapOfTextureIDs.at(arrMapInfo[uiCurLevel][uiRow][uiCol].value));
+
+			glBindVertexArray(VAO);
+			// Render the tile
+			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			quadMesh->Render();
+			glBindVertexArray(0);
+		}
+
 	}
 }
 

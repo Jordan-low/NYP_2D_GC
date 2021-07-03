@@ -161,7 +161,7 @@ void CScene2D::Update(const double dElapsedTime)
 		if (cGUI2->worldInput.length() == 0)
 		{
 			enableTyping = !enableTyping;
-			cSoundController->PlaySoundByName("explosion");
+			//cSoundController->PlaySoundByName("explosion");
 		}
 	}
 
@@ -223,7 +223,6 @@ void CScene2D::Update(const double dElapsedTime)
 				{
 					throw runtime_error("world name " + cGUI2->worldInput + " does not exists, creating a new world for it.");
 				}
-
 			}
 			catch (runtime_error e) //else generate a new world with user inputted world name
 			{
@@ -249,6 +248,9 @@ void CScene2D::Update(const double dElapsedTime)
 			cMouseController->mouseOffset = glm::vec2(0.0f);
 		}
 	}
+
+	if (cPlayer2D->i32vec2Index.x + 5 >= CSettings::GetInstance()->NUM_TILES_XAXIS)
+		cMap2D->ProceduralGeneration();
 
 	//update CMap2D
 	//cMap2D->Update(dElapsedTime);

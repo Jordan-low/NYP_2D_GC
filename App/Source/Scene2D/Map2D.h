@@ -117,6 +117,8 @@ public:
 	//generate a randomly loaded map
 	bool GenerateRandomMap();
 
+	bool ProceduralGeneration();
+
 	// Find the indices of a certain value in arrMapInfo
 	bool FindValue(const int iValue, unsigned int& uirRow, unsigned int& uirCol, const bool bInvert = true);
 
