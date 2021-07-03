@@ -629,7 +629,7 @@ bool CMap2D::GenerateRandomMap()
 
 bool CMap2D::ProceduralGeneration()
 {
-	cSettings->NUM_TILES_XAXIS += 5;
+	cSettings->NUM_TILES_XAXIS += 15;
 	std::cout << cSettings->NUM_TILES_XAXIS << std::endl;
 
 	int current = 20;
@@ -639,15 +639,15 @@ bool CMap2D::ProceduralGeneration()
 	int treeSpawnRate = 8;
 	int enemySpawnRate = 20;
 
-	for (int i = cSettings->NUM_TILES_XAXIS - 5; i < cSettings->NUM_TILES_XAXIS; i++)
+	for (int i = cSettings->NUM_TILES_XAXIS - 15; i < cSettings->NUM_TILES_XAXIS; i++)
 	{
 		for (int j = 0; j < cSettings->NUM_TILES_YAXIS; j++)
 		{
-			SetSaveMapInfo(j, i, 0, false);
+			SetMapInfo(j, i, 0, false);
 		}
 	}
 
-	for (int i = cSettings->NUM_TILES_XAXIS - 5; i < cSettings->NUM_TILES_XAXIS; i++)
+	for (int i = cSettings->NUM_TILES_XAXIS - 15; i < cSettings->NUM_TILES_XAXIS; i++)
 	{
 		bool done = false;
 		while (!done)
@@ -697,7 +697,7 @@ bool CMap2D::ProceduralGeneration()
 					SetSaveMapInfo(random - 1, i, 4, false);
 
 				//set grass and dirt floor
-				SetMapInfo(random, i, 2, false);
+				SetSaveMapInfo(random, i, 2, false);
 				for (int j = 1; j < cSettings->NUM_TILES_YAXIS - random; j++)
 				{
 					if (j == cSettings->NUM_TILES_YAXIS - random - 1)
