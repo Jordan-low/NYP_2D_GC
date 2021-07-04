@@ -77,7 +77,7 @@ void CSpriteAnimation::Update(double dt)
 		float frameTime = animationList[currentAnimation]->animTime / numFrame;
 
 		//Set the current frame based on the current time
-		currentFrame = animationList[currentAnimation]->frames[fmin((int)animationList[currentAnimation]->frames.size() - 1 , static_cast<int>(currentTime / frameTime))];
+ 		currentFrame = animationList[currentAnimation]->frames[fmin((int)animationList[currentAnimation]->frames.size() - 1 , static_cast<int>(currentTime / frameTime))];
 
 		//check if the current time is more than the total animated time
 		if (currentTime >= animationList[currentAnimation]->animTime)

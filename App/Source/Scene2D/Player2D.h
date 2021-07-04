@@ -138,7 +138,7 @@ protected:
 	void Constraint(DIRECTION eDirection = LEFT);
 
 	// Check if a position is possible to move into
-	bool CheckPosition(DIRECTION eDirection);
+	bool CheckPosition(DIRECTION eDirection, int minIndex, int maxIndex);
 
 	//Update jump
 	void UpdateJumpFall(const double dElapsedTime = 0.0166666666666667);
@@ -147,7 +147,7 @@ protected:
 
 	//checks for collision
 	bool Collision(DIRECTION eDirection, int minIndex, int maxIndex);
-	bool CollisionEnd(DIRECTION eDirection, int minIndex, int maxIndex);
+	//bool CollisionEnd(DIRECTION eDirection, int minIndex, int maxIndex);
 
 	//checks if chest have been picked up
 	void CollectChest(int minIndex, int maxIndex);

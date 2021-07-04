@@ -558,7 +558,7 @@ bool CMap2D::GenerateRandomMap()
 	int treeSpawnRate = 8;
 	int enemySpawnRate = 20;
 
-	for (int i = 3; i < 100; i++)
+	for (int i = 3; i < cSettings->NUM_TILES_XAXIS; i++)
 	{
 		bool done = false;
 		while (!done)
@@ -636,7 +636,9 @@ bool CMap2D::GenerateRandomMap()
 
 bool CMap2D::ProceduralGeneration()
 {
-	cSettings->NUM_TILES_XAXIS += 15;
+	std::cout << "GENERATING" << std::endl;
+	int initialNumTilesXAxis = cSettings->NUM_TILES_XAXIS;
+	cSettings->NUM_TILES_XAXIS += 10;
 	std::cout << cSettings->NUM_TILES_XAXIS << std::endl;
 
 	int current = 20;
@@ -646,7 +648,7 @@ bool CMap2D::ProceduralGeneration()
 	int treeSpawnRate = 8;
 	int enemySpawnRate = 20;
 
-	for (int i = cSettings->NUM_TILES_XAXIS - 15; i < cSettings->NUM_TILES_XAXIS; i++)
+	for (int i = initialNumTilesXAxis; i < cSettings->NUM_TILES_XAXIS; i++)
 	{
 		for (int j = 0; j < cSettings->NUM_TILES_YAXIS; j++)
 		{
@@ -654,7 +656,9 @@ bool CMap2D::ProceduralGeneration()
 		}
 	}
 
-	for (int i = cSettings->NUM_TILES_XAXIS - 15; i < cSettings->NUM_TILES_XAXIS; i++)
+	std::cout << "SET ALL TO 0" << std::endl;
+
+	for (int i = initialNumTilesXAxis; i < cSettings->NUM_TILES_XAXIS; i++)
 	{
 		bool done = false;
 		while (!done)
@@ -726,8 +730,9 @@ bool CMap2D::ProceduralGeneration()
 			}
 		}
 	}
+	std::cout << "SAVING FILE" << std::endl;
 	doc.Save(FileSystem::getPath(GetActiveWorldPath()).c_str());
-	return false;
+	return true;
 }
 
 /**
@@ -849,28 +854,14 @@ void CMap2D::RenderTile(const unsigned int uiRow, const unsigned int uiCol)
 {
 	if (arrMapInfo[uiCurLevel][uiRow][uiCol].value != 0)
 	{
-		try {
-			if (arrMapInfo[uiCurLevel][uiRow][uiCol].value < totalTextures)
-				glBindTexture(GL_TEXTURE_2D, MapOfTextureIDs.at(arrMapInfo[uiCurLevel][uiRow][uiCol].value));
+		if (arrMapInfo[uiCurLevel][uiRow][uiCol].value < totalTextures)
+			glBindTexture(GL_TEXTURE_2D, MapOfTextureIDs.at(arrMapInfo[uiCurLevel][uiRow][uiCol].value));
 
-			glBindVertexArray(VAO);
-			// Render the tile
-			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			quadMesh->Render();
-			glBindVertexArray(0);
-		}
-		catch (exception e)
-		{
-			arrMapInfo[uiCurLevel][uiRow][uiCol].value = 0;
-			if (arrMapInfo[uiCurLevel][uiRow][uiCol].value < totalTextures)
-				glBindTexture(GL_TEXTURE_2D, MapOfTextureIDs.at(arrMapInfo[uiCurLevel][uiRow][uiCol].value));
-
-			glBindVertexArray(VAO);
-			// Render the tile
-			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			quadMesh->Render();
-			glBindVertexArray(0);
-		}
+		glBindVertexArray(VAO);
+		// Render the tile
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		quadMesh->Render();
+		glBindVertexArray(0);
 	}
 }
 

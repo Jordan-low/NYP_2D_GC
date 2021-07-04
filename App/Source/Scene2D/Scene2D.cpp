@@ -249,9 +249,17 @@ void CScene2D::Update(const double dElapsedTime)
 			cMouseController->mouseOffset = glm::vec2(0.0f);
 		}
 	}
+	proceduralGenerationCooldown -= dElapsedTime;
 
-	if (cPlayer2D->i32vec2Index.x + 5 >= CSettings::GetInstance()->NUM_TILES_XAXIS)
-		cMap2D->ProceduralGeneration();
+	if (cPlayer2D->i32vec2Index.x + 35 >= CSettings::GetInstance()->NUM_TILES_XAXIS)
+	{
+		if (proceduralGenerationCooldown < 0)
+		{
+			std::cout << "COMMENCE GENERATION" << std::endl;
+			cMap2D->ProceduralGeneration();
+			proceduralGenerationCooldown = 2;
+		}
+	}
 
 	//update CMap2D
 	//cMap2D->Update(dElapsedTime);

@@ -134,9 +134,9 @@ namespace rapidcsv
           typeid(T) == typeid(long double) ||
           typeid(T) == typeid(char))
       {
-        std::ostringstream out;
-        out << pVal;
-        pStr = out.str();
+         std::ostringstream out;
+         out << pVal;
+         pStr = out.str();
       }
       else
       {

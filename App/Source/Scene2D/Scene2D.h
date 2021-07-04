@@ -95,5 +95,7 @@ private:
 	int totalCounter = 1;
 
 	string itemName = "";
+
+	double proceduralGenerationCooldown = 5;
 };
 
