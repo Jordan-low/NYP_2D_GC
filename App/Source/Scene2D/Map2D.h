@@ -97,7 +97,7 @@ public:
 	// Set the value at certain indices in the arrMapInfo
 	void SetMapInfo(const unsigned int uiRow, const unsigned int uiCol, const int iValue, const bool bInvert = true);
 
-	void SetSaveMapInfo(const unsigned int uiRow, const unsigned int uiCol, const int iValue, const bool bInvert = true);
+	void SetSaveMapInfo(const unsigned int uiRow, const unsigned int uiCol, const int iValue, const bool bInvert = true, const bool docSave = true);
 
 	// Get the value at certain indices in the arrMapInfo
 	int GetMapInfo(const unsigned int uiRow, const unsigned int uiCol, const bool bInvert = true) const;

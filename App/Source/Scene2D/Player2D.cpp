@@ -1811,7 +1811,7 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 		Harvest(x, y);
 
 		//set tile to be 0
-		cMap2D->SetSaveMapInfo(y, x, 0, false);
+		cMap2D->SetSaveMapInfo(y, x, 0, false, true);
 		break;
 	}
 }
@@ -1843,7 +1843,7 @@ bool CPlayer2D::UpdateTreeItem(int blockNumber, glm::vec2 position)
 
 	if (temp == CMap2D::BLOCK_TYPE::BLOCKS)
 	{
-		cMap2D->SetSaveMapInfo(position.y, position.x, blockNumber, false);
+		cMap2D->SetSaveMapInfo(position.y, position.x, blockNumber, false, true);
 		return true;
 	}
 	return false;
@@ -1857,7 +1857,7 @@ bool CPlayer2D::UpdateTreeItem(int blockNumber, glm::vec2 position)
 bool CPlayer2D::UpdateBlockItem(int blockNumber, glm::vec2 position)
 {			
 	//set the tile to be the block
-	cMap2D->SetSaveMapInfo(position.y, position.x, blockNumber, false);
+	cMap2D->SetSaveMapInfo(position.y, position.x, blockNumber, false, true);
 	return true;
 }
 
@@ -2183,7 +2183,7 @@ void CPlayer2D::CollectItem(int minIndex, int maxIndex)
 	if (!cInventoryManager->Check(itemName))
 		return;
 
-	cMap2D->SetSaveMapInfo(itemPosition.y, itemPosition.x, 0);
+	cMap2D->SetSaveMapInfo(itemPosition.y, itemPosition.x, 0, true);
 	cInventoryItem = cInventoryManager->GetItem(itemName);
 	cInventoryItem->Add(1);
 }

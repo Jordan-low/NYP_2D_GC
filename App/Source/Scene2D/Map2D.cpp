@@ -407,7 +407,7 @@ void CMap2D::SetMapInfo(const unsigned int uiRow, const unsigned int uiCol, cons
 		arrMapInfo[uiCurLevel][uiRow][uiCol].value = iValue;
 }
 
-void CMap2D::SetSaveMapInfo(const unsigned int uiRow, const unsigned int uiCol, const int iValue, const bool bInvert)
+void CMap2D::SetSaveMapInfo(const unsigned int uiRow, const unsigned int uiCol, const int iValue, const bool bInvert, const bool docSave)
 {
 	if (uiRow >= 0 && uiRow < cSettings->NUM_TILES_YAXIS && uiCol >= 0 && uiCol < cSettings->NUM_TILES_XAXIS) //check if its within screen
 	{
@@ -421,7 +421,8 @@ void CMap2D::SetSaveMapInfo(const unsigned int uiRow, const unsigned int uiCol, 
 			arrMapInfo[uiCurLevel][uiRow][uiCol].value = iValue;
 			doc.SetCell(uiCol, uiRow, arrMapInfo[uiCurLevel][uiRow][uiCol].value);
 		}
-		doc.Save(FileSystem::getPath(GetActiveWorldPath()).c_str());
+		if (docSave)
+			doc.Save(FileSystem::getPath(GetActiveWorldPath()).c_str());
 	}
 }
 
@@ -449,13 +450,16 @@ bool CMap2D::LoadMap(string filename, const unsigned int uiCurLevel)
 {
 	doc = rapidcsv::Document(FileSystem::getPath(filename).c_str());
 	
-	// Check if the sizes of CSV data matches the declared arrMapInfo sizes
-	if ((cSettings->NUM_TILES_XAXIS != (unsigned int)doc.GetColumnCount()) ||
-		(cSettings->NUM_TILES_YAXIS != (unsigned int)doc.GetRowCount()))
-	{
-		cout << "Sizes of CSV map does not match declared arrMapInfo sizes." << endl;
-		return false;
-	}
+	//// Check if the sizes of CSV data matches the declared arrMapInfo sizes
+	//if ((cSettings->NUM_TILES_XAXIS != v) ||
+	//	(cSettings->NUM_TILES_YAXIS != (unsigned int)doc.GetRowCount()))
+	//{
+	//	cout << "Sizes of CSV map does not match declared arrMapInfo sizes." << endl;
+	//	return false;
+	//}
+
+	cSettings->NUM_TILES_XAXIS = (unsigned int)doc.GetColumnCount();
+	cSettings->NUM_TILES_YAXIS = (unsigned int)doc.GetRowCount();
 
 	// Read the rows and columns of CSV data into arrMapInfo
 	for (unsigned int uiRow = 0; uiRow < cSettings->NUM_TILES_YAXIS; uiRow++)
@@ -515,13 +519,16 @@ bool CMap2D::LoadNewMap(string filename)
 {
 	doc = rapidcsv::Document(FileSystem::getPath("Maps/DEFAULT.csv").c_str());
 
-	// Check if the sizes of CSV data matches the declared arrMapInfo sizes
-	if ((cSettings->NUM_TILES_XAXIS != (unsigned int)doc.GetColumnCount()) ||
-		(cSettings->NUM_TILES_YAXIS != (unsigned int)doc.GetRowCount()))
-	{
-		cout << "Sizes of CSV map does not match declared arrMapInfo sizes." << endl;
-		return false;
-	}
+	//// Check if the sizes of CSV data matches the declared arrMapInfo sizes
+	//if ((cSettings->NUM_TILES_XAXIS != (unsigned int)doc.GetColumnCount()) ||
+	//	(cSettings->NUM_TILES_YAXIS != (unsigned int)doc.GetRowCount()))
+	//{
+	//	cout << "Sizes of CSV map does not match declared arrMapInfo sizes." << endl;
+	//	return false;
+	//}
+
+	cSettings->NUM_TILES_XAXIS = (unsigned int)doc.GetColumnCount();
+	cSettings->NUM_TILES_YAXIS = (unsigned int)doc.GetRowCount();
 
 	// Read the rows and columns of CSV data into arrMapInfo
 	for (unsigned int uiRow = 0; uiRow < cSettings->NUM_TILES_YAXIS; uiRow++)
@@ -643,7 +650,7 @@ bool CMap2D::ProceduralGeneration()
 	{
 		for (int j = 0; j < cSettings->NUM_TILES_YAXIS; j++)
 		{
-			SetMapInfo(j, i, 0, false);
+			SetSaveMapInfo(j, i, 0, false, false);
 		}
 	}
 
@@ -666,10 +673,10 @@ bool CMap2D::ProceduralGeneration()
 					switch (treeType)
 					{
 					case 1:
-						SetSaveMapInfo(random - 1, i, 100, false);
+						SetSaveMapInfo(random - 1, i, 100, false, false);
 						break;
 					case 2:
-						SetSaveMapInfo(random - 1, i, 102, false);
+						SetSaveMapInfo(random - 1, i, 102, false, false);
 						break;
 					default:
 						break;
@@ -680,7 +687,7 @@ bool CMap2D::ProceduralGeneration()
 				int chestRandom = Math::RandIntMinMax(0, chestSpawnRate);
 				if (chestRandom == 0)
 				{
-					SetSaveMapInfo(random - 1, i, 4, false);
+					SetSaveMapInfo(random - 1, i, 4, false, false);
 					chestSpawned++;
 				}
 
@@ -689,21 +696,21 @@ bool CMap2D::ProceduralGeneration()
 				int enemyRandom = Math::RandIntMinMax(0, enemySpawnRate);
 				if (enemyRandom == 0)
 				{
-					SetSaveMapInfo(random - 1, i, 401, false);
+					SetSaveMapInfo(random - 1, i, 401, false, false);
 				}
 
 				//force spawn chest
 				if (i == 99 && chestSpawned == 0)
-					SetSaveMapInfo(random - 1, i, 4, false);
+					SetSaveMapInfo(random - 1, i, 4, false, false);
 
 				//set grass and dirt floor
-				SetSaveMapInfo(random, i, 2, false);
+				SetSaveMapInfo(random, i, 2, false, false);
 				for (int j = 1; j < cSettings->NUM_TILES_YAXIS - random; j++)
 				{
 					if (j == cSettings->NUM_TILES_YAXIS - random - 1)
-						SetSaveMapInfo(random + j, i, 1, false);
+						SetSaveMapInfo(random + j, i, 1, false, false);
 					else
-						SetSaveMapInfo(random + j, i, 3, false);
+						SetSaveMapInfo(random + j, i, 3, false, false);
 				}
 
 				int lavaRandom = Math::RandIntMinMax(0, lavaSpawnRate);
@@ -711,7 +718,7 @@ bool CMap2D::ProceduralGeneration()
 				{
 					if (random + 1 == cSettings->NUM_TILES_YAXIS - 1)
 						continue;
-					SetSaveMapInfo(random + 1, i, 5, false);
+					SetSaveMapInfo(random + 1, i, 5, false, false);
 				}
 
 				done = true;
@@ -719,7 +726,7 @@ bool CMap2D::ProceduralGeneration()
 			}
 		}
 	}
-	
+	doc.Save(FileSystem::getPath(GetActiveWorldPath()).c_str());
 	return false;
 }
 
@@ -840,9 +847,6 @@ bool CMap2D::LoadTexture(const char* filename, const int iTextureCode)
  */
 void CMap2D::RenderTile(const unsigned int uiRow, const unsigned int uiCol)
 {
-	if (arrMapInfo[uiCurLevel][uiRow][uiCol].value == 200)
-		arrMapInfo[uiCurLevel][uiRow][uiCol].value = 0;
-
 	if (arrMapInfo[uiCurLevel][uiRow][uiCol].value != 0)
 	{
 		try {
@@ -867,7 +871,6 @@ void CMap2D::RenderTile(const unsigned int uiRow, const unsigned int uiCol)
 			quadMesh->Render();
 			glBindVertexArray(0);
 		}
-
 	}
 }
 
@@ -914,7 +917,7 @@ void CMap2D::UpdateSeed(string itemName, double dt, int blockNumber, float timer
 				if (arrMapInfo[uiCurLevel][uiRow][uiCol].timer > timer)
 				{
 					arrMapInfo[uiCurLevel][uiRow][uiCol].value = blockNumber + 1;
-					SetSaveMapInfo(uiRow, uiCol, arrMapInfo[uiCurLevel][uiRow][uiCol].value, false);
+					SetSaveMapInfo(uiRow, uiCol, arrMapInfo[uiCurLevel][uiRow][uiCol].value, false, true);
 					arrMapInfo[uiCurLevel][uiRow][uiCol].timer = 0;
 				}
 			}

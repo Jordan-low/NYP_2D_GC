@@ -216,7 +216,8 @@ void CScene2D::Update(const double dElapsedTime)
 					cMap2D->activeWorld = cGUI2->worldInput; //set active world to current loaded world
 					if (!cMap2D->LoadMap("Maps/" + cGUI2->worldInput + ".csv")) //check if world is able to load
 					{
-						throw runtime_error("Unable to load existing world name " + cGUI2->worldInput + " to file");
+						std::cout << "Unable to load existing map: " << cGUI2->worldInput << std::endl;
+						return;
 					}
 				}
 				else
