@@ -37,10 +37,14 @@
 //Player
 #include "Player2D.h"
 
+//Enemy
+#include "Enemy2D.h"
+
 //Sound
 #include "..\SoundController\SoundController.h"
 
 #include <sstream>
+#include <vector>
 
 class CScene2D : public CSingletonTemplate<CScene2D>
 {
@@ -86,6 +90,8 @@ protected:
 
 	//Player
 	CPlayer2D* cPlayer2D;
+
+	vector<CEntity2D*> enemyVector;
 
 	CInventoryManager* cInventoryManager;
 

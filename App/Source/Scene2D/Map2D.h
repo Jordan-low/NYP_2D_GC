@@ -37,6 +37,10 @@
 
 #include "Player2D.h"
 
+// Include files for AStar
+#include <queue>
+#include <functional>
+
 // A structure storing information about Map Sizes
 struct MapSize {
 	unsigned int uiRowSize;
@@ -50,12 +54,27 @@ struct Grid {
 	float timer;
 	float health;
 
-	// Row and Column index of its parent
-	// Note that 0 <= i < uiRowSize & 0 <= j < uiColSize
-	unsigned int uiParentRow, uiParentCol;
-	// Movement Costs: f = g + h
-	double f, g, h;
+	Grid() : value(0), pos(0, 0), parent(-1, -1), f(0), g(0), h(0) {}
+	Grid(const glm::i32vec2& pos, unsigned int f) : value(0), pos(pos), parent(-1, 1), f(f), g(0), h(0) {}
+	Grid(const glm::i32vec2& pos, const glm::i32vec2& parent, unsigned int f, unsigned int g, unsigned int h) : value(0), pos(pos), parent(parent), f(f), g(g), h(h) {}
+
+	glm::i32vec2 pos;
+	glm::i32vec2 parent;
+	unsigned int f;
+	unsigned int g;
+	unsigned int h;
 };
+
+using HeuristicFunction = std::function<unsigned int(const glm::i32vec2&, const glm::i32vec2&, int)>;
+// Reverse std::priority_queue to get the smallest element on top
+inline bool operator< (const Grid& a, const Grid& b) { return b.f < a.f; }
+
+namespace heuristic
+{
+	unsigned int manhattan(const glm::i32vec2& v1, const glm::i32vec2& v2, int weight);
+	unsigned int euclidean(const glm::i32vec2& v1, const glm::i32vec2& v2, int weight);
+}
+
 
 class CMap2D : public CSingletonTemplate<CMap2D>, public CEntity2D
 {
@@ -156,6 +175,13 @@ public:
 
 	//unsigned getCurrX(void);
 
+	// For AStar PathFinding
+	std::vector<glm::i32vec2> PathFind(const glm::i32vec2& startPos, const glm::i32vec2& targetPos, HeuristicFunction heuristicFunc, int weight = 1);
+	// Set if AStar PathFinding will consider diagonal movements
+	void SetDiagonalMovement(const bool bEnable);
+	// Print out details about this class instance in the console window
+	void PrintSelf(void) const;
+
 protected:
 
 	// The variable containing the rapidcsv::Document
@@ -194,6 +220,38 @@ protected:
 
 	unsigned int xList; //column
 	unsigned int yList; //row
+
+	// For A-Star PathFinding
+	// Build a path from m_cameFromList after calling PathFind()
+	std::vector<glm::i32vec2> BuildPath() const;
+	// Check if a grid is valid
+	bool isValid(const glm::i32vec2& pos) const;
+	// Check if a grid is blocked
+	bool isBlocked(const unsigned int uiRow,
+		const unsigned int uiCol,
+		const bool bInvert = true) const;
+	// Convert a position to a 1D position in the array
+	int ConvertTo1D(const glm::i32vec2& pos) const;
+
+	// Delete AStar lists
+	bool DeleteAStarLists(void);
+	// Reset AStar lists
+	bool ResetAStarLists(void);
+
+	// Variables for A-Star PathFinding
+	int m_weight;
+	unsigned int m_nrOfDirections;
+	glm::i32vec2 m_startPos;
+	glm::i32vec2 m_targetPos;
+
+	// The handle for heuristic functions
+	HeuristicFunction m_heuristic;
+
+	// Lists for A-Star PathFinding
+	std::priority_queue<Grid> m_openList;
+	std::vector<bool> m_closedList;
+	std::vector<Grid> m_cameFromList;
+	std::vector<glm::i32vec2> m_directions;
 
 private:
 	//total worlds generated

@@ -203,11 +203,13 @@ double CMouseController::GetMouseDeltaY(void) const
 double CMouseController::GetMousePositionXOnScreen(void) const //return screen position x
 {
 	double mouseToScreenPosX = curr_posX / 1280 * 32;
-	return mouseToScreenPosX - mouseOffset.x;
+	std:cout << "POSX: " << mouseToScreenPosX + mouseOffset.x << std::endl;
+	return mouseToScreenPosX + mouseOffset.x;
 }
 
 double CMouseController::GetMousePositionYOnScreen(void) const //return screen position y
 {
 	double mouseToScreenPosY = curr_posY / 720 * 24;
-	return mouseToScreenPosY - mouseOffset.y;
+	std:cout << "POSY: " << mouseToScreenPosY + mouseOffset.y << std::endl;
+	return mouseToScreenPosY + mouseOffset.y;
 }

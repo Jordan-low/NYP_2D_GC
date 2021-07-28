@@ -60,6 +60,12 @@ CScene2D::~CScene2D(void)
 		cPlayer2D = NULL;
 	}
 
+	for (CEntity2D* enemy : enemyVector)
+	{
+		delete enemy;
+		enemy = NULL;
+	}
+
 	if (cSoundController)
 	{
 		cSoundController->Destroy();
@@ -139,6 +145,24 @@ bool CScene2D::Init(void)
 		cout << "Failed to load cPlayer2D" << endl;
 		return false;
 	}
+
+	//Create and Init CEnemy2D
+	enemyVector.clear();
+	while (true)
+	{
+		CEnemy2D* cEnemy2D = new CEnemy2D();
+		//Pass shader to enemy
+		cEnemy2D->SetShader("2DColorShader");
+		//Init instance
+		if (cEnemy2D->Init())
+		{
+			cEnemy2D->SetPlayer2D(cPlayer2D);
+			enemyVector.push_back(cEnemy2D);
+		}
+		else
+			break;
+	}
+
 	return true;
 }
 
@@ -152,6 +176,13 @@ void CScene2D::Update(const double dElapsedTime)
 	cGUI->playerHealth = cPlayer2D->health;
 	cGUI->playerMaxHealth = cPlayer2D->maxHealth;
 	cGUI2->Update(dElapsedTime);
+
+	//update enemy before map
+	for (CEntity2D* enemy : enemyVector)
+	{
+		enemy->Update(dElapsedTime);
+	}
+
 	//update player
 	if (!enableTyping)
 		cPlayer2D->Update(dElapsedTime);
@@ -267,8 +298,13 @@ void CScene2D::Update(const double dElapsedTime)
 	//Update seeds timer
 	cPlayer2D->UpdateSeeds(dElapsedTime);
 
-	cMouseController->mouseOffset.x = cPlayer2D->playerOffset.x;
-	cMouseController->mouseOffset.y = cPlayer2D->playerOffset.y;
+	int multiplier = 0;
+	if (cPlayer2D->isCenter)
+	{
+		multiplier = 1;
+	}
+	cMouseController->mouseOffset.x = multiplier * (cPlayer2D->i32vec2Index.x - 15.5);
+	cMouseController->mouseOffset.y = 0;
 
 	//get mouse updates
 	if (cMouseController->IsButtonPressed(GLFW_MOUSE_BUTTON_1))
@@ -339,6 +375,16 @@ void CScene2D::Render(void)
 	cGUI2->Render(cMap2D->activeWorld);
 	// Call the cGUI's PostRender()
 	cGUI2->PostRender();
+
+	for (CEntity2D* enemy : enemyVector)
+	{
+		// Call the enemy PreRender()
+		enemy->PreRender();
+		// Call the enemy Render()
+		enemy->Render();
+		// Call the enemy PostRender()
+		enemy->PostRender();
+	}
 
 	// Call the cPlayer2D's PreRender()
 	cPlayer2D->PreRender();

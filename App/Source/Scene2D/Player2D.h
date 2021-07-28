@@ -88,6 +88,8 @@ public:
 
 	glm::vec2 playerOffset;
 
+	bool isCenter = false;
+
 protected:
 	enum DIRECTION
 	{

@@ -88,8 +88,7 @@ bool CPlayer2D::Init(void)
 
 	// Get the handler to the CMap2D instance
 	cMap2D = CMap2D::GetInstance();
-
-
+	
 
 	health = 100.f;
 	maxHealth = 100.f;
@@ -565,10 +564,12 @@ void CPlayer2D::Update(const double dElapsedTime)
 	}
 	else if (i32vec2Index.x > cSettings->TILE_RATIO_XAXIS / 2) //player in center area
 	{
-		std::cout << "MOVED" << std::endl;
+		isCenter = true;
 		xAxis = cSettings->TILE_RATIO_XAXIS / 2;
 		xOffset = 0;
 	}
+	else
+		isCenter = false;
 
 	vec2UVCoordinate.x = cSettings->ConvertIndexToUVSpace(cSettings->x, xAxis, false, xOffset * i32vec2NumMicroSteps.x * cSettings->MICRO_STEP_XAXIS);
 	vec2UVCoordinate.y = cSettings->ConvertIndexToUVSpace(cSettings->y, i32vec2Index.y, false, i32vec2NumMicroSteps.y * cSettings->MICRO_STEP_YAXIS);
@@ -1758,7 +1759,7 @@ void CPlayer2D::ResetPosition()
 void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string itemName)
 {
 	//check for player hit range
-	if (x > i32vec2Index.x - (int)playerOffset.x + hitRange || x < i32vec2Index.x - (int)playerOffset.x - hitRange)
+	if (x > i32vec2Index.x + hitRange || x < i32vec2Index.x - hitRange)
 		return;
 	if (y > cSettings->NUM_TILES_YAXIS - i32vec2Index.y + hitRange || y < cSettings->NUM_TILES_YAXIS - i32vec2Index.y - hitRange)
 		return;
@@ -2144,9 +2145,9 @@ void CPlayer2D::RenderBlockRangeTiles()
 	if (cInventoryManager->currentItem == cInventoryManager->currentWeapon)
 		return;
 
-	for (int i = i32vec2Index.x - (int)playerOffset.x - hitRange; i < i32vec2Index.x - (int)playerOffset.x + hitRange; i++)
+	for (int i = i32vec2Index.x - hitRange; i <= i32vec2Index.x + hitRange; i++)
 	{
-		for (int j = cSettings->NUM_TILES_YAXIS - i32vec2Index.y - hitRange; j < cSettings->NUM_TILES_YAXIS - i32vec2Index.y + hitRange; j++)
+		for (int j = cSettings->NUM_TILES_YAXIS - i32vec2Index.y - hitRange; j <= cSettings->NUM_TILES_YAXIS - i32vec2Index.y + hitRange; j++)
 		{
 			if (cMap2D->GetMapInfo(j, i, false) == 0)
 			{
