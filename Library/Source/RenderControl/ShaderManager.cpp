@@ -104,7 +104,7 @@ void CShaderManager::Add(	const std::string& _name,
 	if (Check(_name))
 	{
 		// Scene Exist, unable to proceed
-		throw std::exception("Duplicate shader name provided");
+		return;
 	}
 
 	CShader* cNewShader = new CShader(vertexPath, fragmentPath);

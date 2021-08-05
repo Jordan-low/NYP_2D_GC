@@ -26,6 +26,8 @@ public:
 							int& width, int& height, 
 							int& nrChannels, const bool bInvert = false);
 
+	// Load an image and return as a Texture ID
+	unsigned LoadTextureGetID(const char* filename, const bool bInvert);
 protected:
 	// Constructor
 	CImageLoader(void);

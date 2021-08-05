@@ -53,9 +53,6 @@
     <ClCompile Include="Source\GameControl\Settings.cpp">
       <Filter>GameControl</Filter>
     </ClCompile>
-    <ClCompile Include="Source\System\ImageLoader.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Primitives\Entity3D.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -119,6 +116,9 @@
     <ClCompile Include="Source\GUI\backends\imgui_impl_opengl3.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\System\ImageLoader.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\TimeControl\FPSCounter.h">
@@ -140,9 +140,6 @@
       <Filter>GameControl</Filter>
     </ClInclude>
     <ClInclude Include="Source\System\filesystem.h">
-      <Filter>System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\System\ImageLoader.h">
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Primitives\Entity3D.h">
@@ -209,6 +206,9 @@
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="Source\System\MyMath.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\System\ImageLoader.h">
       <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>

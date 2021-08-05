@@ -18,6 +18,7 @@
 
 // Include Settings
 #include "..\GameControl\Settings.h"
+#include "Mesh.h"
 
 #include <string>
 using namespace std;
@@ -66,6 +67,9 @@ public:
 protected:
 	// Name of Shader Program instance
 	std::string sShaderName;
+
+	//CS: The mesh that is used to draw objects
+	CMesh* mesh;
 
 	// OpenGL objects
 	unsigned int VBO, VAO, EBO;

@@ -24,6 +24,17 @@
 // Include SoundController
 #include "SoundController/SoundController.h"
 
+#include "RenderControl\ShaderManager.h"
+
+// Include CGameStateManager
+#include "GameStateManagement/GameStateManager.h"
+// Include CIntroState
+#include "GameStateManagement/IntroState.h"
+// Include CMenuState
+#include "GameStateManagement/MenuState.h"
+// Include CPlayGameState
+#include "GameStateManagement/PlayGameState.h"
+
 #include <iostream>
 using namespace std;
 
@@ -163,6 +174,7 @@ bool Application::Init(void)
 		return false;
 	}
 
+
 	// Set OpenGL window position
 	glfwSetWindowPos(cSettings->pWindow, cSettings->iWindowPosX, cSettings->iWindowPosY);
 
@@ -207,15 +219,31 @@ bool Application::Init(void)
 	}
 		
 	// Initialise the CScene2D instance
-	cScene2D = CScene2D::GetInstance();
-	if (cScene2D->Init() == false)
-	{
-		cout << "Failed to load Scene2D" << endl;
-		return false;
-	}
+	//cScene2D = CScene2D::GetInstance();
+	//if (cScene2D->Init() == false)
+	//{
+	//	cout << "Failed to load Scene2D" << endl;
+	//	return false;
+	//}
+
+	// Include Shader Manager
+	CShaderManager::GetInstance()->Add("2DShader", "Shader//Scene2D.vs", "Shader//Scene2D.fs");
+	CShaderManager::GetInstance()->Add("2DColorShader", "Shader//Scene2DColor.vs",
+		"Shader//Scene2DColor.fs");
+	CShaderManager::GetInstance()->Add("textShader", "Shader//text.vs", "Shader//text.fs");
+
 	// Initialise the CFPSCounter instance
 	cFPSCounter = CFPSCounter::GetInstance();
 	cFPSCounter->Init();
+
+	// Create the Game States
+	CGameStateManager::GetInstance()->AddGameState("IntroState", new CIntroState());
+	CGameStateManager::GetInstance()->AddGameState("MenuState", new CMenuState());
+	CGameStateManager::GetInstance()->AddGameState("PlayGameState", new CPlayGameState());
+
+	// Set the active scene
+	CGameStateManager::GetInstance()->SetActiveGameState("IntroState");
+
 
 	return true;
 }
@@ -233,20 +261,34 @@ void Application::Run(void)
 	double dTotalFrameTime = 0.0;
 
 	// Render loop
-	while (!glfwWindowShouldClose(cSettings->pWindow)
-		&& (!CKeyboardController::GetInstance()->IsKeyReleased(GLFW_KEY_ESCAPE)))
+	while (!glfwWindowShouldClose(cSettings->pWindow))
+		//&& (!CKeyboardController::GetInstance()->IsKeyReleased(GLFW_KEY_ESCAPE)))
 	{
-		// Call the cScene2D's update method
-		cScene2D->Update(dElapsedTime);
+		//// Call the cScene2D's update method
+		//cScene2D->Update(dElapsedTime);
 
-		// Call the cScene2D's pre render method
-		cScene2D->PreRender();
+		//// Call the cScene2D's pre render method
+		//cScene2D->PreRender();
 
-		// Call the cScene2D's render method
-		cScene2D->Render();
+		//// Call the cScene2D's render method
+		//cScene2D->Render();
 
-		// Call the cScene2D's post render method
-		cScene2D->PostRender();
+		//// Call the cScene2D's post render method
+		//cScene2D->PostRender();
+
+		// This is to prevent the program from crashing due to long dElapsedTime
+		// Causing Physics to calculate a large jump/fall for the player
+		if (dElapsedTime > 0.0166666666666667)
+			dElapsedTime = 0.0166666666666667;
+
+		// Call the active Game State's Update method
+		if (CGameStateManager::GetInstance()->Update(dElapsedTime) == false)
+		{
+			break;
+		}
+
+		// Call the active Game State's Render method
+		CGameStateManager::GetInstance()->Render();
 
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -284,6 +326,8 @@ void Application::Destroy(void)
 	// Destroy the keyboard instance
 	CKeyboardController::GetInstance()->Destroy();
 	CSoundController::GetInstance()->Destroy();
+	CShaderManager::GetInstance()->Destroy();
+	CGameStateManager::GetInstance()->Destroy();
 
 	// Destroy the CFPSCounter instance
 	if (cFPSCounter)
@@ -320,7 +364,6 @@ int Application::GetWindowWidth(void) const
 Application::Application(void)
 	: cFPSCounter(NULL)
 	, cSettings(NULL)
-	, cScene2D(NULL)
 {
 }
 

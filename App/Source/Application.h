@@ -11,7 +11,7 @@
 #include "TimeControl\StopWatch.h"
 
 //Scenes
-#include "Scene2D\Scene2D.h"
+//#include "Scene2D\Scene2D.h"
 
 // FPS Counter
 #include "TimeControl\FPSCounter.h"
@@ -48,7 +48,7 @@ protected:
 	CFPSCounter* cFPSCounter;
 
 	// The handler to the CScene2D instance
-	CScene2D* cScene2D;
+	//CScene2D* cScene2D;
 
 	// Constructor
 	Application(void);
