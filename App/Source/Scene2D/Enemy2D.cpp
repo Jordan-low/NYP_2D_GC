@@ -32,6 +32,7 @@ CEnemy2D::CEnemy2D(void)
 	, cMap2D(NULL)
 	, cSettings(NULL)
 	, cPlayer2D(NULL)
+	, animatedSprites(NULL)
 	, sCurrentFSM(FSM::IDLE)
 	, enemyType(ENEMY_TYPE::DEFAULT_ENEMY)
 	, iFSMCounter(0)
@@ -63,6 +64,13 @@ CEnemy2D::~CEnemy2D(void)
 	// We won't delete this since it was created elsewhere
 	cMap2D = NULL;
 
+	// Delete CAnimation Sprites
+	if (animatedSprites)
+	{
+		delete animatedSprites;
+		animatedSprites = NULL;
+	}
+
 	// optional: de-allocate all resources once they've outlived their purpose:
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
@@ -79,6 +87,9 @@ bool CEnemy2D::Init(void)
 
 	// Get the handler to the CMap2D instance
 	cMap2D = CMap2D::GetInstance();
+
+
+
 	// Find the indices for the player in arrMapInfo, and assign it to cPlayer2D
 	unsigned int uiRow = -1;
 	unsigned int uiCol = -1;
@@ -135,15 +146,19 @@ bool CEnemy2D::Init(void)
 		}
 		break;
 	default:
-		// Load the enemy2D texture
-		if (LoadTexture("Image/Scene2D_EnemyTile.tga", iTextureID) == false)
-		{
-			std::cout << "Failed to load enemy2D tile texture" << std::endl;
-			return false;
-		}
 		break;
 	}
-	
+
+	//CS:: Create the animated sprite and setup the animation
+	animatedSprites = CMeshBuilder::GenerateSpriteAnimation(4, 4,
+		cSettings->TILE_WIDTH, cSettings->TILE_HEIGHT);
+	animatedSprites->AddAnimation("runLeft", 0, 3);
+	animatedSprites->AddAnimation("runRight", 4, 7);
+	animatedSprites->AddAnimation("attackLeft", 8, 11);
+	animatedSprites->AddAnimation("attackRight", 12, 15);
+
+	//CS: Play the "runLeft" animation as default
+	animatedSprites->PlayAnimation("runLeft", -1, 1.0f);
 
 	//CS: Init the color to white
 	currentColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
@@ -166,9 +181,18 @@ void CEnemy2D::Update(const double dElapsedTime)
 	if (!bIsActive)
 		return;
 
+	if (i32vec2Direction.x > 0)
+	{
+		animatedSprites->PlayAnimation("runLeft", -1, 1.0f);
+	}
+	else
+	{
+		animatedSprites->PlayAnimation("runRight", -1, 1.0f);
+	}
+
 	if (health <= 0)
 	{
-		
+		//kill enemy here
 	}
 	else if (health < maxHealth * 0.25) //red colour if health is less than 25% of max
 	{
@@ -196,10 +220,14 @@ void CEnemy2D::Update(const double dElapsedTime)
 		UpdateBossEnemy();
 		break;
 	}
+
 	AttackEnemy();
 
 	// Update Jump or Fall
 	UpdateJumpFall(dElapsedTime);
+
+	//CS: Update sprite animation
+	animatedSprites->Update(dElapsedTime);
 
 	float xAxis = i32vec2Index.x;
 	if (cPlayer2D->isCenter)
@@ -259,6 +287,7 @@ void CEnemy2D::Render(void)
 	// Render the tile
 	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	quadMesh->Render();
+	animatedSprites->Render();
 
 	glBindVertexArray(0);
 
@@ -650,11 +679,11 @@ bool CEnemy2D::InteractWithPlayer(void)
 	glm::i32vec2 i32vec2PlayerPos = cPlayer2D->i32vec2Index;
 	
 	// Check if the enemy2D is within 1.5 indices of the player2D
-	if (((i32vec2Index.x >= i32vec2PlayerPos.x - 0.5) && 
-		(i32vec2Index.x <= i32vec2PlayerPos.x + 0.5))
+	if (((i32vec2Index.x >= i32vec2PlayerPos.x - 0.9) && 
+		(i32vec2Index.x <= i32vec2PlayerPos.x + 0.9))
 		&& 
-		((i32vec2Index.y >= i32vec2PlayerPos.y - 0.5) &&
-		(i32vec2Index.y <= i32vec2PlayerPos.y + 0.5)))
+		((i32vec2Index.y >= i32vec2PlayerPos.y - 0.9) &&
+		(i32vec2Index.y <= i32vec2PlayerPos.y + 0.9)))
 	{
 		cPlayer2D->health -= 10.f;
 		cout << "Gotcha!" << endl;
@@ -936,6 +965,14 @@ void CEnemy2D::UpdateBossEnemy()
 			// Patrol around
 			// Update the Enemy2D's position for patrol
 			UpdatePosition();
+			if (i32vec2Direction.x > 0)
+			{
+				animatedSprites->PlayAnimation("runRight", -1, 1.0f);
+			}
+			else
+			{
+				animatedSprites->PlayAnimation("runLeft", -1, 1.0f);
+			}
 		}
 		iFSMCounter++;
 		break;
@@ -987,6 +1024,15 @@ void CEnemy2D::UpdateBossEnemy()
 				}
 			}
 
+
+			if (i32vec2Direction.x > 0)
+			{
+				animatedSprites->PlayAnimation("attackRight", -1, 1.0f);
+			}
+			else
+			{
+				animatedSprites->PlayAnimation("attackLeft", -1, 1.0f);
+			}
 			//cout << "i32vec2Destination : " << i32vec2Destination.x
 			//	<< ", " << i32vec2Destination.y << endl;
 			//cout << "i32vec2Direction : " << i32vec2Direction.x

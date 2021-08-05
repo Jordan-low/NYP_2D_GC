@@ -144,6 +144,9 @@ protected:
 	// Current color
 	glm::vec4 currentColor;
 
+	//CS: Animated Sprite
+	CSpriteAnimation* animatedSprites;
+
 	// Handle to the CPlayer2D
 	CPlayer2D* cPlayer2D;
 
