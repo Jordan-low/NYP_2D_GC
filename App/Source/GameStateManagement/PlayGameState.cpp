@@ -85,7 +85,7 @@ bool CPlayGameState::Update(const double dElapsedTime)
  */
 void CPlayGameState::Render(void)
 {
-	cout << "CPlayGameState::Render()\n" << endl;
+	//cout << "CPlayGameState::Render()\n" << endl;
 
 	// Call the cScene2D's Pre-Render method
 	cScene2D->PreRender();

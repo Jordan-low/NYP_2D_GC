@@ -59,7 +59,6 @@ CPlayer2D::~CPlayer2D(void)
 	// We won't delete this since it was created elsewhere
 	cInventoryManager = NULL;
 
-
 	// Delete CAnimation Sprites
 	if (animatedSprites)
 	{
@@ -192,8 +191,9 @@ bool CPlayer2D::Init(void)
 	for (int i = 0; i < 5; i++)
 		cInventoryManager->CycleThroughInventory();
 
-	cInventoryManager->currentWeapon = cInventoryManager->GetItem("Fist");
+	cInventoryManager->currentWeapon = cInventoryManager->GetItem("StoneSword");
 	cInventoryManager->currentItem = cInventoryManager->currentWeapon;
+
 
 	return true;
 }
@@ -213,7 +213,7 @@ void CPlayer2D::Update(const double dElapsedTime)
 
 	Shop();
 	CollectChest(4, 4);
-	AttackEnemy(401, 401);
+	AttackEnemy(300, 301);
 	CollectItem(301, 302);
 	CollideDamageBlock(dElapsedTime, 5, 5);
 	SetInventorySelector();

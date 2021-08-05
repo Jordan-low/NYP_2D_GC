@@ -19,6 +19,9 @@
 // Include the Map2D as we will use it to check the player's movements and actions
 class CMap2D;
 
+// Include Keyboard controller
+#include "Inputs\KeyboardController.h"
+
 // Include Settings
 #include "GameControl\Settings.h"
 
@@ -91,7 +94,16 @@ protected:
 		IDLE = 0,
 		PATROL = 1,
 		ATTACK = 2,
+		DEFEND = 3,
+		HEAL = 4,
 		NUM_FSM
+	};
+
+	enum ENEMY_TYPE
+	{
+		DEFAULT_ENEMY = 0,
+		BOSS_ENEMY,
+		TOTAL_ENEMY
 	};
 
 	glm::i32vec2 i32vec2OldIndex;
@@ -138,6 +150,8 @@ protected:
 	// Current FSM
 	FSM sCurrentFSM;
 
+	ENEMY_TYPE enemyType;
+
 	// FSM counter - count how many frames it has been in this FSM
 	int iFSMCounter;
 
@@ -170,5 +184,11 @@ protected:
 
 	// Update position
 	void UpdatePosition(void);
+
+	void UpdateDefaultEnemy();
+
+	void UpdateBossEnemy();
+
+	void AttackEnemy();
 };
 
