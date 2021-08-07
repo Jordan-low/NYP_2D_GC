@@ -50,6 +50,7 @@ public:
 	//cycle through inventory
 	void CycleThroughInventory();
 
+	// The map containing all the items
 	std::map<std::string, CInventoryItem*> inventoryMap;
 
 	bool renderShop = false;
@@ -61,6 +62,5 @@ protected:
 	// Destructor
 	virtual ~CInventoryManager(void);
 
-	// The map containing all the items
 
 };

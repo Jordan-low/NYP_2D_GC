@@ -139,7 +139,7 @@ bool CEnemy2D::Init(void)
 		break;
 	case BOSS_ENEMY:
 		// Load the enemy2D texture
-		if (LoadTexture("Image/Characters/Enemy.png", iTextureID) == false)
+		if (LoadTexture("Image/Characters/Enemy11.png", iTextureID) == false)
 		{
 			std::cout << "Failed to load enemy2D tile texture" << std::endl;
 			return false;
@@ -286,7 +286,7 @@ void CEnemy2D::Render(void)
 
 	// Render the tile
 	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	quadMesh->Render();
+	//quadMesh->Render();
 	animatedSprites->Render();
 
 	glBindVertexArray(0);
@@ -955,7 +955,7 @@ void CEnemy2D::UpdateBossEnemy()
 			iFSMCounter = 0;
 			cout << "Switching to Idle State" << endl;
 		}
-		else if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 10.0f)
+		else if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 3.0f)
 		{
 			sCurrentFSM = ATTACK;
 			iFSMCounter = 0;
@@ -964,6 +964,7 @@ void CEnemy2D::UpdateBossEnemy()
 		{
 			// Patrol around
 			// Update the Enemy2D's position for patrol
+			UpdateDirection();
 			UpdatePosition();
 			if (i32vec2Direction.x > 0)
 			{
@@ -980,7 +981,7 @@ void CEnemy2D::UpdateBossEnemy()
 		std::cout << "attacking" << std::endl;
 
 		//check if distance between player is less than 10, if yes, attack player
-		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 10.0f)
+		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 3.0f)
 		{
 			//check if health is less than 50% of max, if yes change to defend mode
 			if (health < maxHealth * 0.5)
