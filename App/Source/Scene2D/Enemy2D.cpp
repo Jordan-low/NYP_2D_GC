@@ -695,8 +695,9 @@ bool CEnemy2D::InteractWithPlayer(void)
 		cPlayer2D->health -= 10.f;
 		cout << "Gotcha!" << endl;
 		//// Since the player has been caught, then reset the FSM
-		sCurrentFSM = DEFEND;
+		sCurrentFSM = PATROL;
 		iFSMCounter = 0;
+		UpdateDirection();
 		return true;
 	}
 	return false;
@@ -962,7 +963,7 @@ void CEnemy2D::UpdateBossEnemy()
 			iFSMCounter = 0;
 			cout << "Switching to Idle State" << endl;
 		}
-		else if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 3.0f)
+		else if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 2.0f)
 		{
 			sCurrentFSM = ATTACK;
 			iFSMCounter = 0;
@@ -992,7 +993,7 @@ void CEnemy2D::UpdateBossEnemy()
 		std::cout << "attacking" << std::endl;
 
 		//check if distance between player is less than 10, if yes, attack player
-		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 3.0f)
+		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 2.0f)
 		{
 			//check if health is less than 50% of max, if yes change to defend mode
 			if (health < maxHealth * 0.5)
@@ -1074,7 +1075,7 @@ void CEnemy2D::UpdateBossEnemy()
 		cout << "defending" << endl;
 
 		//check if distance between player is less than 10, if yes, retreat and run the opposite direction of the player
-		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 10.0f)
+		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 5.0f)
 		{
 			auto path = cMap2D->PathFind(i32vec2Index,
 				cPlayer2D->i32vec2Index,
@@ -1097,7 +1098,7 @@ void CEnemy2D::UpdateBossEnemy()
 				}
 				else
 				{
-					if ((coord - i32vec2Destination) == i32vec2Direction)
+					if ((coord + i32vec2Destination) == i32vec2Direction)
 					{
 						// Set a destination
 						i32vec2Destination = coord;
