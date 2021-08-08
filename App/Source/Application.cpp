@@ -226,7 +226,7 @@ bool Application::Init(void)
 	//	return false;
 	//}
 
-	// Include Shader Manager
+	// Add the shaders to the ShaderManager
 	CShaderManager::GetInstance()->Add("2DShader", "Shader//Scene2D.vs", "Shader//Scene2D.fs");
 	CShaderManager::GetInstance()->Add("2DColorShader", "Shader//Scene2DColor.vs",
 		"Shader//Scene2DColor.fs");
@@ -243,7 +243,6 @@ bool Application::Init(void)
 
 	// Set the active scene
 	CGameStateManager::GetInstance()->SetActiveGameState("IntroState");
-
 
 	return true;
 }

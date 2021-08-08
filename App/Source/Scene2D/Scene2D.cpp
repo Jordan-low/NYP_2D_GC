@@ -83,28 +83,26 @@ CScene2D::~CScene2D(void)
 bool CScene2D::Init(void)
 {
 	// Include Shader Manager
+	//CShaderManager::GetInstance()->Add("2DShader", "Shader//Scene2D.vs", "Shader//Scene2D.fs");
 	CShaderManager::GetInstance()->Use("2DShader");
 	CShaderManager::GetInstance()->activeShader->setInt("texture1", 0);
 
-	// CMap2D
+	// Create and initialise the Map 2D
 	cMap2D = CMap2D::GetInstance();
-	//set shader
+	// Set a shader to this class
 	cMap2D->SetShader("2DShader");
 
 
-	//Load Scene2DColor into shadermanager
-	CShaderManager::GetInstance()->Add("2DColorShader", "Shader//Scene2DColor.vs", "Shader//Scene2DColor.fs");
+	// Load Scene2DColor into ShaderManager
 	CShaderManager::GetInstance()->Use("2DColorShader");
 	CShaderManager::GetInstance()->activeShader->setInt("texture1", 0);
-
-	//Player
+	// Create and initialise the CPlayer2D
 	cPlayer2D = CPlayer2D::GetInstance();
-	//set shader
+	// Pass shader to cPlayer2D
 	cPlayer2D->SetShader("2DColorShader");
 
 
 	// Setup the shaders
-	CShaderManager::GetInstance()->Add("textShader", "Shader//text.vs", "Shader//text.fs");
 	CShaderManager::GetInstance()->Use("textShader");
 
 	// Store the keyboard and mouse controller singleton instance here

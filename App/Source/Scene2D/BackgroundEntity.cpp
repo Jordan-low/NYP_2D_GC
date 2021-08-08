@@ -5,7 +5,7 @@
  */
 #include "BackgroundEntity.h"
 
-//For allowing creating of Quad Mesh 
+ //For allowing creating of Quad Mesh 
 #include "Primitives/MeshBuilder.h"
 
 #include <iostream>

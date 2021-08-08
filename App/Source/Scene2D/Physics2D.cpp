@@ -143,7 +143,7 @@ void CPhysics2D::Update(void)
 // Add elapsed time
 void CPhysics2D::AddElapsedTime(const float fElapseTime)
 {
-	fTime += fElapseTime;
+	fTime = fElapseTime;
 }
 
 // Calculate the distance between two vec2 varables

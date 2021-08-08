@@ -33,8 +33,6 @@
 // Include CKeyboardController
 #include "Inputs/KeyboardController.h"
 
-#include "../SoundController/SoundController.h"
-
 #include <iostream>
 using namespace std;
 
@@ -78,11 +76,9 @@ bool CIntroState::Init(void)
  */
 bool CIntroState::Update(const double dElapsedTime)
 {
-	//cout << "CIntroState::Update()\n" << endl;
+	cout << "CIntroState::Update()\n" << endl;
 	if (CKeyboardController::GetInstance()->IsKeyReleased(GLFW_KEY_SPACE))
 	{
-		CSoundController::GetInstance()->PlaySoundByName("uiClick");
-
 		// Reset the CKeyboardController
 		CKeyboardController::GetInstance()->Reset();
 
@@ -91,6 +87,7 @@ bool CIntroState::Update(const double dElapsedTime)
 		CGameStateManager::GetInstance()->SetActiveGameState("MenuState");
 		return true;
 	}
+
 	return true;
 }
 
@@ -100,10 +97,10 @@ bool CIntroState::Update(const double dElapsedTime)
 void CIntroState::Render()
 {
 	// Clear the screen and buffer
-	glClearColor(0.0f, 0.55f, 1.00f, 1.00f);
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
 	//Draw the background
-	background->Render();
+ 	background->Render();
 }
 
 /**
@@ -111,7 +108,7 @@ void CIntroState::Render()
  */
 void CIntroState::Destroy(void)
 {
-	// Delete the background object
+	// Delete the background
 	if (background)
 	{
 		delete background;

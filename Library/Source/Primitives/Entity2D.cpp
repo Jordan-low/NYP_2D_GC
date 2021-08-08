@@ -23,6 +23,7 @@ CEntity2D::CEntity2D(void)
 	, EBO(0)
 	, iTextureID(0)
 	, cSettings(NULL)
+	, mesh(NULL)
 {
 	transform = glm::mat4(1.0f);	// make sure to initialize matrix to identity matrix first
 

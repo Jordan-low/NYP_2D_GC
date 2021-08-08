@@ -232,6 +232,7 @@ void CEnemy2D::Update(const double dElapsedTime)
 	//CS: Update sprite animation
 	animatedSprites->Update(dElapsedTime);
 
+	unsigned int xOffset = 1;
 	float xAxis = i32vec2Index.x;
 	if (cPlayer2D->isCenter)
 	{
