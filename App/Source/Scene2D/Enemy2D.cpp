@@ -19,6 +19,8 @@ using namespace std;
 // Include ImageLoader
 #include "System\ImageLoader.h"
 
+#include "../SoundController/SoundController.h"
+
 // Include the Map2D as we will use it to check the player's movements and actions
 #include "Map2D.h"
 // Include math.h
@@ -89,7 +91,6 @@ bool CEnemy2D::Init(void)
 	cMap2D = CMap2D::GetInstance();
 
 
-
 	// Find the indices for the player in arrMapInfo, and assign it to cPlayer2D
 	unsigned int uiRow = -1;
 	unsigned int uiCol = -1;
@@ -139,7 +140,7 @@ bool CEnemy2D::Init(void)
 		break;
 	case BOSS_ENEMY:
 		// Load the enemy2D texture
-		if (LoadTexture("Image/Characters/Enemy11.png", iTextureID) == false)
+		if (LoadTexture("Image/Characters/Enemy111.png", iTextureID) == false)
 		{
 			std::cout << "Failed to load enemy2D tile texture" << std::endl;
 			return false;
@@ -150,15 +151,16 @@ bool CEnemy2D::Init(void)
 	}
 
 	//CS:: Create the animated sprite and setup the animation
-	animatedSprites = CMeshBuilder::GenerateSpriteAnimation(4, 4,
+	animatedSprites = CMeshBuilder::GenerateSpriteAnimation(5, 4,
 		cSettings->TILE_WIDTH, cSettings->TILE_HEIGHT);
 	animatedSprites->AddAnimation("runLeft", 0, 3);
 	animatedSprites->AddAnimation("runRight", 4, 7);
 	animatedSprites->AddAnimation("attackLeft", 8, 11);
 	animatedSprites->AddAnimation("attackRight", 12, 15);
+	animatedSprites->AddAnimation("idle", 16, 19);
 
 	//CS: Play the "runLeft" animation as default
-	animatedSprites->PlayAnimation("runLeft", -1, 1.0f);
+	animatedSprites->PlayAnimation("idle", -1, 1.0f);
 
 	//CS: Init the color to white
 	currentColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
@@ -193,6 +195,7 @@ void CEnemy2D::Update(const double dElapsedTime)
 	if (health <= 0)
 	{
 		//kill enemy here
+		bIsActive = false;
 	}
 	else if (health < maxHealth * 0.25) //red colour if health is less than 25% of max
 	{
@@ -683,8 +686,11 @@ bool CEnemy2D::InteractWithPlayer(void)
 		(i32vec2Index.x <= i32vec2PlayerPos.x + 0.9))
 		&& 
 		((i32vec2Index.y >= i32vec2PlayerPos.y - 0.9) &&
-		(i32vec2Index.y <= i32vec2PlayerPos.y + 0.9)))
+		(i32vec2Index.y <= i32vec2PlayerPos.y + 0.9))
+		&& 
+		sCurrentFSM == ATTACK)
 	{
+		CSoundController::GetInstance()->PlaySoundByName("playerAttack");
 		cPlayer2D->health -= 10.f;
 		cout << "Gotcha!" << endl;
 		//// Since the player has been caught, then reset the FSM
@@ -970,9 +976,13 @@ void CEnemy2D::UpdateBossEnemy()
 			{
 				animatedSprites->PlayAnimation("runRight", -1, 1.0f);
 			}
-			else
+			else if (i32vec2Direction.x < 0)
 			{
 				animatedSprites->PlayAnimation("runLeft", -1, 1.0f);
+			}
+			else
+			{
+				animatedSprites->PlayAnimation("idle", -1, 1.0f);
 			}
 		}
 		iFSMCounter++;
@@ -1042,7 +1052,7 @@ void CEnemy2D::UpdateBossEnemy()
 
 			// Attack
 			// Update direction to move towards for attack
-			//UpdateDirection();
+			UpdateDirection();
 
 			// Update the Enemy2D's position for attack
 			UpdatePosition();
@@ -1138,11 +1148,13 @@ void CEnemy2D::UpdateBossEnemy()
 
 void CEnemy2D::AttackEnemy()
 {
-	if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 10.0f)
+	if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 3.0f)
 	{
 		if (CKeyboardController::GetInstance()->IsKeyPressed(GLFW_KEY_E))
 		{
+			CSoundController::GetInstance()->PlaySoundByName("enemyAttack");
 			health--;
+			currentColor = glm::vec4(1.f, 0.f, 0.f, 1.f);
 		}
 	}
 }

@@ -824,7 +824,7 @@ void CMap2D::RenderTile(const unsigned int uiRow, const unsigned int uiCol)
 	if (arrMapInfo[uiCurLevel][uiRow][uiCol].value != 0)
 	{
 		if (arrMapInfo[uiCurLevel][uiRow][uiCol].value < totalTextures)
-			glBindTexture(GL_TEXTURE_2D, MapOfTextureIDs.at(arrMapInfo[uiCurLevel][uiRow][uiCol].value));
+ 			glBindTexture(GL_TEXTURE_2D, MapOfTextureIDs.at(arrMapInfo[uiCurLevel][uiRow][uiCol].value));
 
 		glBindVertexArray(VAO);
 		// Render the tile

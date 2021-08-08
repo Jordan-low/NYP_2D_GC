@@ -20,6 +20,8 @@ using namespace std;
 // Include MeshBuilder
 #include "Primitives/MeshBuilder.h"
 
+#include "../SoundController/SoundController.h"
+
 /**
  @brief Constructor This constructor has protected access modifier as this class will be a Singleton
  */
@@ -537,12 +539,14 @@ void CPlayer2D::Update(const double dElapsedTime)
 	{
 		if (cPhysics2D.GetStatus() == CPhysics2D::STATUS::IDLE)
 		{
+			CSoundController::GetInstance()->PlaySoundByName("jump");
 			doubleJumpReady = true;
 			cPhysics2D.SetStatus(CPhysics2D::STATUS::JUMP);
 			cPhysics2D.SetInitialVelocity(glm::vec2(0.0f, 3.0f));
 		}
 		else if (doubleJumpReady)
 		{
+			CSoundController::GetInstance()->PlaySoundByName("jump");
 			cPhysics2D.SetStatus(CPhysics2D::STATUS::JUMP);
 			cPhysics2D.SetInitialVelocity(glm::vec2(0.0f, 3.0f));
 			doubleJumpReady = false;
@@ -1789,7 +1793,7 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 		//check if player has enough block quantity
 		if (CheckQuantity(itemName))
 		{
-
+			bool playSound = true;
 			switch (cMap2D->GetBlockType(blockNumber))
 			{
 			case CMap2D::BLOCK_TYPE::BLOCKS:
@@ -1799,17 +1803,25 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 			case CMap2D::BLOCK_TYPE::TREES:
 				if (UpdateTreeItem(blockNumber, glm::vec2(x, y)))
 					ReduceQuantity(itemName, 1);
+				else
+					playSound = false;
 				break;
 			case CMap2D::BLOCK_TYPE::COLLECTABLES:
 				if (UpdateCollectableItem(itemName))
 					ReduceQuantity(itemName, 1);
 				break;
 			}
+			if (playSound)
+				CSoundController::GetInstance()->PlaySoundByName("place");
+		}
+		else
+		{
+			CSoundController::GetInstance()->PlaySoundByName("placeFail");
 		}
 		break;
 	case MOUSE_RIGHT:
 		//break blocks or trees
-		if (cMap2D->GetMapInfo(y, x, false) == 1 || cMap2D->GetMapInfo(y, x, false) == 0 || cMap2D->GetMapInfo(y, x, false) == 201)
+		if (cMap2D->GetMapInfo(y, x, false) == 1 || cMap2D->GetMapInfo(y, x, false) == 0 || cMap2D->GetMapInfo(y, x, false) == 201 || cMap2D->GetMapInfo(y, x, false) == 202)
 			return;
 
 		//harvest item
@@ -1817,6 +1829,7 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 
 		//set tile to be 0
 		cMap2D->SetSaveMapInfo(y, x, 0, false, true);
+		CSoundController::GetInstance()->PlaySoundByName("break");
 		break;
 	}
 }
@@ -1904,6 +1917,7 @@ void CPlayer2D::CollectChest(int minIndex, int maxIndex)
 	if (cKeyboardController->IsKeyPressed(GLFW_KEY_E))
 	{
 		cMap2D->OpenedChest(glm::vec2(i32vec2Index.x + offset, i32vec2Index.y));
+		CSoundController::GetInstance()->PlaySoundByName("openChest");
 	}
 }
 
@@ -2095,6 +2109,7 @@ void CPlayer2D::CollectItem(int minIndex, int maxIndex)
 	cMap2D->SetSaveMapInfo(itemPosition.y, itemPosition.x, 0, true);
 	cInventoryItem = cInventoryManager->GetItem(itemName);
 	cInventoryItem->Add(1);
+	CSoundController::GetInstance()->PlaySoundByName("pickUp");
 }
 
 /**

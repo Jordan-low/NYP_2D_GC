@@ -33,6 +33,8 @@
 // Include CKeyboardController
 #include "Inputs/KeyboardController.h"
 
+#include "../SoundController/SoundController.h"
+
 #include <iostream>
 using namespace std;
 
@@ -159,6 +161,8 @@ bool CMenuState::Update(const double dElapsedTime)
 	//For keyboard controls
 	if (CKeyboardController::GetInstance()->IsKeyReleased(GLFW_KEY_SPACE))
 	{
+		CSoundController::GetInstance()->PlaySoundByName("uiClick");
+
 		// Reset the CKeyboardController
 		CKeyboardController::GetInstance()->Reset();
 
@@ -169,6 +173,8 @@ bool CMenuState::Update(const double dElapsedTime)
 	}
 	else if (CKeyboardController::GetInstance()->IsKeyReleased(GLFW_KEY_ESCAPE))
 	{
+		CSoundController::GetInstance()->PlaySoundByName("uiClick");
+
 		// Reset the CKeyboardController
 		CKeyboardController::GetInstance()->Reset();
 

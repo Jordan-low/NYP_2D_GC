@@ -121,9 +121,15 @@ bool CScene2D::Init(void)
 
 	cSoundController = CSoundController::GetInstance();
 	cSoundController->Init();
-	cSoundController->LoadSound(FileSystem::getPath("Sounds\\Sound_Bell.ogg"), "bell", true);
-	cSoundController->LoadSound(FileSystem::getPath("Sounds\\Sound_Explosion.ogg"), "explosion", true);
-	cSoundController->LoadSound(FileSystem::getPath("Sounds\\Sound_Jump.ogg"), "jump", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\jump.wav"), "jump", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\click.wav"), "uiClick", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\hit.wav"), "playerAttack", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\hurt2.wav"), "enemyAttack", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\placeBlock.wav"), "place", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\placeBlockFail.wav"), "placeFail", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\breakBlock.wav"), "break", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\pickUp.wav"), "pickUp", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\openChest.wav"), "openChest", true);
 
 	//init map instance
 	if (cMap2D->Init(1, 24, 100) == false)
@@ -192,7 +198,7 @@ void CScene2D::Update(const double dElapsedTime)
 		if (cGUI2->worldInput.length() == 0)
 		{
 			enableTyping = !enableTyping;
-			//cSoundController->PlaySoundByName("explosion");
+			cSoundController->PlaySoundByName("uiClick");
 		}
 	}
 
@@ -280,17 +286,19 @@ void CScene2D::Update(const double dElapsedTime)
 			cMouseController->mouseOffset = glm::vec2(0.0f);
 		}
 	}
-	proceduralGenerationCooldown -= dElapsedTime;
 
-	if (cPlayer2D->i32vec2Index.x + 35 >= CSettings::GetInstance()->NUM_TILES_XAXIS)
-	{
-		if (proceduralGenerationCooldown < 0)
-		{
-			std::cout << "COMMENCE GENERATION" << std::endl;
-			cMap2D->ProceduralGeneration();
-			proceduralGenerationCooldown = 2;
-		}
-	}
+	////procedural generation
+	//proceduralGenerationCooldown -= dElapsedTime;
+
+	//if (cPlayer2D->i32vec2Index.x + 35 >= CSettings::GetInstance()->NUM_TILES_XAXIS)
+	//{
+	//	if (proceduralGenerationCooldown < 0)
+	//	{
+	//		std::cout << "COMMENCE GENERATION" << std::endl;
+	//		cMap2D->ProceduralGeneration();
+	//		proceduralGenerationCooldown = 2;
+	//	}
+	//}
 
 	//update CMap2D
 	//cMap2D->Update(dElapsedTime);

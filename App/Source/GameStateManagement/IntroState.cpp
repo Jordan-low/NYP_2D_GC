@@ -33,6 +33,8 @@
 // Include CKeyboardController
 #include "Inputs/KeyboardController.h"
 
+#include "../SoundController/SoundController.h"
+
 #include <iostream>
 using namespace std;
 
@@ -79,6 +81,8 @@ bool CIntroState::Update(const double dElapsedTime)
 	//cout << "CIntroState::Update()\n" << endl;
 	if (CKeyboardController::GetInstance()->IsKeyReleased(GLFW_KEY_SPACE))
 	{
+		CSoundController::GetInstance()->PlaySoundByName("uiClick");
+
 		// Reset the CKeyboardController
 		CKeyboardController::GetInstance()->Reset();
 
