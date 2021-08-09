@@ -4,6 +4,7 @@
  Date: May 2021
  */
 #include "GUI_Scene2D.h"
+#include "Player2D.h"
 
 #include <iostream>
 using namespace std;
@@ -173,13 +174,15 @@ void CGUI_Scene2D::Update(const double dElapsedTime)
 		ImGui::SetWindowPos(ImVec2(1210, 240 + i * 30));
 		ImGui::SetWindowSize(ImVec2(100.0f, 25.0f));
 		cInventoryItem = cInventoryManager->inventoryArray[i];
+		int itemCount = cInventoryItem->GetCount();
+		if (!CPlayer2D::GetInstance()->isSurvival)
+			itemCount = -1;
 		ImGui::Image((void*)(intptr_t)cInventoryItem->GetTextureID(),
 			ImVec2(cInventoryItem->vec2Size.x, cInventoryItem->vec2Size.y),
 			ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::SameLine();
 		ImGui::SetWindowFontScale(1.5f);
-		ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d",
-			cInventoryItem->GetCount());
+		ImGui::TextColored(ImVec4(1, 1, 0, 1), "%d", itemCount);
 		ImGui::End();
 	}
 

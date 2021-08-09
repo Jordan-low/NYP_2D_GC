@@ -1211,8 +1211,10 @@ void CPlayer2D::Harvest(int x, int y)
  @brief Return the item block's quantity
  @param itemName A string for item block name
  */
-bool CPlayer2D::CheckQuantity(string itemName)
+bool CPlayer2D::CheckQuantity(string itemName, bool survival)
 {
+	if (!survival)
+		return true;
 	cInventoryItem = cInventoryManager->GetItem(itemName);
 	if (cInventoryItem->CheckAvailableQuantity())
 		return true;
@@ -1791,7 +1793,7 @@ void CPlayer2D::UpdateMouse(MOUSE_CLICK mouseClick, double x, double y, string i
 			return;
 
 		//check if player has enough block quantity
-		if (CheckQuantity(itemName))
+		if (CheckQuantity(itemName, isSurvival))
 		{
 			bool playSound = true;
 			switch (cMap2D->GetBlockType(blockNumber))

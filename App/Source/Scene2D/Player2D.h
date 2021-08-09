@@ -76,7 +76,7 @@ public:
 	// Let player interact with the map
 	void Harvest(int x, int y);
 
-	bool CheckQuantity(string itemName);
+	bool CheckQuantity(string itemName, bool survival);
 
 	void ReduceQuantity(string itemName, int quantity);
 
@@ -89,6 +89,8 @@ public:
 	glm::vec2 playerOffset;
 
 	bool isCenter = false;
+
+	bool isSurvival = true;
 
 protected:
 	enum DIRECTION

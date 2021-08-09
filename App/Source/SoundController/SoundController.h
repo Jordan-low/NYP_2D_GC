@@ -42,6 +42,8 @@ public:
 
 	void PlaySoundByName(const string name);
 
+	void StopAllSound();
+
 	// Increase Master volume
 	bool MasterVolumeIncrease(void);
 	// Decrease Master volume

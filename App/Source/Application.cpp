@@ -37,6 +37,8 @@
 // Include CPlayGameState
 #include "GameStateManagement/PlayGameState.h"
 
+#include "System\filesystem.h"
+
 #include <iostream>
 using namespace std;
 
@@ -238,6 +240,9 @@ bool Application::Init(void)
 	// Initialise the CFPSCounter instance
 	cFPSCounter = CFPSCounter::GetInstance();
 	cFPSCounter->Init();
+	CSoundController::GetInstance()->LoadSound(FileSystem::getPath("Sounds\\click.wav"), "uiClick", true);
+	CSoundController::GetInstance()->LoadSound(FileSystem::getPath("Sounds\\menu_bg.wav"), "menuBG", true, true);
+	CSoundController::GetInstance()->LoadSound(FileSystem::getPath("Sounds\\game_bg.wav"), "gameBG", true, true);
 
 	// Create the Game States
 	CGameStateManager::GetInstance()->AddGameState("MenuState", new CMenuState());
@@ -262,6 +267,7 @@ void Application::Run(void)
 	double dElapsedTime = 0.0;
 	double dDelayTime = 0.0;
 	double dTotalFrameTime = 0.0;
+	CSoundController::GetInstance()->PlaySoundByName("menuBG");
 
 	// Render loop
 	while (!glfwWindowShouldClose(cSettings->pWindow))

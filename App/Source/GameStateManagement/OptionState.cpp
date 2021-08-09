@@ -35,6 +35,9 @@
 
 #include "../SoundController/SoundController.h"
 
+#include "../Scene2D/Player2D.h"
+
+
 #include <iostream>
 using namespace std;
 
@@ -142,6 +145,7 @@ bool COptionState::Update(const double dElapsedTime)
 
 			// Load the menu state
 			cout << "Loading Survival" << endl;
+			CPlayer2D::GetInstance()->isSurvival = true;
 			CGameStateManager::GetInstance()->SetActiveGameState("PlayGameState");
 		}
 		// Add codes for Creative button here
@@ -153,6 +157,8 @@ bool COptionState::Update(const double dElapsedTime)
 
 			// Load the menu state
 			cout << "Loading Creative" << endl;
+			CPlayer2D::GetInstance()->isSurvival = false;
+			CSoundController::GetInstance()->PlaySoundByName("uiClick");
 			CGameStateManager::GetInstance()->SetActiveGameState("PlayGameState");
 		}
 		// Add codes for Back button here
@@ -164,6 +170,7 @@ bool COptionState::Update(const double dElapsedTime)
 
 			// Load the menu state
 			cout << "Loading MenuState" << endl;
+			CSoundController::GetInstance()->PlaySoundByName("uiClick");
 			CGameStateManager::GetInstance()->SetActiveGameState("MenuState");
 		}
 		ImGui::End();

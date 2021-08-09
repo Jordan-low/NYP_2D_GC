@@ -178,6 +178,11 @@ void CSoundController::PlaySoundByName(const string name)
 	}
 }
 
+void CSoundController::StopAllSound()
+{
+	cSoundEngine->stopAllSounds();
+}
+
 /**
  @brief Increase Master volume
  @return true if successfully increased volume, else false

@@ -93,6 +93,8 @@ bool CMenuState::Init(void)
 	quitButtonData.fileName = "Image\\GUI\\QuitButton.png";
 	quitButtonData.textureID = il->LoadTextureGetID(quitButtonData.fileName.c_str(), false);
 
+
+
 	return true;
 }
 
@@ -142,6 +144,9 @@ bool CMenuState::Update(const double dElapsedTime)
 
 			// Load the menu state
 			cout << "Loading PlayGameState" << endl;
+			CSoundController::GetInstance()->StopAllSound();
+			CSoundController::GetInstance()->PlaySoundByName("uiClick");
+			CSoundController::GetInstance()->PlaySoundByName("gameBG");
 			CGameStateManager::GetInstance()->SetActiveGameState("PlayGameState");
 		}
 		// Add codes for Start button here
@@ -153,6 +158,7 @@ bool CMenuState::Update(const double dElapsedTime)
 
 			// Load the menu state
 			cout << "Loading PlayGameState" << endl;
+			CSoundController::GetInstance()->PlaySoundByName("uiClick");
 			CGameStateManager::GetInstance()->SetActiveGameState("OptionState");
 		}
 		// Add codes for Exit button here
@@ -164,6 +170,7 @@ bool CMenuState::Update(const double dElapsedTime)
 
 			// Load the menu state
 			cout << "Quitting the game from MenuState" << endl;
+			CSoundController::GetInstance()->PlaySoundByName("uiClick");
 
 			return false;
 		}

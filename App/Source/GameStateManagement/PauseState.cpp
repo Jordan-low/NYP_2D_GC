@@ -140,6 +140,7 @@ bool CPauseState::Update(const double dElapsedTime)
 
 			// Load the menu state
 			cout << "Loading PlayGameState" << endl;
+			CSoundController::GetInstance()->PlaySoundByName("uiClick");
 			CGameStateManager::GetInstance()->SetActiveGameState("PlayGameState");
 		}
 		// Add codes for Exit button here
@@ -150,9 +151,9 @@ bool CPauseState::Update(const double dElapsedTime)
 			CKeyboardController::GetInstance()->Reset();
 
 			// Load the menu state
-			cout << "Quitting the game from MenuState" << endl;
-
-			return false;
+			cout << "Loading MenuState" << endl;
+			CSoundController::GetInstance()->PlaySoundByName("uiClick");
+			CGameStateManager::GetInstance()->SetActiveGameState("MenuState");
 		}
 		ImGui::End();
 	}
