@@ -247,7 +247,6 @@ bool Application::Init(void)
 	// Create the Game States
 	CGameStateManager::GetInstance()->AddGameState("MenuState", new CMenuState());
 	CGameStateManager::GetInstance()->AddGameState("OptionState", new COptionState());
-	CGameStateManager::GetInstance()->AddGameState("PauseState", new CPauseState());
 	CGameStateManager::GetInstance()->AddGameState("PlayGameState", new CPlayGameState());
 
 	// Set the active scene

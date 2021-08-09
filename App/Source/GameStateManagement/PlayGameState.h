@@ -31,4 +31,8 @@ public:
 protected:
 	// The handler to the CScene2D instance
 	CScene2D* cScene2D;
+	ButtonData resumeButtonData;
+	ButtonData menuButtonData;
+
+	bool paused = false;
 };

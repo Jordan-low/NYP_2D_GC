@@ -691,12 +691,15 @@ bool CEnemy2D::InteractWithPlayer(void)
 		&& 
 		sCurrentFSM == ATTACK)
 	{
-		CSoundController::GetInstance()->PlaySoundByName("playerAttack");
-		cPlayer2D->health -= 10.f;
-		cout << "Gotcha!" << endl;
-		//// Since the player has been caught, then reset the FSM
+		if (cPlayer2D->isSurvival)
+		{
+			CSoundController::GetInstance()->PlaySoundByName("playerAttack");
+			cPlayer2D->health -= 10.f;
+			cout << "Gotcha!" << endl;
+			iFSMCounter = 0;
+			//// Since the player has been caught, then reset the FSM
+		}
 		sCurrentFSM = PATROL;
-		iFSMCounter = 0;
 		UpdateDirection();
 		return true;
 	}
@@ -708,7 +711,10 @@ bool CEnemy2D::InteractWithPlayer(void)
  */
 void CEnemy2D::UpdateDirection(void)
 {
-	i32vec2Destination = cPlayer2D->i32vec2Index;
+	if (cPlayer2D->isSurvival)
+		i32vec2Destination = cPlayer2D->i32vec2Index;
+	else
+		i32vec2Destination = glm::i32vec2(Math::RandIntMinMax(0, cSettings->NUM_TILES_XAXIS), i32vec2Index.y);
 
 	// Calculate the direction between enemy2D and player2D
 	i32vec2Direction = i32vec2Destination - i32vec2Index;
@@ -965,6 +971,8 @@ void CEnemy2D::UpdateBossEnemy()
 		}
 		else if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 2.0f)
 		{
+			if (!cPlayer2D->isSurvival)
+				break;
 			sCurrentFSM = ATTACK;
 			iFSMCounter = 0;
 		}
