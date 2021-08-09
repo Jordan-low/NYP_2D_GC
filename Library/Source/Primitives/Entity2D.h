@@ -60,6 +60,29 @@ public:
 	// The vec2 variable which stores the UV coordinates to render the enemy2D
 	glm::vec2 vec2UVCoordinate;
 
+
+	//stuffs
+	glm::vec3 vec3Scale;
+
+	glm::vec2 GetRelativeCenter();
+
+	glm::fvec2 f32vec2Index;
+
+	glm::fvec2 f32vec2Vel;
+
+	float rotation;
+
+	enum ENTITY_TYPE {
+		ENTITY_NULL,
+		ENTITY_BULLET,
+		ENTITY_ENEMY,
+		ENTITY_TOTAL
+	};
+	
+	ENTITY_TYPE type;
+
+	bool isActive;
+
 	float health;
 
 	float maxHealth;

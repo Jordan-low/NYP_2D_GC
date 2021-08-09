@@ -28,7 +28,7 @@ CSettings::~CSettings(void)
 /**
 @brief Convert an index number of a tile to a coordinate in UV Space
 */
-float CSettings::ConvertIndexToUVSpace(const AXIS sAxis, const float iIndex, const bool bInvert, const float fOffset)
+float CSettings::ConvertIndexToUVSpace(const AXIS sAxis, const int iIndex, const bool bInvert, const float fOffset)
 {
 	float fResult = 0.0f;
 	if (sAxis == x)
@@ -41,6 +41,31 @@ float CSettings::ConvertIndexToUVSpace(const AXIS sAxis, const float iIndex, con
 			fResult = 1.0f - (float)(iIndex + 1)*TILE_HEIGHT + TILE_HEIGHT / 2.0f + fOffset;
 		else
 			fResult = -1.0f + (float)iIndex*TILE_HEIGHT + TILE_HEIGHT / 2.0f + fOffset;
+	}
+	else if (sAxis == z)
+	{
+		// Not used in here
+	}
+	else
+	{
+		cout << "Unknown axis" << endl;
+	}
+	return fResult;
+}
+
+float CSettings::ConvertFloatIndexToUVSpace(const AXIS sAxis, const float iIndex, const bool bInvert)
+{
+	float fResult = 0.0f;
+	if (sAxis == x)
+	{
+		fResult = -1.0f + (float)iIndex * TILE_WIDTH + TILE_WIDTH;
+	}
+	else if (sAxis == y)
+	{
+		if (bInvert)
+			fResult = 1.0f - (float)(iIndex + 1) * TILE_HEIGHT;
+		else
+			fResult = -1.0f + (float)iIndex * TILE_HEIGHT;
 	}
 	else if (sAxis == z)
 	{

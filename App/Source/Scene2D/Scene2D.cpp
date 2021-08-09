@@ -11,6 +11,7 @@ using namespace std;
 
 #include "System\filesystem.h"
 
+
 bool is_file_exist(string fileName)
 {
 	std::ifstream infile(fileName);
@@ -28,6 +29,7 @@ CScene2D::CScene2D(void)
 	, cMap2D(NULL)
 	, cPlayer2D(NULL)
 	, cSoundController(NULL)
+	, cEntityManager(NULL)
 {
 }
 
@@ -66,15 +68,15 @@ CScene2D::~CScene2D(void)
 		enemy = NULL;
 	}
 
-	//if (cSoundController)
-	//{
-	//	cSoundController->Destroy();
-	//	cSoundController = NULL;
-	//}
+	if (cSoundController)
+	{
+		cSoundController = NULL;
+	}
 
 	// We won't delete this since it was created elsewhere
 	cKeyboardController = NULL;
 	cMouseController = NULL;
+	cEntityManager = NULL;
 }
 
 /**
@@ -92,6 +94,8 @@ bool CScene2D::Init(void)
 	// Set a shader to this class
 	cMap2D->SetShader("2DShader");
 
+	cEntityManager = CEntityManager::GetInstance();
+	cEntityManager->Init();
 
 	// Load Scene2DColor into ShaderManager
 	CShaderManager::GetInstance()->Use("2DColorShader");
@@ -324,6 +328,9 @@ void CScene2D::Update(const double dElapsedTime)
 		if (cInventoryManager->currentItem != cInventoryManager->currentWeapon)
 			cPlayer2D->UpdateMouse(cPlayer2D->MOUSE_RIGHT, cMouseController->GetMousePositionXOnScreen(), cMouseController->GetMousePositionYOnScreen(), cInventoryManager->currentItem->sName);
 	}
+
+	//call entity manager update
+	cEntityManager->Update(dElapsedTime);
 }
 
 /**
@@ -391,6 +398,9 @@ void CScene2D::Render(void)
 		// Call the enemy PostRender()
 		enemy->PostRender();
 	}
+
+	//call entity manager render
+	cEntityManager->Render();
 
 	// Call the cPlayer2D's PreRender()
 	cPlayer2D->PreRender();

@@ -166,6 +166,14 @@ void CEntity2D::PostRender(void)
 	glDisable(GL_BLEND);
 }
 
+glm::vec2 CEntity2D::GetRelativeCenter()
+{
+	glm::vec2 temp;
+	temp.x = i32vec2Index.x + (i32vec2NumMicroSteps.x + 4) / cSettings->NUM_STEPS_PER_TILE_XAXIS;
+	temp.y = i32vec2Index.y + (i32vec2NumMicroSteps.y + 4) / cSettings->NUM_STEPS_PER_TILE_YAXIS;
+	return temp;
+}
+
 /**
 @brief Load a texture, assign it a code and store it in MapOfTextureIDs.
 @param filename A const char* variable which contains the file name of the texture

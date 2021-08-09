@@ -43,6 +43,8 @@
 //Sound
 #include "..\SoundController\SoundController.h"
 
+#include "../Entity/EntityManager.h"
+
 #include <sstream>
 #include <vector>
 
@@ -90,6 +92,8 @@ protected:
 
 	//Player
 	CPlayer2D* cPlayer2D;
+
+	CEntityManager* cEntityManager;
 
 	vector<CEntity2D*> enemyVector;
 

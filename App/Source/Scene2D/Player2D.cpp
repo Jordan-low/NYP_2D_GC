@@ -33,6 +33,8 @@ CPlayer2D::CPlayer2D(void)
 	, playerOffset(glm::vec2(0.0f))
 	, cInventoryManager(NULL)
 	, cInventoryItem(NULL)
+	, cEntityManager(NULL)
+	, cEntityFactory(NULL)
 {
 	transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
 
@@ -60,6 +62,10 @@ CPlayer2D::~CPlayer2D(void)
 
 	// We won't delete this since it was created elsewhere
 	cInventoryManager = NULL;
+
+	cEntityManager = NULL;
+
+	cEntityFactory = NULL;
 
 	// Delete CAnimation Sprites
 	if (animatedSprites)
@@ -89,8 +95,12 @@ bool CPlayer2D::Init(void)
 
 	// Get the handler to the CMap2D instance
 	cMap2D = CMap2D::GetInstance();
-	
 
+	cEntityManager = CEntityManager::GetInstance();
+	cEntityManager->Init();
+
+	cEntityFactory = CEntityFactory::GetInstance();
+	
 	health = 100.f;
 	maxHealth = 100.f;
 
@@ -551,6 +561,11 @@ void CPlayer2D::Update(const double dElapsedTime)
 			cPhysics2D.SetInitialVelocity(glm::vec2(0.0f, 3.0f));
 			doubleJumpReady = false;
 		}
+	}
+
+	if (cKeyboardController->IsKeyPressed(GLFW_KEY_G))
+	{
+		cEntityManager->entityList.push_back(cEntityFactory->SpawnBullet(GetRelativeCenter(), glm::f32vec2(0.2,0), glm::vec3(1,1,1), 0, ENTITY_BULLET));
 	}
 
 	UpdateJumpFall(dElapsedTime);

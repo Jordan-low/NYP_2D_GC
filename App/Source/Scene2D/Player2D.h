@@ -40,6 +40,9 @@ class CMap2D;
 //Include Inventory Manager
 #include "InventoryManager.h"
 
+#include "../Entity/EntityManager.h"
+#include "../Entity/EntityFactory.h"
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -125,6 +128,10 @@ protected:
 
 	//Inventoy Item
 	CInventoryItem* cInventoryItem;
+
+	CEntityManager* cEntityManager;
+
+	CEntityFactory* cEntityFactory;
 
 	//Player Colour
 	glm::vec4 playerColour;
