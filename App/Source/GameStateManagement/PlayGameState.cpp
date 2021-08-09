@@ -69,8 +69,8 @@ bool CPlayGameState::Update(const double dElapsedTime)
 		CKeyboardController::GetInstance()->Reset();
 
 		// Load the menu state
-		cout << "Loading MenuState" << endl;
-		CGameStateManager::GetInstance()->SetActiveGameState("MenuState");
+		cout << "Loading PauseState" << endl;
+		CGameStateManager::GetInstance()->SetActiveGameState("PauseState");
 		return true;
 	}
 

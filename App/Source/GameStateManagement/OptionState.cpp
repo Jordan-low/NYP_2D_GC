@@ -12,7 +12,7 @@
 #include <includes/gtc/matrix_transform.hpp>
 #include <includes/gtc/type_ptr.hpp>
 
-#include "MenuState.h"
+#include "OptionState.h"
 
 // Include CGameStateManager
 #include "GameStateManager.h"
@@ -41,7 +41,7 @@ using namespace std;
 /**
  @brief Constructor
  */
-CMenuState::CMenuState(void)
+COptionState::COptionState(void)
 	: background(NULL)
 {
 
@@ -50,7 +50,7 @@ CMenuState::CMenuState(void)
 /**
  @brief Destructor
  */
-CMenuState::~CMenuState(void)
+COptionState::~COptionState(void)
 {
 
 }
@@ -58,9 +58,9 @@ CMenuState::~CMenuState(void)
 /**
  @brief Init this class instance
  */
-bool CMenuState::Init(void)
+bool COptionState::Init(void)
 {
-	cout << "CMenuState::Init()\n" << endl;
+	cout << "COptionState::Init()\n" << endl;
 
 	CShaderManager::GetInstance()->Use("2DShader");
 	CShaderManager::GetInstance()->activeShader->setInt("texture1", 0);
@@ -86,12 +86,12 @@ bool CMenuState::Init(void)
 
 	// Load the images for buttons
 	CImageLoader* il = CImageLoader::GetInstance();
-	startButtonData.fileName = "Image\\GUI\\PlayButton.png";
-	startButtonData.textureID = il->LoadTextureGetID(startButtonData.fileName.c_str(), false);
-	optionButtonData.fileName = "Image\\GUI\\OptionsButton.png";
-	optionButtonData.textureID = il->LoadTextureGetID(optionButtonData.fileName.c_str(), false);
-	quitButtonData.fileName = "Image\\GUI\\QuitButton.png";
-	quitButtonData.textureID = il->LoadTextureGetID(quitButtonData.fileName.c_str(), false);
+	backButtonData.fileName = "Image\\GUI\\BackButton.png";
+	backButtonData.textureID = il->LoadTextureGetID(backButtonData.fileName.c_str(), false);
+	survivalButtonData.fileName = "Image\\GUI\\SurvivalButton.png";
+	survivalButtonData.textureID = il->LoadTextureGetID(survivalButtonData.fileName.c_str(), false);
+	creativeButtonData.fileName = "Image\\GUI\\CreativeButton.png";
+	creativeButtonData.textureID = il->LoadTextureGetID(creativeButtonData.fileName.c_str(), false);
 
 	return true;
 }
@@ -99,7 +99,7 @@ bool CMenuState::Init(void)
 /**
  @brief Update this class instance
  */
-bool CMenuState::Update(const double dElapsedTime)
+bool COptionState::Update(const double dElapsedTime)
 {
 	// Start the Dear ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
@@ -133,39 +133,38 @@ bool CMenuState::Update(const double dElapsedTime)
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.FrameRounding = 200.0f;
 		
-		// Add codes for Start button here
-		if (ImGui::ImageButton((ImTextureID)startButtonData.textureID,
+		// Add codes for Survival button here
+		if (ImGui::ImageButton((ImTextureID)survivalButtonData.textureID,
 			ImVec2(buttonWidth, buttonHeight), ImVec2(0.0, 0.0), ImVec2(1.0, 1.0)))
 		{
 			// Reset the CKeyboardController
 			CKeyboardController::GetInstance()->Reset();
 
 			// Load the menu state
-			cout << "Loading PlayGameState" << endl;
+			cout << "Loading Survival" << endl;
 			CGameStateManager::GetInstance()->SetActiveGameState("PlayGameState");
 		}
-		// Add codes for Start button here
-		if (ImGui::ImageButton((ImTextureID)optionButtonData.textureID,
+		// Add codes for Creative button here
+		if (ImGui::ImageButton((ImTextureID)creativeButtonData.textureID,
 			ImVec2(buttonWidth, buttonHeight), ImVec2(0.0, 0.0), ImVec2(1.0, 1.0)))
 		{
 			// Reset the CKeyboardController
 			CKeyboardController::GetInstance()->Reset();
 
 			// Load the menu state
-			cout << "Loading PlayGameState" << endl;
-			CGameStateManager::GetInstance()->SetActiveGameState("OptionState");
+			cout << "Loading Creative" << endl;
+			CGameStateManager::GetInstance()->SetActiveGameState("PlayGameState");
 		}
-		// Add codes for Exit button here
-		if (ImGui::ImageButton((ImTextureID)quitButtonData.textureID,
+		// Add codes for Back button here
+		if (ImGui::ImageButton((ImTextureID)backButtonData.textureID,
 			ImVec2(buttonWidth, buttonHeight), ImVec2(0.0, 0.0), ImVec2(1.0, 1.0)))
 		{
 			// Reset the CKeyboardController
 			CKeyboardController::GetInstance()->Reset();
 
 			// Load the menu state
-			cout << "Quitting the game from MenuState" << endl;
-
-			return false;
+			cout << "Loading MenuState" << endl;
+			CGameStateManager::GetInstance()->SetActiveGameState("MenuState");
 		}
 		ImGui::End();
 	}
@@ -203,7 +202,7 @@ bool CMenuState::Update(const double dElapsedTime)
 /**
  @brief Render this class instance
  */
-void CMenuState::Render(void)
+void COptionState::Render(void)
 {
 	// Clear the screen and buffer
 	glClearColor(0.0f, 0.55f, 1.00f, 1.00f);
@@ -215,13 +214,13 @@ void CMenuState::Render(void)
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-	cout << "CMenuState::Render()\n" << endl;
+	cout << "COptionState::Render()\n" << endl;
 }
 
 /**
  @brief Destroy this class instance
  */
-void CMenuState::Destroy(void)
+void COptionState::Destroy(void)
 {
 	// Delete the background object
 	if (background)
@@ -235,5 +234,5 @@ void CMenuState::Destroy(void)
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 
-	cout << "CMenuState::Destroy()\n" << endl;
+	cout << "COptionState::Destroy()\n" << endl;
 }

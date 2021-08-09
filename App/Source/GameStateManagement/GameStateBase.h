@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 /**
  CGameStateBase
@@ -6,6 +7,13 @@
  By: Toh Da Jun
  Date: July 2021
  */
+
+struct ButtonData
+{
+	std::string fileName;
+	unsigned textureID;
+};
+
 class CGameStateBase
 {
 public:

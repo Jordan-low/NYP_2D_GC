@@ -23,13 +23,13 @@
 #define IMGUI_ACTIVE
 #endif
 
-class CMenuState : public CGameStateBase
+class CPauseState : public CGameStateBase
 {
 public:
 	// Constructor
-	CMenuState(void);
+	CPauseState(void);
 	// Destructor
-	~CMenuState(void);
+	~CPauseState(void);
 
 	// Init this class instance
 	virtual bool Init(void);
@@ -42,7 +42,6 @@ public:
 
 protected:
 	CBackgroundEntity* background;
-	ButtonData startButtonData;
-	ButtonData optionButtonData;
-	ButtonData quitButtonData;
+	ButtonData resumeButtonData;
+	ButtonData menuButtonData;
 };

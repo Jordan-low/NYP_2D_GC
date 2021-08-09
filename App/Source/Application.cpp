@@ -28,10 +28,12 @@
 
 // Include CGameStateManager
 #include "GameStateManagement/GameStateManager.h"
-// Include CIntroState
-#include "GameStateManagement/IntroState.h"
 // Include CMenuState
 #include "GameStateManagement/MenuState.h"
+// Include COptionState
+#include "GameStateManagement/OptionState.h"
+// Include CPauseState
+#include "GameStateManagement/PauseState.h"
 // Include CPlayGameState
 #include "GameStateManagement/PlayGameState.h"
 
@@ -166,6 +168,7 @@ bool Application::Init(void)
 	//Create a window and create its OpenGL context
 	cSettings->pWindow = glfwCreateWindow(	cSettings->iWindowWidth, cSettings->iWindowHeight,
 											"NYP Framework", NULL, NULL);
+
 	//If the window couldn't be created, then return false
 	if (cSettings->pWindow == NULL)
 	{
@@ -237,12 +240,13 @@ bool Application::Init(void)
 	cFPSCounter->Init();
 
 	// Create the Game States
-	CGameStateManager::GetInstance()->AddGameState("IntroState", new CIntroState());
 	CGameStateManager::GetInstance()->AddGameState("MenuState", new CMenuState());
+	CGameStateManager::GetInstance()->AddGameState("OptionState", new COptionState());
+	CGameStateManager::GetInstance()->AddGameState("PauseState", new CPauseState());
 	CGameStateManager::GetInstance()->AddGameState("PlayGameState", new CPlayGameState());
 
 	// Set the active scene
-	CGameStateManager::GetInstance()->SetActiveGameState("IntroState");
+	CGameStateManager::GetInstance()->SetActiveGameState("MenuState");
 
 	return true;
 }
