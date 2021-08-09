@@ -240,8 +240,8 @@ void CEnemy2D::Update(const double dElapsedTime)
 		xAxis = cSettings->TILE_RATIO_XAXIS / 2 - displacementX;
 	}
 
-	vec2UVCoordinate.x = cSettings->ConvertIndexToUVSpace(cSettings->x, xAxis, false, i32vec2NumMicroSteps.x * cSettings->MICRO_STEP_XAXIS);
-	vec2UVCoordinate.y = cSettings->ConvertIndexToUVSpace(cSettings->y, i32vec2Index.y, false, i32vec2NumMicroSteps.y * cSettings->MICRO_STEP_YAXIS);
+	vec2UVCoordinate.x = cSettings->ConvertFloatIndexToUVSpace(cSettings->x, xAxis, false, i32vec2NumMicroSteps.x * cSettings->MICRO_STEP_XAXIS);
+	vec2UVCoordinate.y = cSettings->ConvertFloatIndexToUVSpace(cSettings->y, i32vec2Index.y, false, i32vec2NumMicroSteps.y * cSettings->MICRO_STEP_YAXIS);
 }
 
 /**

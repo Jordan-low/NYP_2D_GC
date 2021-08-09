@@ -4,6 +4,7 @@
  Date: Mar 2020
  */
 #include "Bullets.h"
+#include "../Scene2D/Player2D.h"
 
 #include <iostream>
 using namespace std;
@@ -37,9 +38,9 @@ void CBullets::Update(const double dElapsedTime)
 {
     //edit the pos based on vel
     f32vec2Index += f32vec2Vel;
-
-    vec2UVCoordinate.x = cSettings->ConvertFloatIndexToUVSpace(cSettings->x, f32vec2Index.x, false);
-    vec2UVCoordinate.y = cSettings->ConvertFloatIndexToUVSpace(cSettings->y, f32vec2Index.y, false);
+    
+    vec2UVCoordinate.x = cSettings->ConvertEntityIndexToUVSpace(cSettings->x, f32vec2Index.x, false);
+    vec2UVCoordinate.y = cSettings->ConvertEntityIndexToUVSpace(cSettings->y, f32vec2Index.y, false);
 }
 
 void CBullets::PreRender(void)

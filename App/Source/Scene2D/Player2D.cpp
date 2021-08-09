@@ -565,7 +565,7 @@ void CPlayer2D::Update(const double dElapsedTime)
 
 	if (cKeyboardController->IsKeyPressed(GLFW_KEY_G))
 	{
-		cEntityManager->entityList.push_back(cEntityFactory->SpawnBullet(GetRelativeCenter(), glm::f32vec2(0.2,0), glm::vec3(1,1,1), 0, ENTITY_BULLET));
+		cEntityManager->entityList.push_back(cEntityFactory->SpawnBullet(GetRelativeCenter() - glm::vec2(-16,0), glm::f32vec2(0.2,0), glm::vec3(1,1,1), 0, ENTITY_BULLET));
 	}
 
 	UpdateJumpFall(dElapsedTime);
@@ -590,8 +590,8 @@ void CPlayer2D::Update(const double dElapsedTime)
 	else
 		isCenter = false;
 
-	vec2UVCoordinate.x = cSettings->ConvertIndexToUVSpace(cSettings->x, xAxis, false, xOffset * i32vec2NumMicroSteps.x * cSettings->MICRO_STEP_XAXIS);
-	vec2UVCoordinate.y = cSettings->ConvertIndexToUVSpace(cSettings->y, i32vec2Index.y, false, i32vec2NumMicroSteps.y * cSettings->MICRO_STEP_YAXIS);
+	vec2UVCoordinate.x = cSettings->ConvertFloatIndexToUVSpace(cSettings->x, xAxis, false, xOffset * i32vec2NumMicroSteps.x * cSettings->MICRO_STEP_XAXIS);
+	vec2UVCoordinate.y = cSettings->ConvertFloatIndexToUVSpace(cSettings->y, i32vec2Index.y, false, i32vec2NumMicroSteps.y * cSettings->MICRO_STEP_YAXIS);
 }
 
 /**

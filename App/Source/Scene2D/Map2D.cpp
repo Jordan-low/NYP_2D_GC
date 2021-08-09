@@ -269,8 +269,8 @@ void CMap2D::Render(void)
 				yOffset = cSettings->NUM_TILES_YAXIS - cSettings->TILE_RATIO_YAXIS;*/
 
 			transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-			transform = glm::translate(transform, glm::vec3(cSettings->ConvertIndexToUVSpace(cSettings->x, uiCol - xOffset, false, 0),
-				cSettings->ConvertIndexToUVSpace(cSettings->y, uiRow, true, 0),
+			transform = glm::translate(transform, glm::vec3(cSettings->ConvertFloatIndexToUVSpace(cSettings->x, uiCol - xOffset, false, 0),
+				cSettings->ConvertFloatIndexToUVSpace(cSettings->y, uiRow, true, 0),
 				0.0f));
 
 			//transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first

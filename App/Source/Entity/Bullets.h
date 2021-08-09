@@ -24,7 +24,7 @@ public:
 	CBullets(void);
 
 	// Destructor
-	virtual ~CBullets(void);
+	~CBullets(void);
 
 	// Init
 	bool Init(void);

@@ -152,7 +152,8 @@ void CEntity2D::Render(void)
 
 	glBindVertexArray(VAO);
 	// Render the tile
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	mesh->Render();
 	glBindVertexArray(0);
 
 }
