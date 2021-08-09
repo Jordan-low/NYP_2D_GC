@@ -24,6 +24,8 @@ CEntity2D::CEntity2D(void)
 	, iTextureID(0)
 	, cSettings(NULL)
 	, mesh(NULL)
+	, health(0)
+	, maxHealth(1)
 {
 	transform = glm::mat4(1.0f);	// make sure to initialize matrix to identity matrix first
 

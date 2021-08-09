@@ -141,6 +141,7 @@ bool CPlayGameState::Update(const double dElapsedTime)
 
 				// Load the menu state
 				cout << "Loading MenuState" << endl;
+				paused = false;
 				CSoundController::GetInstance()->PlaySoundByName("uiClick");
 				CGameStateManager::GetInstance()->SetActiveGameState("MenuState");
 			}

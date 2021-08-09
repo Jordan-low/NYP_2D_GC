@@ -66,11 +66,11 @@ CScene2D::~CScene2D(void)
 		enemy = NULL;
 	}
 
-	if (cSoundController)
-	{
-		cSoundController->Destroy();
-		cSoundController = NULL;
-	}
+	//if (cSoundController)
+	//{
+	//	cSoundController->Destroy();
+	//	cSoundController = NULL;
+	//}
 
 	// We won't delete this since it was created elsewhere
 	cKeyboardController = NULL;

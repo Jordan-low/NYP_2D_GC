@@ -212,8 +212,16 @@ bool CMenuState::Update(const double dElapsedTime)
  */
 void CMenuState::Render(void)
 {
+	// Reset the OpenGL rendering environment
+	glLoadIdentity();
+
 	// Clear the screen and buffer
-	glClearColor(0.0f, 0.55f, 1.00f, 1.00f);
+	glClearColor(0.0f, 0.55f, 1.f, 0.8f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Enable 2D texture rendering
+	glEnable(GL_TEXTURE_2D);
+
 
 	//Render Background
 	background->Render();
