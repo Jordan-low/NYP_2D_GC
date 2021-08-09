@@ -45,4 +45,7 @@ protected:
 	ButtonData backButtonData;
 	ButtonData survivalButtonData;
 	ButtonData creativeButtonData;
+
+	float survivalButtonColour = 1.f;
+	float creativeButtonColour = 0.f;
 };

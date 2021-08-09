@@ -40,8 +40,10 @@ public:
 	// Play a sound by its ID
 	void PlaySoundByID(const int ID);
 
+	// Play a sound by its name
 	void PlaySoundByName(const string name);
 
+	// Stop all active sounds
 	void StopAllSound();
 
 	// Increase Master volume

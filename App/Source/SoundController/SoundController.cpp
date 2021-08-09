@@ -178,6 +178,9 @@ void CSoundController::PlaySoundByName(const string name)
 	}
 }
 
+/**
+ @brief Stop all active sounds
+ */
 void CSoundController::StopAllSound()
 {
 	cSoundEngine->stopAllSounds();

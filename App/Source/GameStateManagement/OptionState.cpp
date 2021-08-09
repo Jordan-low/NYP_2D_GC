@@ -138,7 +138,7 @@ bool COptionState::Update(const double dElapsedTime)
 		
 		// Add codes for Survival button here
 		if (ImGui::ImageButton((ImTextureID)survivalButtonData.textureID,
-			ImVec2(buttonWidth, buttonHeight), ImVec2(0.0, 0.0), ImVec2(1.0, 1.0)))
+			ImVec2(buttonWidth, buttonHeight), ImVec2(0.0, 0.0), ImVec2(1.0, 1.0), -1, ImVec4(survivalButtonColour, survivalButtonColour, survivalButtonColour, survivalButtonColour)))
 		{
 			// Reset the CKeyboardController
 			CKeyboardController::GetInstance()->Reset();
@@ -146,11 +146,13 @@ bool COptionState::Update(const double dElapsedTime)
 			// Load the menu state
 			cout << "Loading Survival" << endl;
 			CPlayer2D::GetInstance()->isSurvival = true;
-			CGameStateManager::GetInstance()->SetActiveGameState("PlayGameState");
+			CSoundController::GetInstance()->PlaySoundByName("uiClick");
+			survivalButtonColour = 1.f;
+			creativeButtonColour = 0.f;
 		}
 		// Add codes for Creative button here
 		if (ImGui::ImageButton((ImTextureID)creativeButtonData.textureID,
-			ImVec2(buttonWidth, buttonHeight), ImVec2(0.0, 0.0), ImVec2(1.0, 1.0)))
+			ImVec2(buttonWidth, buttonHeight), ImVec2(0.0, 0.0), ImVec2(1.0, 1.0), -1, ImVec4(creativeButtonColour, creativeButtonColour, creativeButtonColour, creativeButtonColour)))
 		{
 			// Reset the CKeyboardController
 			CKeyboardController::GetInstance()->Reset();
@@ -159,7 +161,8 @@ bool COptionState::Update(const double dElapsedTime)
 			cout << "Loading Creative" << endl;
 			CPlayer2D::GetInstance()->isSurvival = false;
 			CSoundController::GetInstance()->PlaySoundByName("uiClick");
-			CGameStateManager::GetInstance()->SetActiveGameState("PlayGameState");
+			survivalButtonColour = 0.f;
+			creativeButtonColour = 1.f;
 		}
 		// Add codes for Back button here
 		if (ImGui::ImageButton((ImTextureID)backButtonData.textureID,
