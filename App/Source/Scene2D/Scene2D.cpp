@@ -459,7 +459,7 @@ bool CScene2D::SpawnEnemy(glm::i32vec2 pos, int enemyMapNumber)
 	CEnemy2D* cEnemy2D = new CEnemy2D();
 	//Pass shader to enemy
 	cEnemy2D->SetShader("2DColorShader");
-	cMap2D->SetMapInfo(pos.y, pos.x, enemyMapNumber, true);
+	cMap2D->SetMapInfo(pos.y, pos.x - 2, enemyMapNumber, true);
 	//Init instance
 	if (cEnemy2D->Init())
 	{
