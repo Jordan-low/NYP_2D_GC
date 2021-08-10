@@ -133,6 +133,7 @@ bool CScene2D::Init(void)
 	cSoundController->LoadSound(FileSystem::getPath("Sounds\\breakBlock.wav"), "break", true);
 	cSoundController->LoadSound(FileSystem::getPath("Sounds\\pickUp.wav"), "pickUp", true);
 	cSoundController->LoadSound(FileSystem::getPath("Sounds\\openChest.wav"), "openChest", true);
+	cSoundController->LoadSound(FileSystem::getPath("Sounds\\spawnMinion.wav"), "spawnMinion", true);
 
 	//init map instance
 	if (cMap2D->Init(1, 24, 100) == false)
@@ -454,6 +455,7 @@ void CScene2D::PostRender(void)
  */
 bool CScene2D::SpawnEnemy(glm::i32vec2 pos, int enemyMapNumber)
 {
+	cSoundController->PlaySoundByName("spawnMinion");
 	CEnemy2D* cEnemy2D = new CEnemy2D();
 	//Pass shader to enemy
 	cEnemy2D->SetShader("2DColorShader");

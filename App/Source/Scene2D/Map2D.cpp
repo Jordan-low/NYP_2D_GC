@@ -526,6 +526,7 @@ bool CMap2D::GenerateRandomMap()
 	int lavaSpawnRate = 10;
 	int treeSpawnRate = 8;
 	int enemySpawnRate = 20;
+	bool enemySpawned = false;
 
 	for (int i = 3; i < cSettings->NUM_TILES_XAXIS; i++)
 	{
@@ -565,11 +566,11 @@ bool CMap2D::GenerateRandomMap()
 				}
 
 				//spawn enemies
-				//spawn chest
 				int enemyRandom = Math::RandIntMinMax(0, enemySpawnRate);
-				if (enemyRandom == 0)
+				if (enemyRandom == 0 && !enemySpawned)
 				{
 					SetMapInfo(random - 1, i, 302, false);
+					enemySpawned = true;
 				}
 
 				//force spawn chest

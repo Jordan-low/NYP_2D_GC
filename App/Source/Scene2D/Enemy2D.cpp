@@ -152,32 +152,37 @@ bool CEnemy2D::Init(void)
 		break;
 	case BOSS_ENEMY:
 		// Load the enemy2D texture
-		if (LoadTexture("Image/Characters/Enemy111.png", iTextureID) == false)
+		if (LoadTexture("Image/Characters/bossEnemy.png", iTextureID) == false)
 		{
 			std::cout << "Failed to load enemy2D tile texture" << std::endl;
 			return false;
 		}
+		//CS:: Create the animated sprite and setup the animation
+		animatedSprites = CMeshBuilder::GenerateSpriteAnimation(3, 1,
+			cSettings->TILE_WIDTH, cSettings->TILE_HEIGHT);
+		animatedSprites->AddAnimation("runLeft", 0, 1);
+		animatedSprites->AddAnimation("runRight", 2, 3);
+		animatedSprites->AddAnimation("idle", 4, 5);
 		break;
 	case MINION_ENEMY:
 		// Load the enemy2D texture
-		if (LoadTexture("Image/Characters/Enemy111.png", iTextureID) == false)
+		if (LoadTexture("Image/Characters/minionEnemy.png", iTextureID) == false)
 		{
 			std::cout << "Failed to load enemy2D tile texture" << std::endl;
 			return false;
 		}
+		//CS:: Create the animated sprite and setup the animation
+		animatedSprites = CMeshBuilder::GenerateSpriteAnimation(5, 4,
+			cSettings->TILE_WIDTH, cSettings->TILE_HEIGHT);
+		animatedSprites->AddAnimation("runLeft", 0, 3);
+		animatedSprites->AddAnimation("runRight", 4, 7);
+		animatedSprites->AddAnimation("attackLeft", 8, 11);
+		animatedSprites->AddAnimation("attackRight", 12, 15);
+		animatedSprites->AddAnimation("idle", 16, 19);
 		break;
 	default:
 		break;
 	}
-
-	//CS:: Create the animated sprite and setup the animation
-	animatedSprites = CMeshBuilder::GenerateSpriteAnimation(5, 4,
-		cSettings->TILE_WIDTH, cSettings->TILE_HEIGHT);
-	animatedSprites->AddAnimation("runLeft", 0, 3);
-	animatedSprites->AddAnimation("runRight", 4, 7);
-	animatedSprites->AddAnimation("attackLeft", 8, 11);
-	animatedSprites->AddAnimation("attackRight", 12, 15);
-	animatedSprites->AddAnimation("idle", 16, 19);
 
 	//CS: Play the "runLeft" animation as default
 	animatedSprites->PlayAnimation("idle", -1, 1.0f);
@@ -1080,15 +1085,6 @@ void CEnemy2D::UpdateBossEnemy()
 					else
 						break;
 				}
-			}
-
-			if (i32vec2Direction.x > 0)
-			{
-				animatedSprites->PlayAnimation("attackRight", -1, 1.0f);
-			}
-			else
-			{
-				animatedSprites->PlayAnimation("attackLeft", -1, 1.0f);
 			}
 			//cout << "i32vec2Destination : " << i32vec2Destination.x
 			//	<< ", " << i32vec2Destination.y << endl;
