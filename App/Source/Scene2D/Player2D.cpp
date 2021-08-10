@@ -218,6 +218,20 @@ void CPlayer2D::Update(const double dElapsedTime)
 	RenderBlockRangeTiles();
 	health = Math::Clamp(health, 0.f, maxHealth);
 
+	if (health <= 0)
+	{
+		//kill player here
+		i32vec2Index = glm::i32vec2(0, 4);
+		i32vec2NumMicroSteps = glm::i32vec2(0, 0);
+		health = 100.f;
+		cInventoryManager->GetNumItems();
+		for (auto const& x : cInventoryManager->inventoryMap)
+		{
+			cInventoryItem = cInventoryManager->GetItem(x.first);
+			cInventoryItem->iItemCount = 0;
+		}
+	}
+
 	////if (reachLeftEnd || reachRightEnd)
 	////	playerPosition = glm::vec2(i32vec2Index.x - (int)playerOffset.x, i32vec2Index.y);
 	////else

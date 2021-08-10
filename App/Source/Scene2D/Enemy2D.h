@@ -201,6 +201,8 @@ protected:
 
 	int iAggressionCounter = 0;
 
+	int iAttackCooldownCounter = 0;
+
 	bool readyToSpawnMinion = true;
 };
 

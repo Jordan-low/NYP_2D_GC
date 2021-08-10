@@ -716,11 +716,11 @@ bool CEnemy2D::InteractWithPlayer(void)
 	glm::i32vec2 i32vec2PlayerPos = cPlayer2D->i32vec2Index;
 	
 	// Check if the enemy2D is within 1.5 indices of the player2D
-	if (((i32vec2Index.x >= i32vec2PlayerPos.x - 0.9) && 
-		(i32vec2Index.x <= i32vec2PlayerPos.x + 0.9))
+	if (((i32vec2Index.x >= i32vec2PlayerPos.x - 0.5) && 
+		(i32vec2Index.x <= i32vec2PlayerPos.x + 0.5))
 		&& 
-		((i32vec2Index.y >= i32vec2PlayerPos.y - 0.9) &&
-		(i32vec2Index.y <= i32vec2PlayerPos.y + 0.9))
+		((i32vec2Index.y >= i32vec2PlayerPos.y - 0.5) &&
+		(i32vec2Index.y <= i32vec2PlayerPos.y + 0.5))
 		&& 
 		sCurrentFSM == ATTACK)
 	{
@@ -741,6 +741,7 @@ bool CEnemy2D::InteractWithPlayer(void)
 		CSoundController::GetInstance()->PlaySoundByName("playerAttack");
 		cout << "Gotcha!" << endl;
 		iFSMCounter = 0;
+		iAttackCooldownCounter = 0;
 		return true;
 	}
 	return false;
@@ -1038,11 +1039,11 @@ void CEnemy2D::UpdateBossEnemy()
 		iFSMCounter = 0;
 		break;
 	case ATTACK:
-		//check if distance between player is less than 10, if yes, attack player
+		//check if distance between player is less than 2, if yes, attack player
 		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 2.0f)
 		{
 			//check if health is less than 50% of max, if yes change to defend mode
-			if (iAggressionCounter <= 120)
+			if (iAggressionCounter < 120)
 			{
 				if (health < maxHealth * 0.5)
 				{
@@ -1097,6 +1098,7 @@ void CEnemy2D::UpdateBossEnemy()
 			UpdateDirection();
 
 			// Update the Enemy2D's position for attack
+			std::cout << "updated pos" << std::endl;
 			UpdatePosition();
 		}
 		else
@@ -1117,12 +1119,16 @@ void CEnemy2D::UpdateBossEnemy()
 		//check if distance between player is less than 10, if yes, retreat and run the opposite direction of the player
 		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 10.0f)
 		{
-			if (iAggressionCounter > 120)
+			iAttackCooldownCounter++;
+			if (iAggressionCounter > 120 && iAttackCooldownCounter > 60)
 			{
+				std::cout << "STRIKE" << std::endl;
 				sCurrentFSM = ATTACK;
+				iFSMCounter = 0;
 			}
 			else
 				iAggressionCounter++;
+			
 			//check if ready to spawn and health is less than 50% of max, if yes change to spawn mode
 			if (readyToSpawnMinion)
 			{
