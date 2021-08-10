@@ -569,7 +569,7 @@ bool CMap2D::GenerateRandomMap()
 				int enemyRandom = Math::RandIntMinMax(0, enemySpawnRate);
 				if (enemyRandom == 0)
 				{
-					SetMapInfo(random - 1, i, 401, false);
+					SetMapInfo(random - 1, i, 302, false);
 				}
 
 				//force spawn chest

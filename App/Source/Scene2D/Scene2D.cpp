@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 using namespace std;
+extern bool spawnEnemy;
 
 // Include Shader Manager
 #include "RenderControl\ShaderManager.h"
@@ -185,6 +186,20 @@ void CScene2D::Update(const double dElapsedTime)
 	cGUI->playerMaxHealth = cPlayer2D->maxHealth;
 	cGUI2->Update(dElapsedTime);
 
+	//spawn new enemy from boss
+	if (spawnEnemy)
+	{
+		for (CEnemy2D* bossEnemy : enemyVector)
+		{
+			if (bossEnemy->enemyType == CEnemy2D::BOSS_ENEMY)
+			{
+				SpawnEnemy(bossEnemy->Geti32vec2Index(), 301);
+				break;
+			}
+		}
+		spawnEnemy = false;
+	}
+
 	//update enemy before map
 	for (CEntity2D* enemy : enemyVector)
 	{
@@ -286,6 +301,23 @@ void CScene2D::Update(const double dElapsedTime)
 			cGUI2->worldInput.clear();
 			cPlayer2D->ResetPosition();
 			cMouseController->mouseOffset = glm::vec2(0.0f);
+
+			//Create and Init CEnemy2D
+			enemyVector.clear();
+			while (true)
+			{
+				CEnemy2D* cEnemy2D = new CEnemy2D();
+				//Pass shader to enemy
+				cEnemy2D->SetShader("2DColorShader");
+				//Init instance
+				if (cEnemy2D->Init())
+				{
+					cEnemy2D->SetPlayer2D(cPlayer2D);
+					enemyVector.push_back(cEnemy2D);
+				}
+				else
+					break;
+			}
 		}
 	}
 
@@ -415,4 +447,24 @@ void CScene2D::Render(void)
  */
 void CScene2D::PostRender(void)
 {
+}
+
+/**
+ @brief Spawn new enemy based on parameter vec2
+ */
+bool CScene2D::SpawnEnemy(glm::i32vec2 pos, int enemyMapNumber)
+{
+	CEnemy2D* cEnemy2D = new CEnemy2D();
+	//Pass shader to enemy
+	cEnemy2D->SetShader("2DColorShader");
+	cMap2D->SetMapInfo(pos.y, pos.x, enemyMapNumber, true);
+	//Init instance
+	if (cEnemy2D->Init())
+	{
+		cEnemy2D->SetPlayer2D(cPlayer2D);
+		enemyVector.push_back(cEnemy2D);
+	}
+	else
+		return false;
+	return true;
 }

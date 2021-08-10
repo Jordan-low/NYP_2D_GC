@@ -7,6 +7,7 @@
 
 #include <iostream>
 using namespace std;
+bool spawnEnemy = false;
 
 // Include Shader Manager
 #include "RenderControl\ShaderManager.h"
@@ -23,6 +24,8 @@ using namespace std;
 
 // Include the Map2D as we will use it to check the player's movements and actions
 #include "Map2D.h"
+
+#include "Scene2D.h"
 // Include math.h
 #include <math.h>
 
@@ -98,12 +101,21 @@ bool CEnemy2D::Init(void)
 	{
 		if (cMap2D->FindValue(301, uiRow, uiCol) == false)
 		{
-			return false; // Unable to find the start position of the player, so quit this game
+			if (cMap2D->FindValue(302, uiRow, uiCol) == false)
+			{
+				return false; // Unable to find any more enemy
+			}
+			else
+			{
+				enemyType = ENEMY_TYPE::BOSS_ENEMY;
+				health = 20.f;
+				maxHealth = health;
+			}
 		}
 		else
 		{
-			enemyType = ENEMY_TYPE::BOSS_ENEMY;
-			health = 10.f;
+			enemyType = ENEMY_TYPE::MINION_ENEMY;
+			health = 3.f;
 			maxHealth = health;
 		}
 	}
@@ -139,6 +151,14 @@ bool CEnemy2D::Init(void)
 		}
 		break;
 	case BOSS_ENEMY:
+		// Load the enemy2D texture
+		if (LoadTexture("Image/Characters/Enemy111.png", iTextureID) == false)
+		{
+			std::cout << "Failed to load enemy2D tile texture" << std::endl;
+			return false;
+		}
+		break;
+	case MINION_ENEMY:
 		// Load the enemy2D texture
 		if (LoadTexture("Image/Characters/Enemy111.png", iTextureID) == false)
 		{
@@ -218,6 +238,9 @@ void CEnemy2D::Update(const double dElapsedTime)
 	{
 	case DEFAULT_ENEMY:
 		UpdateDefaultEnemy();
+		break;
+	case MINION_ENEMY:
+		UpdateMinionEnemy();
 		break;
 	case BOSS_ENEMY:
 		UpdateBossEnemy();
@@ -329,6 +352,11 @@ void CEnemy2D::Seti32vec2NumMicroSteps(const int iNumMicroSteps_XAxis, const int
 {
 	this->i32vec2NumMicroSteps.x = iNumMicroSteps_XAxis;
 	this->i32vec2NumMicroSteps.y = iNumMicroSteps_YAxis;
+}
+
+glm::i32vec2 CEnemy2D::Geti32vec2Index(void) const
+{
+	return i32vec2Index;
 }
 
 /**
@@ -699,8 +727,7 @@ bool CEnemy2D::InteractWithPlayer(void)
 			iFSMCounter = 0;
 			//// Since the player has been caught, then reset the FSM
 		}
-		sCurrentFSM = PATROL;
-		UpdateDirection();
+		sCurrentFSM = DEFEND;
 		return true;
 	}
 	return false;
@@ -835,7 +862,6 @@ void CEnemy2D::UpdatePosition(void)
 
 void CEnemy2D::UpdateDefaultEnemy()
 {
-	std::cout << "updating default" << std::endl;
 	switch (sCurrentFSM)
 	{
 	case IDLE:
@@ -843,7 +869,6 @@ void CEnemy2D::UpdateDefaultEnemy()
 		{
 			sCurrentFSM = PATROL;
 			iFSMCounter = 0;
-			cout << "Switching to Patrol State" << endl;
 		}
 		iFSMCounter++;
 		break;
@@ -852,7 +877,6 @@ void CEnemy2D::UpdateDefaultEnemy()
 		{
 			sCurrentFSM = IDLE;
 			iFSMCounter = 0;
-			cout << "Switching to Idle State" << endl;
 		}
 		else if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 10.0f)
 		{
@@ -938,10 +962,11 @@ void CEnemy2D::UpdateDefaultEnemy()
 void CEnemy2D::UpdateBossEnemy()
 {
 	std::cout << health << " " << maxHealth << std::endl;
+	//CEnemy2D* newEnemy = SpawnEnemy(301);
+
 	switch (sCurrentFSM)
 	{
 	case IDLE:
-		cout << "idling" << endl;
 		if (iFSMCounter > iMaxFSMCounter)
 		{
 			//check if health is less than max, then change to heal mode
@@ -949,30 +974,252 @@ void CEnemy2D::UpdateBossEnemy()
 			{
 				sCurrentFSM = HEAL;
 				iFSMCounter = 0;
-				cout << "switching to healing" << endl;
 			}
 			else
 			{
 				//if health is full, change to patrol mode
 				sCurrentFSM = PATROL;
 				iFSMCounter = 0;
-				cout << "Switching to Patrol State" << endl;
+				readyToSpawnMinion = true;
 			}
 		}
 		iFSMCounter++;
 		break;
 	case PATROL:
-		cout << "patrolling" << endl;
 		if (iFSMCounter > iMaxFSMCounter)
 		{
 			sCurrentFSM = IDLE;
 			iFSMCounter = 0;
-			cout << "Switching to Idle State" << endl;
 		}
 		else if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 2.0f)
 		{
-			if (!cPlayer2D->isSurvival)
-				break;
+			sCurrentFSM = ATTACK;
+			iFSMCounter = 0;
+		}
+		else
+		{
+			// Patrol around
+			// Update the Enemy2D's position for patrol
+			UpdateDirection();
+			UpdatePosition();
+			if (i32vec2Direction.x > 0)
+			{
+				animatedSprites->PlayAnimation("runRight", -1, 1.0f);
+			}
+			else if (i32vec2Direction.x < 0)
+			{
+				animatedSprites->PlayAnimation("runLeft", -1, 1.0f);
+			}
+			else
+			{
+				animatedSprites->PlayAnimation("idle", -1, 1.0f);
+			}
+		}
+		iFSMCounter++;
+		break;
+	case SPAWN:
+		cout << "spawning" << endl;
+		spawnEnemy = true;
+		readyToSpawnMinion = false;
+		sCurrentFSM = DEFEND;
+		iFSMCounter = 0;
+		break;
+	case ATTACK:
+		//check if distance between player is less than 10, if yes, attack player
+		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 2.0f)
+		{
+			//check if health is less than 50% of max, if yes change to defend mode
+			if (iAggressionCounter <= 120)
+			{
+				if (health < maxHealth * 0.5)
+				{
+					sCurrentFSM = SPAWN;
+					iFSMCounter = 0;
+				}
+			}
+			
+			// Calculate a path to the player
+			cMap2D->PrintSelf();
+			/*cout << "StartPos: " << i32vec2Index.x << ", " << i32vec2Index.y << endl;
+			cout << "TargetPos: " << cPlayer2D->i32vec2Index.x << ", "
+				<< cPlayer2D->i32vec2Index.y << endl;*/
+			auto path = cMap2D->PathFind(i32vec2Index,
+				cPlayer2D->i32vec2Index,
+				heuristic::euclidean,
+				10);
+			//cout << "=== Printing out the path ===" << endl;
+
+			// Calculate new destination
+			bool bFirstPosition = true;
+			for (const auto& coord : path)
+			{
+				//std::cout << coord.x << "," << coord.y << "\n";
+				if (bFirstPosition == true)
+				{
+					// Set a destination
+					i32vec2Destination = coord;
+					// Calculate the direction between enemy2D and this destination
+					i32vec2Direction = i32vec2Destination - i32vec2Index;
+					bFirstPosition = false;
+				}
+				else
+				{
+					if ((coord - i32vec2Destination) == i32vec2Direction)
+					{
+						// Set a destination
+						i32vec2Destination = coord;
+					}
+					else
+						break;
+				}
+			}
+
+			if (i32vec2Direction.x > 0)
+			{
+				animatedSprites->PlayAnimation("attackRight", -1, 1.0f);
+			}
+			else
+			{
+				animatedSprites->PlayAnimation("attackLeft", -1, 1.0f);
+			}
+			//cout << "i32vec2Destination : " << i32vec2Destination.x
+			//	<< ", " << i32vec2Destination.y << endl;
+			//cout << "i32vec2Direction : " << i32vec2Direction.x
+			//	<< ", " << i32vec2Direction.y << endl;
+			//system("pause");
+
+			// Attack
+			// Update direction to move towards for attack
+			UpdateDirection();
+
+			// Update the Enemy2D's position for attack
+			UpdatePosition();
+		}
+		else
+		{
+			//if distance between player is far enough, change to patrol mode
+			if (iFSMCounter > iMaxFSMCounter)
+			{
+				sCurrentFSM = PATROL;
+				iFSMCounter = 0;
+				cout << "ATTACK : Reset counter: " << iFSMCounter << endl;
+			}
+			iFSMCounter++;
+		}
+		break;
+	case DEFEND:
+		std::cout << "defending" << std::endl;
+		std::cout << iAggressionCounter << std::endl;
+		//check if distance between player is less than 10, if yes, retreat and run the opposite direction of the player
+		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 10.0f)
+		{
+			if (iAggressionCounter > 120)
+			{
+				sCurrentFSM = ATTACK;
+			}
+			else
+				iAggressionCounter++;
+			//check if ready to spawn and health is less than 50% of max, if yes change to spawn mode
+			if (readyToSpawnMinion)
+			{
+				if (health < maxHealth * 0.5)
+				{
+					sCurrentFSM = SPAWN;
+					iFSMCounter = 0;
+				}
+			}
+			auto path = cMap2D->PathFind(i32vec2Index,
+				cPlayer2D->i32vec2Index,
+				heuristic::euclidean,
+				10);
+			//cout << "=== Printing out the path ===" << endl;
+
+			// Calculate new destination
+			bool bFirstPosition = true;
+			for (const auto& coord : path)
+			{
+				//std::cout << coord.x << "," << coord.y << "\n";
+				if (bFirstPosition == true)
+				{
+					// Set a destination
+					i32vec2Destination = coord;
+					// Calculate the direction between enemy2D and this destination
+					i32vec2Direction = i32vec2Destination + i32vec2Index;
+					bFirstPosition = false;
+				}
+				else
+				{
+					if ((coord - i32vec2Destination) == i32vec2Direction)
+					{
+						// Set a destination
+						i32vec2Destination = coord;
+					}
+					else
+						break;
+				}
+			}
+			//UpdateDirection();
+			UpdatePosition();
+		}
+		else
+		{
+			//once the distance between the player is far enough, change to spawn mode
+			sCurrentFSM = IDLE;
+			iFSMCounter = 0;
+		}
+	case HEAL:
+		//check if distance between player is less than 5, if yes, retreat and change to defend mode
+		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 5.0f)
+		{
+			sCurrentFSM = DEFEND;
+			iFSMCounter = 0;
+		}
+		else
+		{
+			//check if health is less than max health, if yes, start to heal
+			if (health < maxHealth)
+			{
+				if (iFSMCounter > iMaxFSMCounter)
+				{
+					iAggressionCounter = 0;
+					health++;
+					iFSMCounter = 0;
+				}
+				iFSMCounter++;
+			}
+			else //if health is full, change to idle mode
+			{
+				i32vec2Direction = glm::i32vec2(0, 0);
+				sCurrentFSM = IDLE;
+				iFSMCounter = 0;
+			}
+		}
+	default:
+		break;
+	}
+}
+
+void CEnemy2D::UpdateMinionEnemy()
+{
+	switch (sCurrentFSM)
+	{
+	case IDLE:
+		if (iFSMCounter > iMaxFSMCounter)
+		{
+			//if health is full, change to patrol mode
+			sCurrentFSM = PATROL;
+			iFSMCounter = 0;
+		}
+		iFSMCounter++;
+		break;
+	case PATROL:
+		if (iFSMCounter > iMaxFSMCounter)
+		{
+			sCurrentFSM = IDLE;
+			iFSMCounter = 0;
+		}
+		else if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 2.0f)
+		{
 			sCurrentFSM = ATTACK;
 			iFSMCounter = 0;
 		}
@@ -998,17 +1245,9 @@ void CEnemy2D::UpdateBossEnemy()
 		iFSMCounter++;
 		break;
 	case ATTACK:
-		std::cout << "attacking" << std::endl;
-
 		//check if distance between player is less than 10, if yes, attack player
 		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 2.0f)
 		{
-			//check if health is less than 50% of max, if yes change to defend mode
-			if (health < maxHealth * 0.5)
-			{
-				sCurrentFSM = DEFEND;
-				iFSMCounter = 0;
-			}
 			// Calculate a path to the player
 			cMap2D->PrintSelf();
 			/*cout << "StartPos: " << i32vec2Index.x << ", " << i32vec2Index.y << endl;
@@ -1079,78 +1318,6 @@ void CEnemy2D::UpdateBossEnemy()
 			iFSMCounter++;
 		}
 		break;
-	case DEFEND:
-		cout << "defending" << endl;
-
-		//check if distance between player is less than 10, if yes, retreat and run the opposite direction of the player
-		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 5.0f)
-		{
-			auto path = cMap2D->PathFind(i32vec2Index,
-				cPlayer2D->i32vec2Index,
-				heuristic::euclidean,
-				10);
-			//cout << "=== Printing out the path ===" << endl;
-
-			// Calculate new destination
-			bool bFirstPosition = true;
-			for (const auto& coord : path)
-			{
-				//std::cout << coord.x << "," << coord.y << "\n";
-				if (bFirstPosition == true)
-				{
-					// Set a destination
-					i32vec2Destination = coord;
-					// Calculate the direction between enemy2D and this destination
-					i32vec2Direction = i32vec2Destination + i32vec2Index;
-					bFirstPosition = false;
-				}
-				else
-				{
-					if ((coord + i32vec2Destination) == i32vec2Direction)
-					{
-						// Set a destination
-						i32vec2Destination = coord;
-					}
-					else
-						break;
-				}
-			}
-			UpdatePosition();
-		}
-		else
-		{
-			//once the distance between the player is far enough, change to idle mode
-			sCurrentFSM = IDLE;
-			iFSMCounter = 0;
-		}
-	case HEAL:
-		cout << "healing" << endl;
-
-		//check if distance between player is less than 5, if yes, retreat and change to defend mode
-		if (cPhysics2D.CalculateDistance(i32vec2Index, cPlayer2D->i32vec2Index) < 5.0f)
-		{
-			sCurrentFSM = DEFEND;
-			iFSMCounter = 0;
-		}
-		else 
-		{
-			//check if health is less than max health, if yes, start to heal
-			if (health < maxHealth)
-			{
-				if (iFSMCounter > iMaxFSMCounter)
-				{
-					health++;
-					iFSMCounter = 0;
-				}
-				iFSMCounter++;
-			}
-			else //if health is full, change to idle mode
-			{
-				i32vec2Direction = glm::i32vec2(0, 0);
-				sCurrentFSM = IDLE;
-				iFSMCounter = 0;
-			}
-		}
 	default:
 		break;
 	}

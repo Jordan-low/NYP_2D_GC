@@ -79,6 +79,16 @@ public:
 	// boolean flag to indicate if this enemy is active
 	bool bIsActive;
 
+	enum ENEMY_TYPE
+	{
+		DEFAULT_ENEMY = 0,
+		BOSS_ENEMY,
+		MINION_ENEMY,
+		TOTAL_ENEMY
+	};
+
+	ENEMY_TYPE enemyType;
+
 protected:
 	enum DIRECTION
 	{
@@ -96,14 +106,8 @@ protected:
 		ATTACK = 2,
 		DEFEND = 3,
 		HEAL = 4,
+		SPAWN = 5,
 		NUM_FSM
-	};
-
-	enum ENEMY_TYPE
-	{
-		DEFAULT_ENEMY = 0,
-		BOSS_ENEMY,
-		TOTAL_ENEMY
 	};
 
 	glm::i32vec2 i32vec2OldIndex;
@@ -153,7 +157,6 @@ protected:
 	// Current FSM
 	FSM sCurrentFSM;
 
-	ENEMY_TYPE enemyType;
 
 	// FSM counter - count how many frames it has been in this FSM
 	int iFSMCounter;
@@ -192,6 +195,12 @@ protected:
 
 	void UpdateBossEnemy();
 
+	void UpdateMinionEnemy();
+
 	void AttackEnemy();
+
+	int iAggressionCounter = 0;
+
+	bool readyToSpawnMinion = true;
 };
 

@@ -66,6 +66,8 @@ public:
 
 	// PostRender
 	void PostRender(void);
+
+	bool SpawnEnemy(glm::i32vec2, int enemyMapNumber);
 protected:
 	// Constructor
 	CScene2D(void);
@@ -95,7 +97,7 @@ protected:
 
 	CEntityManager* cEntityManager;
 
-	vector<CEntity2D*> enemyVector;
+	vector<CEnemy2D*> enemyVector;
 
 	CInventoryManager* cInventoryManager;
 
