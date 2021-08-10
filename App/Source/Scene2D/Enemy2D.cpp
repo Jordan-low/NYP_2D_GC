@@ -719,15 +719,23 @@ bool CEnemy2D::InteractWithPlayer(void)
 		&& 
 		sCurrentFSM == ATTACK)
 	{
-		if (cPlayer2D->isSurvival)
+		if (!cPlayer2D->isSurvival)
+			return false;
+
+		switch (enemyType)
 		{
-			CSoundController::GetInstance()->PlaySoundByName("playerAttack");
+		case MINION_ENEMY:
+			cPlayer2D->health -= 1.f;
+			sCurrentFSM = IDLE;
+			break;
+		case BOSS_ENEMY:
 			cPlayer2D->health -= 10.f;
-			cout << "Gotcha!" << endl;
-			iFSMCounter = 0;
-			//// Since the player has been caught, then reset the FSM
+			sCurrentFSM = DEFEND;
+			break;
 		}
-		sCurrentFSM = DEFEND;
+		CSoundController::GetInstance()->PlaySoundByName("playerAttack");
+		cout << "Gotcha!" << endl;
+		iFSMCounter = 0;
 		return true;
 	}
 	return false;
